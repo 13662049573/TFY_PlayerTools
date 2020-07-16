@@ -1,0 +1,708 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3644636D24BFF3CD001D0DC4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3644636B24BFF3CD001D0DC4 /* Main.storyboard */; };
+		3644636F24BFF3CF001D0DC4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3644636E24BFF3CF001D0DC4 /* Assets.xcassets */; };
+		3644637224BFF3CF001D0DC4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3644637024BFF3CF001D0DC4 /* LaunchScreen.storyboard */; };
+		3644637524BFF3CF001D0DC4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3644637424BFF3CF001D0DC4 /* main.m */; };
+		3644637F24BFF3CF001D0DC4 /* TFY_PlayerToolsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3644637E24BFF3CF001D0DC4 /* TFY_PlayerToolsTests.m */; };
+		3644638A24BFF3CF001D0DC4 /* TFY_PlayerToolsUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3644638924BFF3CF001D0DC4 /* TFY_PlayerToolsUITests.m */; };
+		364463A024BFF44E001D0DC4 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3644639A24BFF44E001D0DC4 /* SceneDelegate.m */; };
+		364463A124BFF44E001D0DC4 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3644639B24BFF44E001D0DC4 /* AppDelegate.m */; };
+		364463A224BFF44E001D0DC4 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3644639E24BFF44E001D0DC4 /* ViewController.m */; };
+		364463C124BFF4A5001D0DC4 /* TFY_NetworkSpeedMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 364463A424BFF4A5001D0DC4 /* TFY_NetworkSpeedMonitor.m */; };
+		364463C224BFF4A5001D0DC4 /* TFY_PlayerBaseView.m in Sources */ = {isa = PBXBuildFile; fileRef = 364463A524BFF4A5001D0DC4 /* TFY_PlayerBaseView.m */; };
+		364463C324BFF4A5001D0DC4 /* UIScrollView+TFY_Player.m in Sources */ = {isa = PBXBuildFile; fileRef = 364463A924BFF4A5001D0DC4 /* UIScrollView+TFY_Player.m */; };
+		364463C424BFF4A5001D0DC4 /* TFY_LoadingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 364463AA24BFF4A5001D0DC4 /* TFY_LoadingView.m */; };
+		364463C524BFF4A5001D0DC4 /* TFY_AVPlayerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 364463AB24BFF4A5001D0DC4 /* TFY_AVPlayerManager.m */; };
+		364463C624BFF4A5001D0DC4 /* TFY_OrientationObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = 364463AC24BFF4A5001D0DC4 /* TFY_OrientationObserver.m */; };
+		364463C724BFF4A5001D0DC4 /* TFY_PlayerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 364463AD24BFF4A5001D0DC4 /* TFY_PlayerController.m */; };
+		364463C824BFF4A5001D0DC4 /* TFY_PlayerVideoModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 364463AF24BFF4A5001D0DC4 /* TFY_PlayerVideoModel.m */; };
+		364463C924BFF4A5001D0DC4 /* TFY_FloatView.m in Sources */ = {isa = PBXBuildFile; fileRef = 364463B124BFF4A5001D0DC4 /* TFY_FloatView.m */; };
+		364463CA24BFF4A5001D0DC4 /* TFY_ReachabilityManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 364463B524BFF4A5001D0DC4 /* TFY_ReachabilityManager.m */; };
+		364463CB24BFF4A5001D0DC4 /* TFY_PlayerNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 364463B624BFF4A5001D0DC4 /* TFY_PlayerNotification.m */; };
+		364463CC24BFF4A5001D0DC4 /* TFY_KVOController.m in Sources */ = {isa = PBXBuildFile; fileRef = 364463B924BFF4A5001D0DC4 /* TFY_KVOController.m */; };
+		364463CD24BFF4A5001D0DC4 /* TFY_PlayerGestureControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 364463BE24BFF4A5001D0DC4 /* TFY_PlayerGestureControl.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3644637B24BFF3CF001D0DC4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3644635724BFF3CD001D0DC4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3644635E24BFF3CD001D0DC4;
+			remoteInfo = TFY_PlayerTools;
+		};
+		3644638624BFF3CF001D0DC4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3644635724BFF3CD001D0DC4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3644635E24BFF3CD001D0DC4;
+			remoteInfo = TFY_PlayerTools;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		3644635F24BFF3CD001D0DC4 /* TFY_PlayerTools.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TFY_PlayerTools.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3644636C24BFF3CD001D0DC4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		3644636E24BFF3CF001D0DC4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		3644637124BFF3CF001D0DC4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		3644637324BFF3CF001D0DC4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3644637424BFF3CF001D0DC4 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		3644637A24BFF3CF001D0DC4 /* TFY_PlayerToolsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TFY_PlayerToolsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3644637E24BFF3CF001D0DC4 /* TFY_PlayerToolsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_PlayerToolsTests.m; sourceTree = "<group>"; };
+		3644638024BFF3CF001D0DC4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3644638524BFF3CF001D0DC4 /* TFY_PlayerToolsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TFY_PlayerToolsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3644638924BFF3CF001D0DC4 /* TFY_PlayerToolsUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_PlayerToolsUITests.m; sourceTree = "<group>"; };
+		3644638B24BFF3CF001D0DC4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3644639924BFF44E001D0DC4 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		3644639A24BFF44E001D0DC4 /* SceneDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
+		3644639B24BFF44E001D0DC4 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		3644639C24BFF44E001D0DC4 /* SceneDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
+		3644639E24BFF44E001D0DC4 /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		3644639F24BFF44E001D0DC4 /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		364463A424BFF4A5001D0DC4 /* TFY_NetworkSpeedMonitor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TFY_NetworkSpeedMonitor.m; sourceTree = "<group>"; };
+		364463A524BFF4A5001D0DC4 /* TFY_PlayerBaseView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TFY_PlayerBaseView.m; sourceTree = "<group>"; };
+		364463A624BFF4A5001D0DC4 /* TFY_PlayerMediaPlayback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TFY_PlayerMediaPlayback.h; sourceTree = "<group>"; };
+		364463A724BFF4A5001D0DC4 /* TFY_PlayerNotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TFY_PlayerNotification.h; sourceTree = "<group>"; };
+		364463A824BFF4A5001D0DC4 /* TFY_ReachabilityManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TFY_ReachabilityManager.h; sourceTree = "<group>"; };
+		364463A924BFF4A5001D0DC4 /* UIScrollView+TFY_Player.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIScrollView+TFY_Player.m"; sourceTree = "<group>"; };
+		364463AA24BFF4A5001D0DC4 /* TFY_LoadingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TFY_LoadingView.m; sourceTree = "<group>"; };
+		364463AB24BFF4A5001D0DC4 /* TFY_AVPlayerManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TFY_AVPlayerManager.m; sourceTree = "<group>"; };
+		364463AC24BFF4A5001D0DC4 /* TFY_OrientationObserver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TFY_OrientationObserver.m; sourceTree = "<group>"; };
+		364463AD24BFF4A5001D0DC4 /* TFY_PlayerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TFY_PlayerController.m; sourceTree = "<group>"; };
+		364463AE24BFF4A5001D0DC4 /* TFY_KVOController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TFY_KVOController.h; sourceTree = "<group>"; };
+		364463AF24BFF4A5001D0DC4 /* TFY_PlayerVideoModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TFY_PlayerVideoModel.m; sourceTree = "<group>"; };
+		364463B024BFF4A5001D0DC4 /* TFY_PlayerGestureControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TFY_PlayerGestureControl.h; sourceTree = "<group>"; };
+		364463B124BFF4A5001D0DC4 /* TFY_FloatView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TFY_FloatView.m; sourceTree = "<group>"; };
+		364463B224BFF4A5001D0DC4 /* TFY_AVPlayerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TFY_AVPlayerManager.h; sourceTree = "<group>"; };
+		364463B324BFF4A5001D0DC4 /* TFY_LoadingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TFY_LoadingView.h; sourceTree = "<group>"; };
+		364463B424BFF4A5001D0DC4 /* UIScrollView+TFY_Player.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIScrollView+TFY_Player.h"; sourceTree = "<group>"; };
+		364463B524BFF4A5001D0DC4 /* TFY_ReachabilityManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TFY_ReachabilityManager.m; sourceTree = "<group>"; };
+		364463B624BFF4A5001D0DC4 /* TFY_PlayerNotification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TFY_PlayerNotification.m; sourceTree = "<group>"; };
+		364463B724BFF4A5001D0DC4 /* TFY_NetworkSpeedMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TFY_NetworkSpeedMonitor.h; sourceTree = "<group>"; };
+		364463B824BFF4A5001D0DC4 /* TFY_PlayerBaseView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TFY_PlayerBaseView.h; sourceTree = "<group>"; };
+		364463B924BFF4A5001D0DC4 /* TFY_KVOController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TFY_KVOController.m; sourceTree = "<group>"; };
+		364463BA24BFF4A5001D0DC4 /* TFY_PlayerMediaControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TFY_PlayerMediaControl.h; sourceTree = "<group>"; };
+		364463BB24BFF4A5001D0DC4 /* TFY_OrientationObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TFY_OrientationObserver.h; sourceTree = "<group>"; };
+		364463BC24BFF4A5001D0DC4 /* TFY_PlayerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TFY_PlayerController.h; sourceTree = "<group>"; };
+		364463BD24BFF4A5001D0DC4 /* TFY_PlayerToolsHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TFY_PlayerToolsHeader.h; sourceTree = "<group>"; };
+		364463BE24BFF4A5001D0DC4 /* TFY_PlayerGestureControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TFY_PlayerGestureControl.m; sourceTree = "<group>"; };
+		364463BF24BFF4A5001D0DC4 /* TFY_FloatView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TFY_FloatView.h; sourceTree = "<group>"; };
+		364463C024BFF4A5001D0DC4 /* TFY_PlayerVideoModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TFY_PlayerVideoModel.h; sourceTree = "<group>"; };
+		364463CE24BFF4C8001D0DC4 /* TFY_PlayerToolsKitHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_PlayerToolsKitHeader.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3644635C24BFF3CD001D0DC4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3644637724BFF3CF001D0DC4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3644638224BFF3CF001D0DC4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3644635624BFF3CD001D0DC4 = {
+			isa = PBXGroup;
+			children = (
+				3644636124BFF3CD001D0DC4 /* TFY_PlayerTools */,
+				3644637D24BFF3CF001D0DC4 /* TFY_PlayerToolsTests */,
+				3644638824BFF3CF001D0DC4 /* TFY_PlayerToolsUITests */,
+				3644636024BFF3CD001D0DC4 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		3644636024BFF3CD001D0DC4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3644635F24BFF3CD001D0DC4 /* TFY_PlayerTools.app */,
+				3644637A24BFF3CF001D0DC4 /* TFY_PlayerToolsTests.xctest */,
+				3644638524BFF3CF001D0DC4 /* TFY_PlayerToolsUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3644636124BFF3CD001D0DC4 /* TFY_PlayerTools */ = {
+			isa = PBXGroup;
+			children = (
+				3644639824BFF44D001D0DC4 /* TFY_AppDelegate */,
+				3644639D24BFF44E001D0DC4 /* TFY_Class */,
+				3644639724BFF44D001D0DC4 /* TFY_PlayerToolsKit */,
+				3644636B24BFF3CD001D0DC4 /* Main.storyboard */,
+				3644636E24BFF3CF001D0DC4 /* Assets.xcassets */,
+				3644637024BFF3CF001D0DC4 /* LaunchScreen.storyboard */,
+				3644637324BFF3CF001D0DC4 /* Info.plist */,
+				3644637424BFF3CF001D0DC4 /* main.m */,
+			);
+			path = TFY_PlayerTools;
+			sourceTree = "<group>";
+		};
+		3644637D24BFF3CF001D0DC4 /* TFY_PlayerToolsTests */ = {
+			isa = PBXGroup;
+			children = (
+				3644637E24BFF3CF001D0DC4 /* TFY_PlayerToolsTests.m */,
+				3644638024BFF3CF001D0DC4 /* Info.plist */,
+			);
+			path = TFY_PlayerToolsTests;
+			sourceTree = "<group>";
+		};
+		3644638824BFF3CF001D0DC4 /* TFY_PlayerToolsUITests */ = {
+			isa = PBXGroup;
+			children = (
+				3644638924BFF3CF001D0DC4 /* TFY_PlayerToolsUITests.m */,
+				3644638B24BFF3CF001D0DC4 /* Info.plist */,
+			);
+			path = TFY_PlayerToolsUITests;
+			sourceTree = "<group>";
+		};
+		3644639724BFF44D001D0DC4 /* TFY_PlayerToolsKit */ = {
+			isa = PBXGroup;
+			children = (
+				364463CE24BFF4C8001D0DC4 /* TFY_PlayerToolsKitHeader.h */,
+				364463A324BFF4A5001D0DC4 /* TFY_PlayerTool */,
+			);
+			path = TFY_PlayerToolsKit;
+			sourceTree = "<group>";
+		};
+		3644639824BFF44D001D0DC4 /* TFY_AppDelegate */ = {
+			isa = PBXGroup;
+			children = (
+				3644639924BFF44E001D0DC4 /* AppDelegate.h */,
+				3644639B24BFF44E001D0DC4 /* AppDelegate.m */,
+				3644639C24BFF44E001D0DC4 /* SceneDelegate.h */,
+				3644639A24BFF44E001D0DC4 /* SceneDelegate.m */,
+			);
+			path = TFY_AppDelegate;
+			sourceTree = "<group>";
+		};
+		3644639D24BFF44E001D0DC4 /* TFY_Class */ = {
+			isa = PBXGroup;
+			children = (
+				3644639F24BFF44E001D0DC4 /* ViewController.h */,
+				3644639E24BFF44E001D0DC4 /* ViewController.m */,
+			);
+			path = TFY_Class;
+			sourceTree = "<group>";
+		};
+		364463A324BFF4A5001D0DC4 /* TFY_PlayerTool */ = {
+			isa = PBXGroup;
+			children = (
+				364463BD24BFF4A5001D0DC4 /* TFY_PlayerToolsHeader.h */,
+				364463A624BFF4A5001D0DC4 /* TFY_PlayerMediaPlayback.h */,
+				364463BA24BFF4A5001D0DC4 /* TFY_PlayerMediaControl.h */,
+				364463BF24BFF4A5001D0DC4 /* TFY_FloatView.h */,
+				364463B124BFF4A5001D0DC4 /* TFY_FloatView.m */,
+				364463B324BFF4A5001D0DC4 /* TFY_LoadingView.h */,
+				364463AA24BFF4A5001D0DC4 /* TFY_LoadingView.m */,
+				364463B824BFF4A5001D0DC4 /* TFY_PlayerBaseView.h */,
+				364463A524BFF4A5001D0DC4 /* TFY_PlayerBaseView.m */,
+				364463AE24BFF4A5001D0DC4 /* TFY_KVOController.h */,
+				364463B924BFF4A5001D0DC4 /* TFY_KVOController.m */,
+				364463A724BFF4A5001D0DC4 /* TFY_PlayerNotification.h */,
+				364463B624BFF4A5001D0DC4 /* TFY_PlayerNotification.m */,
+				364463B724BFF4A5001D0DC4 /* TFY_NetworkSpeedMonitor.h */,
+				364463A424BFF4A5001D0DC4 /* TFY_NetworkSpeedMonitor.m */,
+				364463A824BFF4A5001D0DC4 /* TFY_ReachabilityManager.h */,
+				364463B524BFF4A5001D0DC4 /* TFY_ReachabilityManager.m */,
+				364463B024BFF4A5001D0DC4 /* TFY_PlayerGestureControl.h */,
+				364463BE24BFF4A5001D0DC4 /* TFY_PlayerGestureControl.m */,
+				364463BC24BFF4A5001D0DC4 /* TFY_PlayerController.h */,
+				364463AD24BFF4A5001D0DC4 /* TFY_PlayerController.m */,
+				364463C024BFF4A5001D0DC4 /* TFY_PlayerVideoModel.h */,
+				364463AF24BFF4A5001D0DC4 /* TFY_PlayerVideoModel.m */,
+				364463B224BFF4A5001D0DC4 /* TFY_AVPlayerManager.h */,
+				364463AB24BFF4A5001D0DC4 /* TFY_AVPlayerManager.m */,
+				364463BB24BFF4A5001D0DC4 /* TFY_OrientationObserver.h */,
+				364463AC24BFF4A5001D0DC4 /* TFY_OrientationObserver.m */,
+				364463B424BFF4A5001D0DC4 /* UIScrollView+TFY_Player.h */,
+				364463A924BFF4A5001D0DC4 /* UIScrollView+TFY_Player.m */,
+			);
+			path = TFY_PlayerTool;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3644635E24BFF3CD001D0DC4 /* TFY_PlayerTools */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3644638E24BFF3CF001D0DC4 /* Build configuration list for PBXNativeTarget "TFY_PlayerTools" */;
+			buildPhases = (
+				3644635B24BFF3CD001D0DC4 /* Sources */,
+				3644635C24BFF3CD001D0DC4 /* Frameworks */,
+				3644635D24BFF3CD001D0DC4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TFY_PlayerTools;
+			productName = TFY_PlayerTools;
+			productReference = 3644635F24BFF3CD001D0DC4 /* TFY_PlayerTools.app */;
+			productType = "com.apple.product-type.application";
+		};
+		3644637924BFF3CF001D0DC4 /* TFY_PlayerToolsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3644639124BFF3CF001D0DC4 /* Build configuration list for PBXNativeTarget "TFY_PlayerToolsTests" */;
+			buildPhases = (
+				3644637624BFF3CF001D0DC4 /* Sources */,
+				3644637724BFF3CF001D0DC4 /* Frameworks */,
+				3644637824BFF3CF001D0DC4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3644637C24BFF3CF001D0DC4 /* PBXTargetDependency */,
+			);
+			name = TFY_PlayerToolsTests;
+			productName = TFY_PlayerToolsTests;
+			productReference = 3644637A24BFF3CF001D0DC4 /* TFY_PlayerToolsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		3644638424BFF3CF001D0DC4 /* TFY_PlayerToolsUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3644639424BFF3CF001D0DC4 /* Build configuration list for PBXNativeTarget "TFY_PlayerToolsUITests" */;
+			buildPhases = (
+				3644638124BFF3CF001D0DC4 /* Sources */,
+				3644638224BFF3CF001D0DC4 /* Frameworks */,
+				3644638324BFF3CF001D0DC4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3644638724BFF3CF001D0DC4 /* PBXTargetDependency */,
+			);
+			name = TFY_PlayerToolsUITests;
+			productName = TFY_PlayerToolsUITests;
+			productReference = 3644638524BFF3CF001D0DC4 /* TFY_PlayerToolsUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3644635724BFF3CD001D0DC4 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1160;
+				ORGANIZATIONNAME = "田风有";
+				TargetAttributes = {
+					3644635E24BFF3CD001D0DC4 = {
+						CreatedOnToolsVersion = 11.6;
+					};
+					3644637924BFF3CF001D0DC4 = {
+						CreatedOnToolsVersion = 11.6;
+						TestTargetID = 3644635E24BFF3CD001D0DC4;
+					};
+					3644638424BFF3CF001D0DC4 = {
+						CreatedOnToolsVersion = 11.6;
+						TestTargetID = 3644635E24BFF3CD001D0DC4;
+					};
+				};
+			};
+			buildConfigurationList = 3644635A24BFF3CD001D0DC4 /* Build configuration list for PBXProject "TFY_PlayerTools" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 3644635624BFF3CD001D0DC4;
+			productRefGroup = 3644636024BFF3CD001D0DC4 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				3644635E24BFF3CD001D0DC4 /* TFY_PlayerTools */,
+				3644637924BFF3CF001D0DC4 /* TFY_PlayerToolsTests */,
+				3644638424BFF3CF001D0DC4 /* TFY_PlayerToolsUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3644635D24BFF3CD001D0DC4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3644637224BFF3CF001D0DC4 /* LaunchScreen.storyboard in Resources */,
+				3644636F24BFF3CF001D0DC4 /* Assets.xcassets in Resources */,
+				3644636D24BFF3CD001D0DC4 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3644637824BFF3CF001D0DC4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3644638324BFF3CF001D0DC4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3644635B24BFF3CD001D0DC4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				364463C824BFF4A5001D0DC4 /* TFY_PlayerVideoModel.m in Sources */,
+				364463C124BFF4A5001D0DC4 /* TFY_NetworkSpeedMonitor.m in Sources */,
+				364463C524BFF4A5001D0DC4 /* TFY_AVPlayerManager.m in Sources */,
+				3644637524BFF3CF001D0DC4 /* main.m in Sources */,
+				364463CC24BFF4A5001D0DC4 /* TFY_KVOController.m in Sources */,
+				364463A024BFF44E001D0DC4 /* SceneDelegate.m in Sources */,
+				364463A224BFF44E001D0DC4 /* ViewController.m in Sources */,
+				364463C224BFF4A5001D0DC4 /* TFY_PlayerBaseView.m in Sources */,
+				364463C724BFF4A5001D0DC4 /* TFY_PlayerController.m in Sources */,
+				364463CA24BFF4A5001D0DC4 /* TFY_ReachabilityManager.m in Sources */,
+				364463C324BFF4A5001D0DC4 /* UIScrollView+TFY_Player.m in Sources */,
+				364463C924BFF4A5001D0DC4 /* TFY_FloatView.m in Sources */,
+				364463A124BFF44E001D0DC4 /* AppDelegate.m in Sources */,
+				364463C624BFF4A5001D0DC4 /* TFY_OrientationObserver.m in Sources */,
+				364463CD24BFF4A5001D0DC4 /* TFY_PlayerGestureControl.m in Sources */,
+				364463CB24BFF4A5001D0DC4 /* TFY_PlayerNotification.m in Sources */,
+				364463C424BFF4A5001D0DC4 /* TFY_LoadingView.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3644637624BFF3CF001D0DC4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3644637F24BFF3CF001D0DC4 /* TFY_PlayerToolsTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3644638124BFF3CF001D0DC4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3644638A24BFF3CF001D0DC4 /* TFY_PlayerToolsUITests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3644637C24BFF3CF001D0DC4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3644635E24BFF3CD001D0DC4 /* TFY_PlayerTools */;
+			targetProxy = 3644637B24BFF3CF001D0DC4 /* PBXContainerItemProxy */;
+		};
+		3644638724BFF3CF001D0DC4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3644635E24BFF3CD001D0DC4 /* TFY_PlayerTools */;
+			targetProxy = 3644638624BFF3CF001D0DC4 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		3644636B24BFF3CD001D0DC4 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3644636C24BFF3CD001D0DC4 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		3644637024BFF3CF001D0DC4 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3644637124BFF3CF001D0DC4 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		3644638C24BFF3CF001D0DC4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		3644638D24BFF3CF001D0DC4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		3644638F24BFF3CF001D0DC4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1.0.0;
+				INFOPLIST_FILE = TFY_PlayerTools/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.TFYCompany.TFY-PlayerTools";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		3644639024BFF3CF001D0DC4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1.0.0;
+				INFOPLIST_FILE = TFY_PlayerTools/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.TFYCompany.TFY-PlayerTools";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		3644639224BFF3CF001D0DC4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = TFY_PlayerToolsTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.TFYCompany.TFY-PlayerToolsTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TFY_PlayerTools.app/TFY_PlayerTools";
+			};
+			name = Debug;
+		};
+		3644639324BFF3CF001D0DC4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = TFY_PlayerToolsTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.TFYCompany.TFY-PlayerToolsTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TFY_PlayerTools.app/TFY_PlayerTools";
+			};
+			name = Release;
+		};
+		3644639524BFF3CF001D0DC4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = TFY_PlayerToolsUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.TFYCompany.TFY-PlayerToolsUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = TFY_PlayerTools;
+			};
+			name = Debug;
+		};
+		3644639624BFF3CF001D0DC4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = TFY_PlayerToolsUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.TFYCompany.TFY-PlayerToolsUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = TFY_PlayerTools;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3644635A24BFF3CD001D0DC4 /* Build configuration list for PBXProject "TFY_PlayerTools" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3644638C24BFF3CF001D0DC4 /* Debug */,
+				3644638D24BFF3CF001D0DC4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3644638E24BFF3CF001D0DC4 /* Build configuration list for PBXNativeTarget "TFY_PlayerTools" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3644638F24BFF3CF001D0DC4 /* Debug */,
+				3644639024BFF3CF001D0DC4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3644639124BFF3CF001D0DC4 /* Build configuration list for PBXNativeTarget "TFY_PlayerToolsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3644639224BFF3CF001D0DC4 /* Debug */,
+				3644639324BFF3CF001D0DC4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3644639424BFF3CF001D0DC4 /* Build configuration list for PBXNativeTarget "TFY_PlayerToolsUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3644639524BFF3CF001D0DC4 /* Debug */,
+				3644639624BFF3CF001D0DC4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 3644635724BFF3CD001D0DC4 /* Project object */;
+}
