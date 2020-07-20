@@ -392,7 +392,7 @@ static NSString *const kPresentationSize         = @"presentationSize";
     [_playerItemKVO safelyAddObserver:self forKeyPath:kPresentationSize options:NSKeyValueObservingOptionNew context:@""];
     
     CMTime interval = CMTimeMakeWithSeconds(self.timeRefreshInterval > 0 ? self.timeRefreshInterval : 0.1, NSEC_PER_SEC);
-    TFY_PLAYER_WS(myself);
+    Player_WS(myself);
     _timeObserver = [self.player addPeriodicTimeObserverForInterval:interval queue:dispatch_get_main_queue() usingBlock:^(CMTime time) {
         
         if (!myself) return;

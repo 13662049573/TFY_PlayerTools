@@ -12,6 +12,7 @@
 #import "TFY_KVOController.h"
 #import "TFY_PlayerToolsHeader.h"
 
+#define Player_WS(weakSelf)  __weak __typeof(&*self)weakSelf = self;
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored"-Wdeprecated-declarations"
@@ -334,7 +335,7 @@
     __block NSIndexPath *finalIndexPath = nil;
     /// 距离中心线的最终距离。
     __block CGFloat finalSpace = 0;
-    TFY_PLAYER_WS(myself);
+    Player_WS(myself);
     [cells enumerateObjectsUsingBlock:^(UIView *cell, NSUInteger idx, BOOL * _Nonnull stop) {
         
         UIView *playerView = [cell viewWithTag:myself.tfy_containerViewTag];
@@ -456,7 +457,7 @@
     __block NSIndexPath *finalIndexPath = nil;
     /// 距离中心线的最终距离。
     __block CGFloat finalSpace = 0;
-    TFY_PLAYER_WS(myself);
+    Player_WS(myself);
     [cells enumerateObjectsUsingBlock:^(UIView *cell, NSUInteger idx, BOOL * _Nonnull stop) {
         
         UIView *playerView = [cell viewWithTag:myself.tfy_containerViewTag];
@@ -525,7 +526,7 @@
 
 - (void)tfy_filterShouldPlayCellWhileScrolled:(void (^ __nullable)(NSIndexPath *indexPath))handler {
     if (!self.tfy_shouldAutoPlay) return;
-    TFY_PLAYER_WS(myself);
+    Player_WS(myself);
     [self tfy_filterShouldPlayCellWhileScrolling:^(NSIndexPath *indexPath) {
         
         /// 如果当前控制器已经消失，直接return

@@ -168,11 +168,11 @@
 
 - (void)sliderTouchEnded:(float)value {
     if (self.player.totalTime > 0) {
-        PLAYER_WS(myself);
+        
         [self.player seekToTime:self.player.totalTime*value completionHandler:^(BOOL finished) {
            
             if (finished) {
-                myself.slider.isdragging = NO;
+                self.slider.isdragging = NO;
             }
         }];
         if (self.seekToPlay) {
@@ -198,12 +198,12 @@
 - (void)sliderTapped:(float)value {
     if (self.player.totalTime > 0) {
         self.slider.isdragging = YES;
-        PLAYER_WS(myself);
+        
         [self.player seekToTime:self.player.totalTime*value completionHandler:^(BOOL finished) {
             
             if (finished) {
-                myself.slider.isdragging = NO;
-                [myself.player.currentPlayerManager play];
+                self.slider.isdragging = NO;
+                [self.player.currentPlayerManager play];
             }
         }];
     } else {

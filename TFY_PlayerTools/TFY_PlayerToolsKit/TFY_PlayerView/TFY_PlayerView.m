@@ -377,14 +377,14 @@
 
 /// 滑动结束手势事件
 - (void)gestureEndedPan:(TFY_PlayerGestureControl *)gestureControl panDirection:(PanDirection)direction panLocation:(PanLocation)location {
-    PLAYER_WS(myself);
+    
     if (direction == PanDirectionH && self.sumTime >= 0 && self.player.totalTime > 0) {
         [self.player seekToTime:self.sumTime completionHandler:^(BOOL finished) {
             /// 左右滑动调节播放进度
-            [myself.portraitControlView sliderChangeEnded];
-            [myself.landScapeControlView sliderChangeEnded];
-            if (myself.controlViewAppeared) {
-                [myself autoFadeOutControlView];
+            [self.portraitControlView sliderChangeEnded];
+            [self.landScapeControlView sliderChangeEnded];
+            if (self.controlViewAppeared) {
+                [self autoFadeOutControlView];
             }
         }];
         if (self.seekToPlay) {
