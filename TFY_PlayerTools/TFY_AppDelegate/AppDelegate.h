@@ -10,6 +10,11 @@
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
+@property (strong, nonatomic) UIWindow * window;
+
+@property (nonatomic, assign)BOOL enablePortrait;
+
+@property (nonatomic, assign)BOOL lockedScreen;
 
 @end
 

@@ -1,0 +1,13 @@
+${PODS_ROOT}/Target Support Files/Pods-TFY_PlayerTools-TFY_PlayerToolsUITests/Pods-TFY_PlayerTools-TFY_PlayerToolsUITests-frameworks.sh
+${BUILT_PRODUCTS_DIR}/AFNetworking/AFNetworking.framework
+${BUILT_PRODUCTS_DIR}/IQKeyboardManager/IQKeyboardManager.framework
+${BUILT_PRODUCTS_DIR}/MJRefresh/MJRefresh.framework
+${BUILT_PRODUCTS_DIR}/ReactiveObjC/ReactiveObjC.framework
+${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework
+${BUILT_PRODUCTS_DIR}/TFY_AutoLayout/TFY_AutoLayout.framework
+${BUILT_PRODUCTS_DIR}/TFY_Category/TFY_Category.framework
+${BUILT_PRODUCTS_DIR}/TFY_Model/TFY_Model.framework
+${BUILT_PRODUCTS_DIR}/TFY_Navigation/TFY_Navigation.framework
+${BUILT_PRODUCTS_DIR}/TFY_ProgressHUD/TFY_ProgressHUD.framework
+${BUILT_PRODUCTS_DIR}/TFY_SimplifytableViewKit/TFY_SimplifytableViewKit.framework
+${BUILT_PRODUCTS_DIR}/TFY_TabBarKit/TFY_TabBarKit.framework

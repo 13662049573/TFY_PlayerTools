@@ -635,7 +635,7 @@
 
 - (BOOL)tfy_shouldAutoPlay {
     NSNumber *number = objc_getAssociatedObject(self, _cmd);
-    if (number.boolValue) return number.boolValue;
+    if (number) return number.boolValue;
     self.tfy_shouldAutoPlay = YES;
     return YES;
 }

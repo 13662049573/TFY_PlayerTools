@@ -18,10 +18,13 @@ FOUNDATION_EXPORT const unsigned char TFY_AutoLayoutVersionString[];
 #if TFY_AutoLayoutKitRelease
 
 #import <TFY_PlayerTool/TFY_PlayerToolsHeader.h>
+#import <TFY_PlayerView/TFY_PlayerView.h>
+
 
 #else
 
 #import "TFY_PlayerToolsHeader.h"
+#import "TFY_PlayerView.h"
 
 #endif
 

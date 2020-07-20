@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  你需要适合的控制器，或者默认图片View
  */
-@property (nonatomic, strong) UIView *imageView;
+@property (nonatomic, strong) UIView *containerView;
 /**
  *  播放速度，0.5 ... 2
  */

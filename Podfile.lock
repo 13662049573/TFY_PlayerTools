@@ -1,0 +1,99 @@
+PODS:
+  - AFNetworking (4.0.1):
+    - AFNetworking/NSURLSession (= 4.0.1)
+    - AFNetworking/Reachability (= 4.0.1)
+    - AFNetworking/Security (= 4.0.1)
+    - AFNetworking/Serialization (= 4.0.1)
+    - AFNetworking/UIKit (= 4.0.1)
+  - AFNetworking/NSURLSession (4.0.1):
+    - AFNetworking/Reachability
+    - AFNetworking/Security
+    - AFNetworking/Serialization
+  - AFNetworking/Reachability (4.0.1)
+  - AFNetworking/Security (4.0.1)
+  - AFNetworking/Serialization (4.0.1)
+  - AFNetworking/UIKit (4.0.1):
+    - AFNetworking/NSURLSession
+  - IQKeyboardManager (6.5.5)
+  - MJRefresh (3.4.3)
+  - ReactiveObjC (3.1.1)
+  - SDWebImage (5.8.3):
+    - SDWebImage/Core (= 5.8.3)
+  - SDWebImage/Core (5.8.3)
+  - TFY_AutoLayout (2.6.0):
+    - TFY_AutoLayout/IOS_Layout (= 2.6.0)
+    - TFY_AutoLayout/MAC_Layout (= 2.6.0)
+    - TFY_AutoLayout/Util (= 2.6.0)
+  - TFY_AutoLayout/IOS_Layout (2.6.0):
+    - TFY_AutoLayout/Util
+  - TFY_AutoLayout/MAC_Layout (2.6.0):
+    - TFY_AutoLayout/Util
+  - TFY_AutoLayout/Util (2.6.0)
+  - TFY_Category (3.4.0):
+    - TFY_Category/TFY_Foundation (= 3.4.0)
+    - TFY_Category/TFY_ITools (= 3.4.0)
+    - TFY_Category/TFY_UI (= 3.4.0)
+  - TFY_Category/TFY_Foundation (3.4.0)
+  - TFY_Category/TFY_ITools (3.4.0)
+  - TFY_Category/TFY_UI (3.4.0)
+  - TFY_Model (2.7.4)
+  - TFY_Navigation (2.3.4):
+    - TFY_Navigation/TFY_NavControoler (= 2.3.4)
+    - TFY_Navigation/TFY_PageController (= 2.3.4)
+    - TFY_Navigation/TFY_PopController (= 2.3.4)
+  - TFY_Navigation/TFY_NavControoler (2.3.4):
+    - TFY_Navigation/TFY_PopController
+  - TFY_Navigation/TFY_PageController (2.3.4)
+  - TFY_Navigation/TFY_PopController (2.3.4)
+  - TFY_ProgressHUD (2.3.9)
+  - TFY_SimplifytableViewKit (2.1.8)
+  - TFY_TabBarKit (1.1.0):
+    - TFY_TabBarKit/TFY_SystemTabBar (= 1.1.0)
+  - TFY_TabBarKit/TFY_SystemTabBar (1.1.0)
+
+DEPENDENCIES:
+  - AFNetworking
+  - IQKeyboardManager
+  - MJRefresh
+  - ReactiveObjC
+  - SDWebImage
+  - TFY_AutoLayout
+  - TFY_Category
+  - TFY_Model
+  - TFY_Navigation
+  - TFY_ProgressHUD
+  - TFY_SimplifytableViewKit
+  - TFY_TabBarKit
+
+SPEC REPOS:
+  trunk:
+    - AFNetworking
+    - IQKeyboardManager
+    - MJRefresh
+    - ReactiveObjC
+    - SDWebImage
+    - TFY_AutoLayout
+    - TFY_Category
+    - TFY_Model
+    - TFY_Navigation
+    - TFY_ProgressHUD
+    - TFY_SimplifytableViewKit
+    - TFY_TabBarKit
+
+SPEC CHECKSUMS:
+  AFNetworking: 7864c38297c79aaca1500c33288e429c3451fdce
+  IQKeyboardManager: 3a8b9e603f8b0eeaf5f096a1f2b2cfcf121992ef
+  MJRefresh: 53e3e3219f204425ee6d3e62e8733d3295944cd6
+  ReactiveObjC: 011caa393aa0383245f2dcf9bf02e86b80b36040
+  SDWebImage: 112503ec94a5a2a41869503844a15e8d8f1ead5c
+  TFY_AutoLayout: ef69f4a2b3892931a80dc80421ecaa758e96a558
+  TFY_Category: d529c5981c30fb72031e431c40d923c0aae96b08
+  TFY_Model: 53314bb37e6f9d1b82c31eb316d0117ca67b376c
+  TFY_Navigation: 9f8631e7650b800f161cfbf5df357271f23e6a90
+  TFY_ProgressHUD: f0201d5f5be0784435e23d385687572ab16410a4
+  TFY_SimplifytableViewKit: 89e6d40925eae80ca5ee9a2fb129bd584c86c72f
+  TFY_TabBarKit: 848611ba5fb4dabb7215bdd709a71dbbeed344ba
+
+PODFILE CHECKSUM: 3f9dfc48fe11e1bd9b048542dd518689d06ab262
+
+COCOAPODS: 1.9.3

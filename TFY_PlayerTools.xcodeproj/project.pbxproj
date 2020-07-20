@@ -3,11 +3,10 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3644636D24BFF3CD001D0DC4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3644636B24BFF3CD001D0DC4 /* Main.storyboard */; };
 		3644636F24BFF3CF001D0DC4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3644636E24BFF3CF001D0DC4 /* Assets.xcassets */; };
 		3644637224BFF3CF001D0DC4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3644637024BFF3CF001D0DC4 /* LaunchScreen.storyboard */; };
 		3644637524BFF3CF001D0DC4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3644637424BFF3CF001D0DC4 /* main.m */; };
@@ -15,7 +14,6 @@
 		3644638A24BFF3CF001D0DC4 /* TFY_PlayerToolsUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3644638924BFF3CF001D0DC4 /* TFY_PlayerToolsUITests.m */; };
 		364463A024BFF44E001D0DC4 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3644639A24BFF44E001D0DC4 /* SceneDelegate.m */; };
 		364463A124BFF44E001D0DC4 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3644639B24BFF44E001D0DC4 /* AppDelegate.m */; };
-		364463A224BFF44E001D0DC4 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3644639E24BFF44E001D0DC4 /* ViewController.m */; };
 		364463C124BFF4A5001D0DC4 /* TFY_NetworkSpeedMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 364463A424BFF4A5001D0DC4 /* TFY_NetworkSpeedMonitor.m */; };
 		364463C224BFF4A5001D0DC4 /* TFY_PlayerBaseView.m in Sources */ = {isa = PBXBuildFile; fileRef = 364463A524BFF4A5001D0DC4 /* TFY_PlayerBaseView.m */; };
 		364463C324BFF4A5001D0DC4 /* UIScrollView+TFY_Player.m in Sources */ = {isa = PBXBuildFile; fileRef = 364463A924BFF4A5001D0DC4 /* UIScrollView+TFY_Player.m */; };
@@ -29,6 +27,61 @@
 		364463CB24BFF4A5001D0DC4 /* TFY_PlayerNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 364463B624BFF4A5001D0DC4 /* TFY_PlayerNotification.m */; };
 		364463CC24BFF4A5001D0DC4 /* TFY_KVOController.m in Sources */ = {isa = PBXBuildFile; fileRef = 364463B924BFF4A5001D0DC4 /* TFY_KVOController.m */; };
 		364463CD24BFF4A5001D0DC4 /* TFY_PlayerGestureControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 364463BE24BFF4A5001D0DC4 /* TFY_PlayerGestureControl.m */; };
+		364D74AC24C3073200ECC7E9 /* TFY_CollectionController.m in Sources */ = {isa = PBXBuildFile; fileRef = 364D74AB24C3073200ECC7E9 /* TFY_CollectionController.m */; };
+		364D74AF24C3076A00ECC7E9 /* TFY_CollectionCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 364D74AE24C3076A00ECC7E9 /* TFY_CollectionCell.m */; };
+		364D74B324C3132C00ECC7E9 /* TFY_ScrollViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 364D74B224C3132C00ECC7E9 /* TFY_ScrollViewController.m */; };
+		3662A15824C4329E00ABD124 /* TFY_NotAutoPlayController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3662A15724C4329E00ABD124 /* TFY_NotAutoPlayController.m */; };
+		3662A16124C4375C00ABD124 /* TFY_LightController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3662A16024C4375C00ABD124 /* TFY_LightController.m */; };
+		3662A16624C437A600ABD124 /* TFY_LightTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 3662A16524C437A600ABD124 /* TFY_LightTableViewCell.m */; };
+		3662A16A24C4494500ABD124 /* TFY_SmallPlayController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3662A16924C4494500ABD124 /* TFY_SmallPlayController.m */; };
+		3662A16D24C456AF00ABD124 /* TFY_DouYinController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3662A16C24C456AF00ABD124 /* TFY_DouYinController.m */; };
+		3662A17024C4580800ABD124 /* TFY_DouYinPlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3662A16F24C4580800ABD124 /* TFY_DouYinPlayerView.m */; };
+		3662A17324C45B3500ABD124 /* TFY_DouYinViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 3662A17224C45B3500ABD124 /* TFY_DouYinViewCell.m */; };
+		3671A2CD24C19A0E0010728D /* LM_TabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A2C224C19A0E0010728D /* LM_TabBarController.m */; };
+		3671A2CE24C19A0E0010728D /* BaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A2C624C19A0E0010728D /* BaseViewController.m */; };
+		3671A2CF24C19A0E0010728D /* BaseTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A2C724C19A0E0010728D /* BaseTableView.m */; };
+		3671A2D024C19A0E0010728D /* BaseCollectionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A2C924C19A0E0010728D /* BaseCollectionView.m */; };
+		3671A2D124C19A0E0010728D /* UIResponder+LM_Navigation.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A2CB24C19A0E0010728D /* UIResponder+LM_Navigation.m */; };
+		3671A2DE24C19ADE0010728D /* LX_CalendarController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A2D324C19ADE0010728D /* LX_CalendarController.m */; };
+		3671A2DF24C19ADE0010728D /* LX_CurveController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A2D724C19ADE0010728D /* LX_CurveController.m */; };
+		3671A2E024C19ADE0010728D /* LX_MineController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A2DA24C19ADE0010728D /* LX_MineController.m */; };
+		3671A2E124C19ADE0010728D /* LX_HomeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A2DD24C19ADE0010728D /* LX_HomeController.m */; };
+		3671A2EC24C1A0000010728D /* PlayerAController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A2EB24C1A0000010728D /* PlayerAController.m */; };
+		3671A2F024C1A3410010728D /* UIView+PlayerFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A2EF24C1A3410010728D /* UIView+PlayerFrame.m */; };
+		3671A2F324C1A8D10010728D /* UIImageView+PlayerImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A2F224C1A8D10010728D /* UIImageView+PlayerImageView.m */; };
+		3671A2F624C1AC560010728D /* TFY_SliderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A2F524C1AC560010728D /* TFY_SliderView.m */; };
+		3671A2F924C1ADCC0010728D /* TFY_SmallFloatControlView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A2F824C1ADCC0010728D /* TFY_SmallFloatControlView.m */; };
+		3671A2FB24C1AF640010728D /* videoImages.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 3671A2FA24C1AF630010728D /* videoImages.bundle */; };
+		3671A2FE24C1AFB80010728D /* TFY_ITools.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A2FD24C1AFB80010728D /* TFY_ITools.m */; };
+		3671A30124C1B12A0010728D /* TFY_VolumeBrightnessView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A30024C1B12A0010728D /* TFY_VolumeBrightnessView.m */; };
+		3671A30424C1B3E60010728D /* TFY_SpeedLoadingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A30324C1B3E60010728D /* TFY_SpeedLoadingView.m */; };
+		3671A30724C1B5450010728D /* TFY_PortraitView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A30624C1B5450010728D /* TFY_PortraitView.m */; };
+		3671A30A24C1B5870010728D /* TFY_PlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A30924C1B5870010728D /* TFY_PlayerView.m */; };
+		3671A30D24C1B5A80010728D /* TFY_LandScapeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A30C24C1B5A80010728D /* TFY_LandScapeView.m */; };
+		3671A31124C1C9000010728D /* TFY_NoramlController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A31024C1C9000010728D /* TFY_NoramlController.m */; };
+		3671A31324C1DEE90010728D /* Playerdata.json in Resources */ = {isa = PBXBuildFile; fileRef = 3671A31224C1DEE90010728D /* Playerdata.json */; };
+		3671A31624C1DFAF0010728D /* TFY_RootModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A31424C1DFAF0010728D /* TFY_RootModel.m */; };
+		3671A31A24C1E14E0010728D /* TFY_AutoPlayerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A31924C1E14E0010728D /* TFY_AutoPlayerController.m */; };
+		3671A31D24C1E9B00010728D /* TFY_AutoPlayerCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A31C24C1E9B00010728D /* TFY_AutoPlayerCell.m */; };
+		368831A724C517FE00869B42 /* TFY_TableHeaderController.m in Sources */ = {isa = PBXBuildFile; fileRef = 368831A624C517FE00869B42 /* TFY_TableHeaderController.m */; };
+		368831AA24C5186F00869B42 /* TFY_TableHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 368831A924C5186F00869B42 /* TFY_TableHeaderView.m */; };
+		368831AD24C5192B00869B42 /* TFY_HerderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 368831AC24C5192B00869B42 /* TFY_HerderTableViewCell.m */; };
+		368831B524C525E400869B42 /* TFY_CollectionBController.m in Sources */ = {isa = PBXBuildFile; fileRef = 368831B424C525E400869B42 /* TFY_CollectionBController.m */; };
+		368831B824C5268E00869B42 /* TFY_CollectionBFlowLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 368831B724C5268E00869B42 /* TFY_CollectionBFlowLayout.m */; };
+		368831BB24C5276C00869B42 /* TFY_CollectionBCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 368831BA24C5276C00869B42 /* TFY_CollectionBCell.m */; };
+		368831BE24C5357400869B42 /* TFY_DouyinCollectionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 368831BD24C5357400869B42 /* TFY_DouyinCollectionView.m */; };
+		368831C124C5364300869B42 /* TFY_DouyinCollectionFlowLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 368831C024C5364300869B42 /* TFY_DouyinCollectionFlowLayout.m */; };
+		368831C424C5371E00869B42 /* TFY_DouyinCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 368831C324C5371E00869B42 /* TFY_DouyinCollectionViewCell.m */; };
+		368831CA24C5410300869B42 /* TFY_RotationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 368831C924C5410300869B42 /* TFY_RotationController.m */; };
+		368831CD24C5468C00869B42 /* TFY_KeyboardController.m in Sources */ = {isa = PBXBuildFile; fileRef = 368831CC24C5468C00869B42 /* TFY_KeyboardController.m */; };
+		368831D024C5488400869B42 /* TFY_FullScreenController.m in Sources */ = {isa = PBXBuildFile; fileRef = 368831CF24C5488400869B42 /* TFY_FullScreenController.m */; };
+		368831D324C549EE00869B42 /* TFY_CustomControlController.m in Sources */ = {isa = PBXBuildFile; fileRef = 368831D224C549EE00869B42 /* TFY_CustomControlController.m */; };
+		368831D624C54A0D00869B42 /* TFY_CustomControlView.m in Sources */ = {isa = PBXBuildFile; fileRef = 368831D524C54A0D00869B42 /* TFY_CustomControlView.m */; };
+		368831D924C54E9D00869B42 /* TFY_ADViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 368831D824C54E9D00869B42 /* TFY_ADViewController.m */; };
+		368831DC24C5525800869B42 /* TFY_ADPlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 368831DB24C5525800869B42 /* TFY_ADPlayerView.m */; };
+		6294F17FE75EE22B782E5C8B /* Pods_TFY_PlayerToolsTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FDB271589F080C44D8BF122 /* Pods_TFY_PlayerToolsTests.framework */; };
+		707EEB4419EAD99D523F062B /* Pods_TFY_PlayerTools_TFY_PlayerToolsUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52B98E1AAB93436628FBBA24 /* Pods_TFY_PlayerTools_TFY_PlayerToolsUITests.framework */; };
+		9C670764028413C2C9F15779 /* Pods_TFY_PlayerTools.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EEF64341EBE063A1395DF71 /* Pods_TFY_PlayerTools.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,8 +102,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1C1DAF401246747A42050380 /* Pods-TFY_PlayerToolsTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TFY_PlayerToolsTests.release.xcconfig"; path = "Target Support Files/Pods-TFY_PlayerToolsTests/Pods-TFY_PlayerToolsTests.release.xcconfig"; sourceTree = "<group>"; };
 		3644635F24BFF3CD001D0DC4 /* TFY_PlayerTools.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TFY_PlayerTools.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		3644636C24BFF3CD001D0DC4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		3644636E24BFF3CF001D0DC4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3644637124BFF3CF001D0DC4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		3644637324BFF3CF001D0DC4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -65,8 +118,6 @@
 		3644639A24BFF44E001D0DC4 /* SceneDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
 		3644639B24BFF44E001D0DC4 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		3644639C24BFF44E001D0DC4 /* SceneDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
-		3644639E24BFF44E001D0DC4 /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
-		3644639F24BFF44E001D0DC4 /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		364463A424BFF4A5001D0DC4 /* TFY_NetworkSpeedMonitor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TFY_NetworkSpeedMonitor.m; sourceTree = "<group>"; };
 		364463A524BFF4A5001D0DC4 /* TFY_PlayerBaseView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TFY_PlayerBaseView.m; sourceTree = "<group>"; };
 		364463A624BFF4A5001D0DC4 /* TFY_PlayerMediaPlayback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TFY_PlayerMediaPlayback.h; sourceTree = "<group>"; };
@@ -97,6 +148,119 @@
 		364463BF24BFF4A5001D0DC4 /* TFY_FloatView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TFY_FloatView.h; sourceTree = "<group>"; };
 		364463C024BFF4A5001D0DC4 /* TFY_PlayerVideoModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TFY_PlayerVideoModel.h; sourceTree = "<group>"; };
 		364463CE24BFF4C8001D0DC4 /* TFY_PlayerToolsKitHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_PlayerToolsKitHeader.h; sourceTree = "<group>"; };
+		364D74AA24C3073200ECC7E9 /* TFY_CollectionController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_CollectionController.h; sourceTree = "<group>"; };
+		364D74AB24C3073200ECC7E9 /* TFY_CollectionController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_CollectionController.m; sourceTree = "<group>"; };
+		364D74AD24C3076A00ECC7E9 /* TFY_CollectionCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_CollectionCell.h; sourceTree = "<group>"; };
+		364D74AE24C3076A00ECC7E9 /* TFY_CollectionCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_CollectionCell.m; sourceTree = "<group>"; };
+		364D74B124C3132C00ECC7E9 /* TFY_ScrollViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_ScrollViewController.h; sourceTree = "<group>"; };
+		364D74B224C3132C00ECC7E9 /* TFY_ScrollViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_ScrollViewController.m; sourceTree = "<group>"; };
+		3662A15624C4329E00ABD124 /* TFY_NotAutoPlayController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_NotAutoPlayController.h; sourceTree = "<group>"; };
+		3662A15724C4329E00ABD124 /* TFY_NotAutoPlayController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_NotAutoPlayController.m; sourceTree = "<group>"; };
+		3662A15F24C4375C00ABD124 /* TFY_LightController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_LightController.h; sourceTree = "<group>"; };
+		3662A16024C4375C00ABD124 /* TFY_LightController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_LightController.m; sourceTree = "<group>"; };
+		3662A16424C437A600ABD124 /* TFY_LightTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_LightTableViewCell.h; sourceTree = "<group>"; };
+		3662A16524C437A600ABD124 /* TFY_LightTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_LightTableViewCell.m; sourceTree = "<group>"; };
+		3662A16724C43C8800ABD124 /* TableViewCellDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TableViewCellDelegate.h; sourceTree = "<group>"; };
+		3662A16824C4494500ABD124 /* TFY_SmallPlayController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_SmallPlayController.h; sourceTree = "<group>"; };
+		3662A16924C4494500ABD124 /* TFY_SmallPlayController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_SmallPlayController.m; sourceTree = "<group>"; };
+		3662A16B24C456AF00ABD124 /* TFY_DouYinController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_DouYinController.h; sourceTree = "<group>"; };
+		3662A16C24C456AF00ABD124 /* TFY_DouYinController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_DouYinController.m; sourceTree = "<group>"; };
+		3662A16E24C4580800ABD124 /* TFY_DouYinPlayerView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_DouYinPlayerView.h; sourceTree = "<group>"; };
+		3662A16F24C4580800ABD124 /* TFY_DouYinPlayerView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_DouYinPlayerView.m; sourceTree = "<group>"; };
+		3662A17124C45B3500ABD124 /* TFY_DouYinViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_DouYinViewCell.h; sourceTree = "<group>"; };
+		3662A17224C45B3500ABD124 /* TFY_DouYinViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_DouYinViewCell.m; sourceTree = "<group>"; };
+		3671A2BE24C1993C0010728D /* TFY_PrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_PrefixHeader.pch; sourceTree = "<group>"; };
+		3671A2BF24C1994A0010728D /* TFY_Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_Header.h; sourceTree = "<group>"; };
+		3671A2C224C19A0E0010728D /* LM_TabBarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LM_TabBarController.m; sourceTree = "<group>"; };
+		3671A2C324C19A0E0010728D /* LM_TabBarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LM_TabBarController.h; sourceTree = "<group>"; };
+		3671A2C524C19A0E0010728D /* BaseCollectionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseCollectionView.h; sourceTree = "<group>"; };
+		3671A2C624C19A0E0010728D /* BaseViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseViewController.m; sourceTree = "<group>"; };
+		3671A2C724C19A0E0010728D /* BaseTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseTableView.m; sourceTree = "<group>"; };
+		3671A2C824C19A0E0010728D /* UIResponder+LM_Navigation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIResponder+LM_Navigation.h"; sourceTree = "<group>"; };
+		3671A2C924C19A0E0010728D /* BaseCollectionView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseCollectionView.m; sourceTree = "<group>"; };
+		3671A2CA24C19A0E0010728D /* BaseViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseViewController.h; sourceTree = "<group>"; };
+		3671A2CB24C19A0E0010728D /* UIResponder+LM_Navigation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIResponder+LM_Navigation.m"; sourceTree = "<group>"; };
+		3671A2CC24C19A0E0010728D /* BaseTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseTableView.h; sourceTree = "<group>"; };
+		3671A2D324C19ADE0010728D /* LX_CalendarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LX_CalendarController.m; sourceTree = "<group>"; };
+		3671A2D424C19ADE0010728D /* LX_CalendarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LX_CalendarController.h; sourceTree = "<group>"; };
+		3671A2D624C19ADE0010728D /* LX_CurveController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LX_CurveController.h; sourceTree = "<group>"; };
+		3671A2D724C19ADE0010728D /* LX_CurveController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LX_CurveController.m; sourceTree = "<group>"; };
+		3671A2D924C19ADE0010728D /* LX_MineController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LX_MineController.h; sourceTree = "<group>"; };
+		3671A2DA24C19ADE0010728D /* LX_MineController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LX_MineController.m; sourceTree = "<group>"; };
+		3671A2DC24C19ADE0010728D /* LX_HomeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LX_HomeController.h; sourceTree = "<group>"; };
+		3671A2DD24C19ADE0010728D /* LX_HomeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LX_HomeController.m; sourceTree = "<group>"; };
+		3671A2EA24C1A0000010728D /* PlayerAController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlayerAController.h; sourceTree = "<group>"; };
+		3671A2EB24C1A0000010728D /* PlayerAController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlayerAController.m; sourceTree = "<group>"; };
+		3671A2EE24C1A3410010728D /* UIView+PlayerFrame.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIView+PlayerFrame.h"; sourceTree = "<group>"; };
+		3671A2EF24C1A3410010728D /* UIView+PlayerFrame.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIView+PlayerFrame.m"; sourceTree = "<group>"; };
+		3671A2F124C1A8D10010728D /* UIImageView+PlayerImageView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImageView+PlayerImageView.h"; sourceTree = "<group>"; };
+		3671A2F224C1A8D10010728D /* UIImageView+PlayerImageView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImageView+PlayerImageView.m"; sourceTree = "<group>"; };
+		3671A2F424C1AC560010728D /* TFY_SliderView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_SliderView.h; sourceTree = "<group>"; };
+		3671A2F524C1AC560010728D /* TFY_SliderView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_SliderView.m; sourceTree = "<group>"; };
+		3671A2F724C1ADCC0010728D /* TFY_SmallFloatControlView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_SmallFloatControlView.h; sourceTree = "<group>"; };
+		3671A2F824C1ADCC0010728D /* TFY_SmallFloatControlView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_SmallFloatControlView.m; sourceTree = "<group>"; };
+		3671A2FA24C1AF630010728D /* videoImages.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = videoImages.bundle; sourceTree = "<group>"; };
+		3671A2FC24C1AFB80010728D /* TFY_ITools.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_ITools.h; sourceTree = "<group>"; };
+		3671A2FD24C1AFB80010728D /* TFY_ITools.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_ITools.m; sourceTree = "<group>"; };
+		3671A2FF24C1B12A0010728D /* TFY_VolumeBrightnessView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_VolumeBrightnessView.h; sourceTree = "<group>"; };
+		3671A30024C1B12A0010728D /* TFY_VolumeBrightnessView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_VolumeBrightnessView.m; sourceTree = "<group>"; };
+		3671A30224C1B3E60010728D /* TFY_SpeedLoadingView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_SpeedLoadingView.h; sourceTree = "<group>"; };
+		3671A30324C1B3E60010728D /* TFY_SpeedLoadingView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_SpeedLoadingView.m; sourceTree = "<group>"; };
+		3671A30524C1B5450010728D /* TFY_PortraitView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_PortraitView.h; sourceTree = "<group>"; };
+		3671A30624C1B5450010728D /* TFY_PortraitView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_PortraitView.m; sourceTree = "<group>"; };
+		3671A30824C1B5870010728D /* TFY_PlayerView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_PlayerView.h; sourceTree = "<group>"; };
+		3671A30924C1B5870010728D /* TFY_PlayerView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_PlayerView.m; sourceTree = "<group>"; };
+		3671A30B24C1B5A80010728D /* TFY_LandScapeView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_LandScapeView.h; sourceTree = "<group>"; };
+		3671A30C24C1B5A80010728D /* TFY_LandScapeView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_LandScapeView.m; sourceTree = "<group>"; };
+		3671A30F24C1C9000010728D /* TFY_NoramlController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_NoramlController.h; sourceTree = "<group>"; };
+		3671A31024C1C9000010728D /* TFY_NoramlController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_NoramlController.m; sourceTree = "<group>"; };
+		3671A31224C1DEE90010728D /* Playerdata.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Playerdata.json; sourceTree = "<group>"; };
+		3671A31424C1DFAF0010728D /* TFY_RootModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TFY_RootModel.m; sourceTree = "<group>"; };
+		3671A31524C1DFAF0010728D /* TFY_RootModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TFY_RootModel.h; sourceTree = "<group>"; };
+		3671A31824C1E14E0010728D /* TFY_AutoPlayerController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_AutoPlayerController.h; sourceTree = "<group>"; };
+		3671A31924C1E14E0010728D /* TFY_AutoPlayerController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_AutoPlayerController.m; sourceTree = "<group>"; };
+		3671A31B24C1E9B00010728D /* TFY_AutoPlayerCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_AutoPlayerCell.h; sourceTree = "<group>"; };
+		3671A31C24C1E9B00010728D /* TFY_AutoPlayerCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_AutoPlayerCell.m; sourceTree = "<group>"; };
+		368831A524C517FE00869B42 /* TFY_TableHeaderController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_TableHeaderController.h; sourceTree = "<group>"; };
+		368831A624C517FE00869B42 /* TFY_TableHeaderController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_TableHeaderController.m; sourceTree = "<group>"; };
+		368831A824C5186F00869B42 /* TFY_TableHeaderView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_TableHeaderView.h; sourceTree = "<group>"; };
+		368831A924C5186F00869B42 /* TFY_TableHeaderView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_TableHeaderView.m; sourceTree = "<group>"; };
+		368831AB24C5192B00869B42 /* TFY_HerderTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_HerderTableViewCell.h; sourceTree = "<group>"; };
+		368831AC24C5192B00869B42 /* TFY_HerderTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_HerderTableViewCell.m; sourceTree = "<group>"; };
+		368831B324C525E400869B42 /* TFY_CollectionBController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_CollectionBController.h; sourceTree = "<group>"; };
+		368831B424C525E400869B42 /* TFY_CollectionBController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_CollectionBController.m; sourceTree = "<group>"; };
+		368831B624C5268E00869B42 /* TFY_CollectionBFlowLayout.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_CollectionBFlowLayout.h; sourceTree = "<group>"; };
+		368831B724C5268E00869B42 /* TFY_CollectionBFlowLayout.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_CollectionBFlowLayout.m; sourceTree = "<group>"; };
+		368831B924C5276C00869B42 /* TFY_CollectionBCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_CollectionBCell.h; sourceTree = "<group>"; };
+		368831BA24C5276C00869B42 /* TFY_CollectionBCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_CollectionBCell.m; sourceTree = "<group>"; };
+		368831BC24C5357400869B42 /* TFY_DouyinCollectionView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_DouyinCollectionView.h; sourceTree = "<group>"; };
+		368831BD24C5357400869B42 /* TFY_DouyinCollectionView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_DouyinCollectionView.m; sourceTree = "<group>"; };
+		368831BF24C5364300869B42 /* TFY_DouyinCollectionFlowLayout.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_DouyinCollectionFlowLayout.h; sourceTree = "<group>"; };
+		368831C024C5364300869B42 /* TFY_DouyinCollectionFlowLayout.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_DouyinCollectionFlowLayout.m; sourceTree = "<group>"; };
+		368831C224C5371E00869B42 /* TFY_DouyinCollectionViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_DouyinCollectionViewCell.h; sourceTree = "<group>"; };
+		368831C324C5371E00869B42 /* TFY_DouyinCollectionViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_DouyinCollectionViewCell.m; sourceTree = "<group>"; };
+		368831C824C5410300869B42 /* TFY_RotationController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_RotationController.h; sourceTree = "<group>"; };
+		368831C924C5410300869B42 /* TFY_RotationController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_RotationController.m; sourceTree = "<group>"; };
+		368831CB24C5468C00869B42 /* TFY_KeyboardController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_KeyboardController.h; sourceTree = "<group>"; };
+		368831CC24C5468C00869B42 /* TFY_KeyboardController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_KeyboardController.m; sourceTree = "<group>"; };
+		368831CE24C5488400869B42 /* TFY_FullScreenController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_FullScreenController.h; sourceTree = "<group>"; };
+		368831CF24C5488400869B42 /* TFY_FullScreenController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_FullScreenController.m; sourceTree = "<group>"; };
+		368831D124C549EE00869B42 /* TFY_CustomControlController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_CustomControlController.h; sourceTree = "<group>"; };
+		368831D224C549EE00869B42 /* TFY_CustomControlController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_CustomControlController.m; sourceTree = "<group>"; };
+		368831D424C54A0D00869B42 /* TFY_CustomControlView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_CustomControlView.h; sourceTree = "<group>"; };
+		368831D524C54A0D00869B42 /* TFY_CustomControlView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_CustomControlView.m; sourceTree = "<group>"; };
+		368831D724C54E9D00869B42 /* TFY_ADViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_ADViewController.h; sourceTree = "<group>"; };
+		368831D824C54E9D00869B42 /* TFY_ADViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_ADViewController.m; sourceTree = "<group>"; };
+		368831DA24C5525800869B42 /* TFY_ADPlayerView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_ADPlayerView.h; sourceTree = "<group>"; };
+		368831DB24C5525800869B42 /* TFY_ADPlayerView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_ADPlayerView.m; sourceTree = "<group>"; };
+		39DDEEBB4318EF7A6D0F3291 /* Pods-TFY_PlayerTools.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TFY_PlayerTools.release.xcconfig"; path = "Target Support Files/Pods-TFY_PlayerTools/Pods-TFY_PlayerTools.release.xcconfig"; sourceTree = "<group>"; };
+		40E51E255898427097586ED0 /* Pods-TFY_PlayerToolsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TFY_PlayerToolsTests.debug.xcconfig"; path = "Target Support Files/Pods-TFY_PlayerToolsTests/Pods-TFY_PlayerToolsTests.debug.xcconfig"; sourceTree = "<group>"; };
+		4FDB271589F080C44D8BF122 /* Pods_TFY_PlayerToolsTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TFY_PlayerToolsTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		52B98E1AAB93436628FBBA24 /* Pods_TFY_PlayerTools_TFY_PlayerToolsUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TFY_PlayerTools_TFY_PlayerToolsUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		818E6AC0508A0FF1503A85E3 /* Pods-TFY_PlayerTools-TFY_PlayerToolsUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TFY_PlayerTools-TFY_PlayerToolsUITests.debug.xcconfig"; path = "Target Support Files/Pods-TFY_PlayerTools-TFY_PlayerToolsUITests/Pods-TFY_PlayerTools-TFY_PlayerToolsUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		9EEF64341EBE063A1395DF71 /* Pods_TFY_PlayerTools.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TFY_PlayerTools.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CB09171ADF32FB3F78C0CF16 /* Pods-TFY_PlayerTools.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TFY_PlayerTools.debug.xcconfig"; path = "Target Support Files/Pods-TFY_PlayerTools/Pods-TFY_PlayerTools.debug.xcconfig"; sourceTree = "<group>"; };
+		F036F8341A258F78571C3D1A /* Pods-TFY_PlayerTools-TFY_PlayerToolsUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TFY_PlayerTools-TFY_PlayerToolsUITests.release.xcconfig"; path = "Target Support Files/Pods-TFY_PlayerTools-TFY_PlayerToolsUITests/Pods-TFY_PlayerTools-TFY_PlayerToolsUITests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,6 +268,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9C670764028413C2C9F15779 /* Pods_TFY_PlayerTools.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -111,6 +276,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6294F17FE75EE22B782E5C8B /* Pods_TFY_PlayerToolsTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,6 +284,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				707EEB4419EAD99D523F062B /* Pods_TFY_PlayerTools_TFY_PlayerToolsUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -131,6 +298,8 @@
 				3644637D24BFF3CF001D0DC4 /* TFY_PlayerToolsTests */,
 				3644638824BFF3CF001D0DC4 /* TFY_PlayerToolsUITests */,
 				3644636024BFF3CD001D0DC4 /* Products */,
+				68A9E0B9F8B106C6F7B5C142 /* Pods */,
+				8366A023B6AA3D0CF975DEE4 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -147,10 +316,11 @@
 		3644636124BFF3CD001D0DC4 /* TFY_PlayerTools */ = {
 			isa = PBXGroup;
 			children = (
+				3671A2C024C19A0E0010728D /* TFY_BaseClass */,
+				3671A2BD24C1992A0010728D /* TFY_PCH */,
 				3644639824BFF44D001D0DC4 /* TFY_AppDelegate */,
 				3644639D24BFF44E001D0DC4 /* TFY_Class */,
 				3644639724BFF44D001D0DC4 /* TFY_PlayerToolsKit */,
-				3644636B24BFF3CD001D0DC4 /* Main.storyboard */,
 				3644636E24BFF3CF001D0DC4 /* Assets.xcassets */,
 				3644637024BFF3CF001D0DC4 /* LaunchScreen.storyboard */,
 				3644637324BFF3CF001D0DC4 /* Info.plist */,
@@ -180,7 +350,9 @@
 		3644639724BFF44D001D0DC4 /* TFY_PlayerToolsKit */ = {
 			isa = PBXGroup;
 			children = (
+				3671A2FA24C1AF630010728D /* videoImages.bundle */,
 				364463CE24BFF4C8001D0DC4 /* TFY_PlayerToolsKitHeader.h */,
+				3671A2ED24C1A2DF0010728D /* TFY_PlayerView */,
 				364463A324BFF4A5001D0DC4 /* TFY_PlayerTool */,
 			);
 			path = TFY_PlayerToolsKit;
@@ -200,8 +372,11 @@
 		3644639D24BFF44E001D0DC4 /* TFY_Class */ = {
 			isa = PBXGroup;
 			children = (
-				3644639F24BFF44E001D0DC4 /* ViewController.h */,
-				3644639E24BFF44E001D0DC4 /* ViewController.m */,
+				3671A2E524C19DF40010728D /* TFY_PlayerClass */,
+				3671A2D224C19ADE0010728D /* TFY_Calendar */,
+				3671A2D524C19ADE0010728D /* TFY_Curve */,
+				3671A2DB24C19ADE0010728D /* TFY_Home */,
+				3671A2D824C19ADE0010728D /* TFY_Mine */,
 			);
 			path = TFY_Class;
 			sourceTree = "<group>";
@@ -242,6 +417,333 @@
 			path = TFY_PlayerTool;
 			sourceTree = "<group>";
 		};
+		364D74A924C305B200ECC7E9 /* TFY_Collection */ = {
+			isa = PBXGroup;
+			children = (
+				364D74AA24C3073200ECC7E9 /* TFY_CollectionController.h */,
+				364D74AB24C3073200ECC7E9 /* TFY_CollectionController.m */,
+				364D74AD24C3076A00ECC7E9 /* TFY_CollectionCell.h */,
+				364D74AE24C3076A00ECC7E9 /* TFY_CollectionCell.m */,
+			);
+			path = TFY_Collection;
+			sourceTree = "<group>";
+		};
+		364D74B024C3130D00ECC7E9 /* TFY_ScrollView */ = {
+			isa = PBXGroup;
+			children = (
+				364D74B124C3132C00ECC7E9 /* TFY_ScrollViewController.h */,
+				364D74B224C3132C00ECC7E9 /* TFY_ScrollViewController.m */,
+			);
+			path = TFY_ScrollView;
+			sourceTree = "<group>";
+		};
+		3662A15524C4327900ABD124 /* TFY_TableView */ = {
+			isa = PBXGroup;
+			children = (
+				3662A15624C4329E00ABD124 /* TFY_NotAutoPlayController.h */,
+				3662A15724C4329E00ABD124 /* TFY_NotAutoPlayController.m */,
+				3662A15F24C4375C00ABD124 /* TFY_LightController.h */,
+				3662A16024C4375C00ABD124 /* TFY_LightController.m */,
+				3662A16824C4494500ABD124 /* TFY_SmallPlayController.h */,
+				3662A16924C4494500ABD124 /* TFY_SmallPlayController.m */,
+				3662A16B24C456AF00ABD124 /* TFY_DouYinController.h */,
+				3662A16C24C456AF00ABD124 /* TFY_DouYinController.m */,
+				368831A524C517FE00869B42 /* TFY_TableHeaderController.h */,
+				368831A624C517FE00869B42 /* TFY_TableHeaderController.m */,
+			);
+			path = TFY_TableView;
+			sourceTree = "<group>";
+		};
+		3662A16224C4378600ABD124 /* Cell */ = {
+			isa = PBXGroup;
+			children = (
+				3662A16424C437A600ABD124 /* TFY_LightTableViewCell.h */,
+				3662A16524C437A600ABD124 /* TFY_LightTableViewCell.m */,
+				3662A17124C45B3500ABD124 /* TFY_DouYinViewCell.h */,
+				3662A17224C45B3500ABD124 /* TFY_DouYinViewCell.m */,
+				368831AB24C5192B00869B42 /* TFY_HerderTableViewCell.h */,
+				368831AC24C5192B00869B42 /* TFY_HerderTableViewCell.m */,
+			);
+			path = Cell;
+			sourceTree = "<group>";
+		};
+		3662A16324C4378700ABD124 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				3662A16E24C4580800ABD124 /* TFY_DouYinPlayerView.h */,
+				3662A16F24C4580800ABD124 /* TFY_DouYinPlayerView.m */,
+				368831A824C5186F00869B42 /* TFY_TableHeaderView.h */,
+				368831A924C5186F00869B42 /* TFY_TableHeaderView.m */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		3671A2BD24C1992A0010728D /* TFY_PCH */ = {
+			isa = PBXGroup;
+			children = (
+				3671A31224C1DEE90010728D /* Playerdata.json */,
+				3671A2BE24C1993C0010728D /* TFY_PrefixHeader.pch */,
+				3671A2BF24C1994A0010728D /* TFY_Header.h */,
+			);
+			path = TFY_PCH;
+			sourceTree = "<group>";
+		};
+		3671A2C024C19A0E0010728D /* TFY_BaseClass */ = {
+			isa = PBXGroup;
+			children = (
+				3671A2C124C19A0E0010728D /* TFY_TabBarController */,
+				3671A2C424C19A0E0010728D /* TFY_BaseController */,
+			);
+			path = TFY_BaseClass;
+			sourceTree = "<group>";
+		};
+		3671A2C124C19A0E0010728D /* TFY_TabBarController */ = {
+			isa = PBXGroup;
+			children = (
+				3671A2C324C19A0E0010728D /* LM_TabBarController.h */,
+				3671A2C224C19A0E0010728D /* LM_TabBarController.m */,
+			);
+			path = TFY_TabBarController;
+			sourceTree = "<group>";
+		};
+		3671A2C424C19A0E0010728D /* TFY_BaseController */ = {
+			isa = PBXGroup;
+			children = (
+				3671A2CC24C19A0E0010728D /* BaseTableView.h */,
+				3671A2C724C19A0E0010728D /* BaseTableView.m */,
+				3671A2C524C19A0E0010728D /* BaseCollectionView.h */,
+				3671A2C924C19A0E0010728D /* BaseCollectionView.m */,
+				3671A2CA24C19A0E0010728D /* BaseViewController.h */,
+				3671A2C624C19A0E0010728D /* BaseViewController.m */,
+				3671A2C824C19A0E0010728D /* UIResponder+LM_Navigation.h */,
+				3671A2CB24C19A0E0010728D /* UIResponder+LM_Navigation.m */,
+			);
+			path = TFY_BaseController;
+			sourceTree = "<group>";
+		};
+		3671A2D224C19ADE0010728D /* TFY_Calendar */ = {
+			isa = PBXGroup;
+			children = (
+				3662A16224C4378600ABD124 /* Cell */,
+				3662A16324C4378700ABD124 /* View */,
+				3662A15524C4327900ABD124 /* TFY_TableView */,
+				3671A2D424C19ADE0010728D /* LX_CalendarController.h */,
+				3671A2D324C19ADE0010728D /* LX_CalendarController.m */,
+			);
+			path = TFY_Calendar;
+			sourceTree = "<group>";
+		};
+		3671A2D524C19ADE0010728D /* TFY_Curve */ = {
+			isa = PBXGroup;
+			children = (
+				368831AE24C5247100869B42 /* TFY_Collection */,
+				3671A2D624C19ADE0010728D /* LX_CurveController.h */,
+				3671A2D724C19ADE0010728D /* LX_CurveController.m */,
+			);
+			path = TFY_Curve;
+			sourceTree = "<group>";
+		};
+		3671A2D824C19ADE0010728D /* TFY_Mine */ = {
+			isa = PBXGroup;
+			children = (
+				368831C724C540E600869B42 /* Cell */,
+				368831C524C540E600869B42 /* VC */,
+				368831C624C540E600869B42 /* View */,
+				3671A2D924C19ADE0010728D /* LX_MineController.h */,
+				3671A2DA24C19ADE0010728D /* LX_MineController.m */,
+			);
+			path = TFY_Mine;
+			sourceTree = "<group>";
+		};
+		3671A2DB24C19ADE0010728D /* TFY_Home */ = {
+			isa = PBXGroup;
+			children = (
+				364D74B024C3130D00ECC7E9 /* TFY_ScrollView */,
+				364D74A924C305B200ECC7E9 /* TFY_Collection */,
+				3671A31724C1E1260010728D /* TFY_TableView */,
+				3671A30E24C1C8DE0010728D /* TFY_Noraml */,
+				3671A2DC24C19ADE0010728D /* LX_HomeController.h */,
+				3671A2DD24C19ADE0010728D /* LX_HomeController.m */,
+			);
+			path = TFY_Home;
+			sourceTree = "<group>";
+		};
+		3671A2E524C19DF40010728D /* TFY_PlayerClass */ = {
+			isa = PBXGroup;
+			children = (
+				3671A2E624C19DF40010728D /* Controller */,
+			);
+			path = TFY_PlayerClass;
+			sourceTree = "<group>";
+		};
+		3671A2E624C19DF40010728D /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				3671A31524C1DFAF0010728D /* TFY_RootModel.h */,
+				3671A31424C1DFAF0010728D /* TFY_RootModel.m */,
+				3671A2EA24C1A0000010728D /* PlayerAController.h */,
+				3671A2EB24C1A0000010728D /* PlayerAController.m */,
+				3662A16724C43C8800ABD124 /* TableViewCellDelegate.h */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		3671A2ED24C1A2DF0010728D /* TFY_PlayerView */ = {
+			isa = PBXGroup;
+			children = (
+				3671A2EE24C1A3410010728D /* UIView+PlayerFrame.h */,
+				3671A2EF24C1A3410010728D /* UIView+PlayerFrame.m */,
+				3671A2F124C1A8D10010728D /* UIImageView+PlayerImageView.h */,
+				3671A2F224C1A8D10010728D /* UIImageView+PlayerImageView.m */,
+				3671A2F424C1AC560010728D /* TFY_SliderView.h */,
+				3671A2F524C1AC560010728D /* TFY_SliderView.m */,
+				3671A2F724C1ADCC0010728D /* TFY_SmallFloatControlView.h */,
+				3671A2F824C1ADCC0010728D /* TFY_SmallFloatControlView.m */,
+				3671A2FC24C1AFB80010728D /* TFY_ITools.h */,
+				3671A2FD24C1AFB80010728D /* TFY_ITools.m */,
+				3671A2FF24C1B12A0010728D /* TFY_VolumeBrightnessView.h */,
+				3671A30024C1B12A0010728D /* TFY_VolumeBrightnessView.m */,
+				3671A30224C1B3E60010728D /* TFY_SpeedLoadingView.h */,
+				3671A30324C1B3E60010728D /* TFY_SpeedLoadingView.m */,
+				3671A30824C1B5870010728D /* TFY_PlayerView.h */,
+				3671A30924C1B5870010728D /* TFY_PlayerView.m */,
+				3671A30524C1B5450010728D /* TFY_PortraitView.h */,
+				3671A30624C1B5450010728D /* TFY_PortraitView.m */,
+				3671A30B24C1B5A80010728D /* TFY_LandScapeView.h */,
+				3671A30C24C1B5A80010728D /* TFY_LandScapeView.m */,
+			);
+			path = TFY_PlayerView;
+			sourceTree = "<group>";
+		};
+		3671A30E24C1C8DE0010728D /* TFY_Noraml */ = {
+			isa = PBXGroup;
+			children = (
+				3671A30F24C1C9000010728D /* TFY_NoramlController.h */,
+				3671A31024C1C9000010728D /* TFY_NoramlController.m */,
+			);
+			path = TFY_Noraml;
+			sourceTree = "<group>";
+		};
+		3671A31724C1E1260010728D /* TFY_TableView */ = {
+			isa = PBXGroup;
+			children = (
+				3671A31824C1E14E0010728D /* TFY_AutoPlayerController.h */,
+				3671A31924C1E14E0010728D /* TFY_AutoPlayerController.m */,
+				3671A31B24C1E9B00010728D /* TFY_AutoPlayerCell.h */,
+				3671A31C24C1E9B00010728D /* TFY_AutoPlayerCell.m */,
+			);
+			path = TFY_TableView;
+			sourceTree = "<group>";
+		};
+		368831AE24C5247100869B42 /* TFY_Collection */ = {
+			isa = PBXGroup;
+			children = (
+				368831AF24C5247100869B42 /* Controller */,
+				368831B024C5247100869B42 /* Cell */,
+				368831B124C5247100869B42 /* Model */,
+				368831B224C5247100869B42 /* View */,
+			);
+			path = TFY_Collection;
+			sourceTree = "<group>";
+		};
+		368831AF24C5247100869B42 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				368831B324C525E400869B42 /* TFY_CollectionBController.h */,
+				368831B424C525E400869B42 /* TFY_CollectionBController.m */,
+				368831BC24C5357400869B42 /* TFY_DouyinCollectionView.h */,
+				368831BD24C5357400869B42 /* TFY_DouyinCollectionView.m */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		368831B024C5247100869B42 /* Cell */ = {
+			isa = PBXGroup;
+			children = (
+				368831B924C5276C00869B42 /* TFY_CollectionBCell.h */,
+				368831BA24C5276C00869B42 /* TFY_CollectionBCell.m */,
+				368831C224C5371E00869B42 /* TFY_DouyinCollectionViewCell.h */,
+				368831C324C5371E00869B42 /* TFY_DouyinCollectionViewCell.m */,
+			);
+			path = Cell;
+			sourceTree = "<group>";
+		};
+		368831B124C5247100869B42 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		368831B224C5247100869B42 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				368831B624C5268E00869B42 /* TFY_CollectionBFlowLayout.h */,
+				368831B724C5268E00869B42 /* TFY_CollectionBFlowLayout.m */,
+				368831BF24C5364300869B42 /* TFY_DouyinCollectionFlowLayout.h */,
+				368831C024C5364300869B42 /* TFY_DouyinCollectionFlowLayout.m */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		368831C524C540E600869B42 /* VC */ = {
+			isa = PBXGroup;
+			children = (
+				368831C824C5410300869B42 /* TFY_RotationController.h */,
+				368831C924C5410300869B42 /* TFY_RotationController.m */,
+				368831CB24C5468C00869B42 /* TFY_KeyboardController.h */,
+				368831CC24C5468C00869B42 /* TFY_KeyboardController.m */,
+				368831CE24C5488400869B42 /* TFY_FullScreenController.h */,
+				368831CF24C5488400869B42 /* TFY_FullScreenController.m */,
+				368831D124C549EE00869B42 /* TFY_CustomControlController.h */,
+				368831D224C549EE00869B42 /* TFY_CustomControlController.m */,
+				368831D724C54E9D00869B42 /* TFY_ADViewController.h */,
+				368831D824C54E9D00869B42 /* TFY_ADViewController.m */,
+			);
+			path = VC;
+			sourceTree = "<group>";
+		};
+		368831C624C540E600869B42 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				368831D424C54A0D00869B42 /* TFY_CustomControlView.h */,
+				368831D524C54A0D00869B42 /* TFY_CustomControlView.m */,
+				368831DA24C5525800869B42 /* TFY_ADPlayerView.h */,
+				368831DB24C5525800869B42 /* TFY_ADPlayerView.m */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		368831C724C540E600869B42 /* Cell */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Cell;
+			sourceTree = "<group>";
+		};
+		68A9E0B9F8B106C6F7B5C142 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				CB09171ADF32FB3F78C0CF16 /* Pods-TFY_PlayerTools.debug.xcconfig */,
+				39DDEEBB4318EF7A6D0F3291 /* Pods-TFY_PlayerTools.release.xcconfig */,
+				818E6AC0508A0FF1503A85E3 /* Pods-TFY_PlayerTools-TFY_PlayerToolsUITests.debug.xcconfig */,
+				F036F8341A258F78571C3D1A /* Pods-TFY_PlayerTools-TFY_PlayerToolsUITests.release.xcconfig */,
+				40E51E255898427097586ED0 /* Pods-TFY_PlayerToolsTests.debug.xcconfig */,
+				1C1DAF401246747A42050380 /* Pods-TFY_PlayerToolsTests.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		8366A023B6AA3D0CF975DEE4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9EEF64341EBE063A1395DF71 /* Pods_TFY_PlayerTools.framework */,
+				52B98E1AAB93436628FBBA24 /* Pods_TFY_PlayerTools_TFY_PlayerToolsUITests.framework */,
+				4FDB271589F080C44D8BF122 /* Pods_TFY_PlayerToolsTests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -249,9 +751,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3644638E24BFF3CF001D0DC4 /* Build configuration list for PBXNativeTarget "TFY_PlayerTools" */;
 			buildPhases = (
+				DED5C3EC585EC81A1503490B /* [CP] Check Pods Manifest.lock */,
 				3644635B24BFF3CD001D0DC4 /* Sources */,
 				3644635C24BFF3CD001D0DC4 /* Frameworks */,
 				3644635D24BFF3CD001D0DC4 /* Resources */,
+				21BA64B539F4ECBA13C48065 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -266,6 +770,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3644639124BFF3CF001D0DC4 /* Build configuration list for PBXNativeTarget "TFY_PlayerToolsTests" */;
 			buildPhases = (
+				B66CF348376F86F033EB948A /* [CP] Check Pods Manifest.lock */,
 				3644637624BFF3CF001D0DC4 /* Sources */,
 				3644637724BFF3CF001D0DC4 /* Frameworks */,
 				3644637824BFF3CF001D0DC4 /* Resources */,
@@ -284,9 +789,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3644639424BFF3CF001D0DC4 /* Build configuration list for PBXNativeTarget "TFY_PlayerToolsUITests" */;
 			buildPhases = (
+				B5CF3425325F7BA4956FD546 /* [CP] Check Pods Manifest.lock */,
 				3644638124BFF3CF001D0DC4 /* Sources */,
 				3644638224BFF3CF001D0DC4 /* Frameworks */,
 				3644638324BFF3CF001D0DC4 /* Resources */,
+				11C34C14223304077BBFD041 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -346,8 +853,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				3644637224BFF3CF001D0DC4 /* LaunchScreen.storyboard in Resources */,
+				3671A2FB24C1AF640010728D /* videoImages.bundle in Resources */,
+				3671A31324C1DEE90010728D /* Playerdata.json in Resources */,
 				3644636F24BFF3CF001D0DC4 /* Assets.xcassets in Resources */,
-				3644636D24BFF3CD001D0DC4 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -367,28 +875,180 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		11C34C14223304077BBFD041 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-TFY_PlayerTools-TFY_PlayerToolsUITests/Pods-TFY_PlayerTools-TFY_PlayerToolsUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-TFY_PlayerTools-TFY_PlayerToolsUITests/Pods-TFY_PlayerTools-TFY_PlayerToolsUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-TFY_PlayerTools-TFY_PlayerToolsUITests/Pods-TFY_PlayerTools-TFY_PlayerToolsUITests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		21BA64B539F4ECBA13C48065 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-TFY_PlayerTools/Pods-TFY_PlayerTools-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-TFY_PlayerTools/Pods-TFY_PlayerTools-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-TFY_PlayerTools/Pods-TFY_PlayerTools-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B5CF3425325F7BA4956FD546 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-TFY_PlayerTools-TFY_PlayerToolsUITests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B66CF348376F86F033EB948A /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-TFY_PlayerToolsTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		DED5C3EC585EC81A1503490B /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-TFY_PlayerTools-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		3644635B24BFF3CD001D0DC4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3671A2EC24C1A0000010728D /* PlayerAController.m in Sources */,
+				3671A2F624C1AC560010728D /* TFY_SliderView.m in Sources */,
+				368831DC24C5525800869B42 /* TFY_ADPlayerView.m in Sources */,
+				3662A16124C4375C00ABD124 /* TFY_LightController.m in Sources */,
+				3671A2DF24C19ADE0010728D /* LX_CurveController.m in Sources */,
+				3662A16624C437A600ABD124 /* TFY_LightTableViewCell.m in Sources */,
+				368831C424C5371E00869B42 /* TFY_DouyinCollectionViewCell.m in Sources */,
+				3662A17024C4580800ABD124 /* TFY_DouYinPlayerView.m in Sources */,
+				3671A2CE24C19A0E0010728D /* BaseViewController.m in Sources */,
+				3671A2F024C1A3410010728D /* UIView+PlayerFrame.m in Sources */,
+				368831BB24C5276C00869B42 /* TFY_CollectionBCell.m in Sources */,
+				3671A30124C1B12A0010728D /* TFY_VolumeBrightnessView.m in Sources */,
+				3671A2DE24C19ADE0010728D /* LX_CalendarController.m in Sources */,
+				368831D024C5488400869B42 /* TFY_FullScreenController.m in Sources */,
 				364463C824BFF4A5001D0DC4 /* TFY_PlayerVideoModel.m in Sources */,
+				3662A16A24C4494500ABD124 /* TFY_SmallPlayController.m in Sources */,
+				368831B524C525E400869B42 /* TFY_CollectionBController.m in Sources */,
 				364463C124BFF4A5001D0DC4 /* TFY_NetworkSpeedMonitor.m in Sources */,
 				364463C524BFF4A5001D0DC4 /* TFY_AVPlayerManager.m in Sources */,
+				368831CA24C5410300869B42 /* TFY_RotationController.m in Sources */,
 				3644637524BFF3CF001D0DC4 /* main.m in Sources */,
 				364463CC24BFF4A5001D0DC4 /* TFY_KVOController.m in Sources */,
+				3662A15824C4329E00ABD124 /* TFY_NotAutoPlayController.m in Sources */,
+				368831AD24C5192B00869B42 /* TFY_HerderTableViewCell.m in Sources */,
 				364463A024BFF44E001D0DC4 /* SceneDelegate.m in Sources */,
-				364463A224BFF44E001D0DC4 /* ViewController.m in Sources */,
+				364D74AF24C3076A00ECC7E9 /* TFY_CollectionCell.m in Sources */,
+				3671A2CF24C19A0E0010728D /* BaseTableView.m in Sources */,
 				364463C224BFF4A5001D0DC4 /* TFY_PlayerBaseView.m in Sources */,
+				368831B824C5268E00869B42 /* TFY_CollectionBFlowLayout.m in Sources */,
+				3671A31D24C1E9B00010728D /* TFY_AutoPlayerCell.m in Sources */,
+				364D74B324C3132C00ECC7E9 /* TFY_ScrollViewController.m in Sources */,
+				368831CD24C5468C00869B42 /* TFY_KeyboardController.m in Sources */,
 				364463C724BFF4A5001D0DC4 /* TFY_PlayerController.m in Sources */,
+				368831A724C517FE00869B42 /* TFY_TableHeaderController.m in Sources */,
+				368831BE24C5357400869B42 /* TFY_DouyinCollectionView.m in Sources */,
 				364463CA24BFF4A5001D0DC4 /* TFY_ReachabilityManager.m in Sources */,
+				3671A2E124C19ADE0010728D /* LX_HomeController.m in Sources */,
 				364463C324BFF4A5001D0DC4 /* UIScrollView+TFY_Player.m in Sources */,
 				364463C924BFF4A5001D0DC4 /* TFY_FloatView.m in Sources */,
+				3671A30724C1B5450010728D /* TFY_PortraitView.m in Sources */,
+				368831AA24C5186F00869B42 /* TFY_TableHeaderView.m in Sources */,
+				3671A2FE24C1AFB80010728D /* TFY_ITools.m in Sources */,
+				368831D924C54E9D00869B42 /* TFY_ADViewController.m in Sources */,
+				3671A31124C1C9000010728D /* TFY_NoramlController.m in Sources */,
+				3671A31A24C1E14E0010728D /* TFY_AutoPlayerController.m in Sources */,
+				3671A2CD24C19A0E0010728D /* LM_TabBarController.m in Sources */,
+				368831C124C5364300869B42 /* TFY_DouyinCollectionFlowLayout.m in Sources */,
 				364463A124BFF44E001D0DC4 /* AppDelegate.m in Sources */,
+				3671A31624C1DFAF0010728D /* TFY_RootModel.m in Sources */,
 				364463C624BFF4A5001D0DC4 /* TFY_OrientationObserver.m in Sources */,
+				3671A2D124C19A0E0010728D /* UIResponder+LM_Navigation.m in Sources */,
 				364463CD24BFF4A5001D0DC4 /* TFY_PlayerGestureControl.m in Sources */,
+				368831D324C549EE00869B42 /* TFY_CustomControlController.m in Sources */,
+				3671A2D024C19A0E0010728D /* BaseCollectionView.m in Sources */,
+				3671A30A24C1B5870010728D /* TFY_PlayerView.m in Sources */,
+				3671A2F324C1A8D10010728D /* UIImageView+PlayerImageView.m in Sources */,
+				3671A2F924C1ADCC0010728D /* TFY_SmallFloatControlView.m in Sources */,
 				364463CB24BFF4A5001D0DC4 /* TFY_PlayerNotification.m in Sources */,
+				3671A2E024C19ADE0010728D /* LX_MineController.m in Sources */,
+				364D74AC24C3073200ECC7E9 /* TFY_CollectionController.m in Sources */,
 				364463C424BFF4A5001D0DC4 /* TFY_LoadingView.m in Sources */,
+				368831D624C54A0D00869B42 /* TFY_CustomControlView.m in Sources */,
+				3662A17324C45B3500ABD124 /* TFY_DouYinViewCell.m in Sources */,
+				3671A30424C1B3E60010728D /* TFY_SpeedLoadingView.m in Sources */,
+				3671A30D24C1B5A80010728D /* TFY_LandScapeView.m in Sources */,
+				3662A16D24C456AF00ABD124 /* TFY_DouYinController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -424,14 +1084,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		3644636B24BFF3CD001D0DC4 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				3644636C24BFF3CD001D0DC4 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		3644637024BFF3CF001D0DC4 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -555,10 +1207,14 @@
 		};
 		3644638F24BFF3CF001D0DC4 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = CB09171ADF32FB3F78C0CF16 /* Pods-TFY_PlayerTools.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1.0.0;
+				DEVELOPMENT_TEAM = QH95759TSS;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = TFY_PlayerTools/TFY_PCH/TFY_PrefixHeader.pch;
 				INFOPLIST_FILE = TFY_PlayerTools/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -574,10 +1230,14 @@
 		};
 		3644639024BFF3CF001D0DC4 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 39DDEEBB4318EF7A6D0F3291 /* Pods-TFY_PlayerTools.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1.0.0;
+				DEVELOPMENT_TEAM = QH95759TSS;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = TFY_PlayerTools/TFY_PCH/TFY_PrefixHeader.pch;
 				INFOPLIST_FILE = TFY_PlayerTools/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -593,6 +1253,7 @@
 		};
 		3644639224BFF3CF001D0DC4 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 40E51E255898427097586ED0 /* Pods-TFY_PlayerToolsTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -612,6 +1273,7 @@
 		};
 		3644639324BFF3CF001D0DC4 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1C1DAF401246747A42050380 /* Pods-TFY_PlayerToolsTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -631,6 +1293,7 @@
 		};
 		3644639524BFF3CF001D0DC4 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 818E6AC0508A0FF1503A85E3 /* Pods-TFY_PlayerTools-TFY_PlayerToolsUITests.debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = TFY_PlayerToolsUITests/Info.plist;
@@ -648,6 +1311,7 @@
 		};
 		3644639624BFF3CF001D0DC4 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F036F8341A258F78571C3D1A /* Pods-TFY_PlayerTools-TFY_PlayerToolsUITests.release.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = TFY_PlayerToolsUITests/Info.plist;

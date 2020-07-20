@@ -93,7 +93,7 @@
 - (instancetype)initWithPlayerManagercontainerView:(nonnull UIView *)containerView {
     TFY_AVPlayerManager *manger = [TFY_AVPlayerManager new];
     TFY_PlayerController *player = [self init];
-    player.imageView = containerView;
+    player.containerView = containerView;
     player.currentPlayerManager = manger;
     player.containerType = PlayerContainerTypeView;
     return player;
@@ -113,7 +113,7 @@
     TFY_AVPlayerManager *manger = [TFY_AVPlayerManager new];
     TFY_PlayerController *player = [self init];
     player.scrollView = scrollView;
-    player.imageView = containerView;
+    player.containerView = containerView;
     player.currentPlayerManager = manger;
     player.containerType = PlayerContainerTypeView;
     return player;
@@ -219,12 +219,12 @@
 
 
 - (void)layoutPlayerSubViews {
-    if (self.imageView && self.currentPlayerManager.view) {
+    if (self.containerView && self.currentPlayerManager.view) {
         UIView *superview = nil;
         if (self.isFullScreen) {
             superview = self.orientationObserver.fullScreenContainerView;
-        } else if (self.imageView) {
-            superview = self.imageView;
+        } else if (self.containerView) {
+            superview = self.containerView;
         }
         [superview addSubview:self.currentPlayerManager.view];
         [self.currentPlayerManager.view addSubview:self.controlView];
@@ -301,20 +301,21 @@
     self.gestureControl.disableTypes = self.disableGestureTypes;
     [self.gestureControl addGestureToView:currentPlayerManager.view];
     [self playerManagerCallbcak];
-    [self.orientationObserver updateRotateView:currentPlayerManager.view containerView:self.imageView];
+    [self.orientationObserver updateRotateView:currentPlayerManager.view containerView:self.containerView];
     self.controlView.player = self;
     [self layoutPlayerSubViews];
 }
 
--(void)setImageView:(UIView *)imageView{
-    _imageView = imageView;
+-(void)setContainerView:(UIView *)containerView{
+    _containerView = containerView;
     if (self.scrollView) {
-        self.scrollView.tfy_containerView = _imageView;
+        self.scrollView.tfy_containerView = _containerView;
     }
-    if (!_imageView) return;
-    _imageView.userInteractionEnabled = YES;
+    if (!_containerView) return;
+    _containerView.userInteractionEnabled = YES;
     [self layoutPlayerSubViews];
 }
+
 
 - (void)setControlView:(UIView<TFY_PlayerMediaControl> *)controlView {
     _controlView = controlView;
@@ -429,9 +430,9 @@
     self.isSmallFloatViewShow = NO;
     self.smallFloatView.hidden = YES;
     UIView *cell = [self.scrollView tfy_getCellForIndexPath:self.playingIndexPath];
-    self.imageView = [cell viewWithTag:self.containerViewTag];
-    [self.imageView addSubview:self.currentPlayerManager.view];
-    self.currentPlayerManager.view.frame = self.imageView.bounds;
+    self.containerView = [cell viewWithTag:self.containerViewTag];
+    [self.containerView addSubview:self.currentPlayerManager.view];
+    self.currentPlayerManager.view.frame = self.containerView.bounds;
     self.currentPlayerManager.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self.orientationObserver cellModelRotateView:self.currentPlayerManager.view rotateViewAtCell:cell playerViewTag:self.containerViewTag];
     if ([self.controlView respondsToSelector:@selector(videoPlayer:floatViewShow:)]) {
@@ -443,11 +444,11 @@
 - (void)addPlayerViewToContainerView:(UIView *)containerView {
     self.isSmallFloatViewShow = NO;
     self.smallFloatView.hidden = YES;
-    self.imageView = containerView;
-    [self.imageView addSubview:self.currentPlayerManager.view];
-    self.currentPlayerManager.view.frame = self.imageView.bounds;
+    self.containerView = containerView;
+    [self.containerView addSubview:self.currentPlayerManager.view];
+    self.currentPlayerManager.view.frame = self.containerView.bounds;
     self.currentPlayerManager.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    [self.orientationObserver cellOtherModelRotateView:self.currentPlayerManager.view containerView:self.imageView];
+    [self.orientationObserver cellOtherModelRotateView:self.currentPlayerManager.view containerView:self.containerView];
     if ([self.controlView respondsToSelector:@selector(videoPlayer:floatViewShow:)]) {
         [self.controlView videoPlayer:self floatViewShow:NO];
     }
@@ -467,7 +468,7 @@
 }
 
 - (void)stopCurrentPlayingView {
-    if (self.imageView) {
+    if (self.containerView) {
         [self stop];
         self.isSmallFloatViewShow = NO;
         if (self.smallFloatView) self.smallFloatView.hidden = YES;
@@ -559,7 +560,7 @@
 
 - (BOOL)pauseWhenAppResignActive {
     NSNumber *number = objc_getAssociatedObject(self, _cmd);
-    if (number.boolValue) return number.boolValue;
+    if (number) return number.boolValue;
     self.pauseWhenAppResignActive = YES;
     return YES;
 }
@@ -817,7 +818,7 @@
 
 - (BOOL)exitFullScreenWhenStop {
     NSNumber *number = objc_getAssociatedObject(self, _cmd);
-    if (number.boolValue) return number.boolValue;
+    if (number) return number.boolValue;
     self.exitFullScreenWhenStop = YES;
     return YES;
 }
@@ -840,14 +841,14 @@
 
 - (BOOL)allowOrentitaionRotation {
     NSNumber *number = objc_getAssociatedObject(self, _cmd);
-    if (number.boolValue) return number.boolValue;
+    if (number) return number.boolValue;
     self.allowOrentitaionRotation = YES;
     return YES;
 }
 
 -(BOOL)systemrotationbool{
     NSNumber *number = objc_getAssociatedObject(self, _cmd);
-    if (number.boolValue) return number.boolValue;
+    if (number) return number.boolValue;
     self.systemrotationbool = NO;
     return NO;
 }
@@ -1068,7 +1069,7 @@
         }
         if (!myself.stopWhileNotVisible && playerApperaPercent >= myself.playerApperaPercent) {
             if (myself.containerType == PlayerContainerTypeView) {
-                [myself addPlayerViewToContainerView:myself.imageView];
+                [myself addPlayerViewToContainerView:myself.containerView];
             } else if (myself.containerType == PlayerContainerTypeCell) {
                 [myself addPlayerViewToCell];
             }
@@ -1115,7 +1116,7 @@
     if (playingIndexPath) {
         [self stopCurrentPlayingCell];
         UIView *cell = [self.scrollView tfy_getCellForIndexPath:playingIndexPath];
-        self.imageView = [cell viewWithTag:self.containerViewTag];
+        self.containerView = [cell viewWithTag:self.containerViewTag];
         [self.orientationObserver cellModelRotateView:self.currentPlayerManager.view rotateViewAtCell:cell playerViewTag:self.containerViewTag];
         [self addDeviceOrientationObserver];
         self.scrollView.tfy_playingIndexPath = playingIndexPath;
@@ -1187,7 +1188,7 @@
 
 - (BOOL)stopWhileNotVisible {
     NSNumber *number = objc_getAssociatedObject(self, _cmd);
-    if (number.boolValue) return number.boolValue;
+    if (number) return number.boolValue;
     self.stopWhileNotVisible = YES;
     return YES;
 }
@@ -1210,14 +1211,14 @@
 
 - (CGFloat)playerDisapperaPercent {
     NSNumber *number = objc_getAssociatedObject(self, _cmd);
-    if (number.floatValue) return number.floatValue;
+    if (number) return number.floatValue;
     self.playerDisapperaPercent = 0.5;
     return 0.5;
 }
 
 - (CGFloat)playerApperaPercent {
     NSNumber *number = objc_getAssociatedObject(self, _cmd);
-    if (number.floatValue) return number.floatValue;
+    if (number) return number.floatValue;
     self.playerApperaPercent = 0.0;
     return 0.0;
 }
@@ -1315,16 +1316,16 @@
 - (void)updateScrollViewPlayerToCell {
     if (self.currentPlayerManager.view && self.playingIndexPath && self.containerViewTag) {
         UIView *cell = [self.scrollView tfy_getCellForIndexPath:self.playingIndexPath];
-        self.imageView = [cell viewWithTag:self.containerViewTag];
+        self.containerView = [cell viewWithTag:self.containerViewTag];
         [self.orientationObserver cellModelRotateView:self.currentPlayerManager.view rotateViewAtCell:cell playerViewTag:self.containerViewTag];
         [self layoutPlayerSubViews];
     }
 }
 
 - (void)updateNoramlPlayerWithContainerView:(UIView *)containerView {
-    if (self.currentPlayerManager.view && self.imageView) {
-        self.imageView = containerView;
-        [self.orientationObserver cellOtherModelRotateView:self.currentPlayerManager.view containerView:self.imageView];
+    if (self.currentPlayerManager.view && self.containerView) {
+        self.containerView = containerView;
+        [self.orientationObserver cellOtherModelRotateView:self.currentPlayerManager.view containerView:self.containerView];
         [self layoutPlayerSubViews];
     }
 }

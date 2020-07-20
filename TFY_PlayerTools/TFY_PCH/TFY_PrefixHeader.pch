@@ -1,0 +1,38 @@
+//
+//  TFY_PrefixHeader.pch
+//  TFY_PlayerTools
+//
+//  Created by 田风有 on 2020/7/17.
+//  Copyright © 2020 田风有. All rights reserved.
+//
+
+#ifndef TFY_PrefixHeader_pch
+#define TFY_PrefixHeader_pch
+
+#import <AudioToolbox/AudioToolbox.h>
+
+#ifdef __OBJC__
+
+#import <TFY_AutoLayout.h>
+#import <TFY_CategoryHerder.h>
+#import <TFY_Navigation.h>
+#import <TFY_PromptpopupHeader.h>
+#import <TFY_SimplifytableHeader.h>
+#import <TFY_ModelSqliteHeader.h>
+#import <TFY_TabBarHeader.h>
+
+#import <AFNetworking.h>
+#import <MJRefresh.h>
+#import <IQKeyboardManager.h>
+#import <ReactiveObjC.h>
+#import <SDWebImage.h>
+
+#endif
+
+#import "AppDelegate.h"
+#import "TFY_Header.h"
+#import "UIResponder+LM_Navigation.h"
+#import "TFY_PlayerToolsKitHeader.h"
+#import "TFY_RootModel.h"
+
+#endif /* TFY_PrefixHeader_pch */

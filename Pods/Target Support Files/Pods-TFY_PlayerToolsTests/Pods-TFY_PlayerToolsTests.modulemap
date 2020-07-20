@@ -1,0 +1,6 @@
+framework module Pods_TFY_PlayerToolsTests {
+  umbrella header "Pods-TFY_PlayerToolsTests-umbrella.h"
+
+  export *
+  module * { export * }
+}
