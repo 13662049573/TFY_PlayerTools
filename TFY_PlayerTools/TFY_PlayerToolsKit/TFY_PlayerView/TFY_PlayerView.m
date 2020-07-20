@@ -11,6 +11,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import <MediaPlayer/MediaPlayer.h>
 
+#define PLAYER_WS(weakSelf)  __weak __typeof(&*self)weakSelf = self;
 
 @interface TFY_PlayerView ()<TFY_SliderViewDelegate>
 /// 竖屏控制层的View
@@ -164,7 +165,7 @@
 - (void)autoFadeOutControlView {
     self.controlViewAppeared = YES;
     [self cancelAutoFadeOutControlView];
-    TFY_PLAYER_WS(myself);
+    PLAYER_WS(myself);
     self.afterBlock = dispatch_block_create(0, ^{
         
         [myself hideControlViewWithAnimated:YES];
@@ -376,7 +377,7 @@
 
 /// 滑动结束手势事件
 - (void)gestureEndedPan:(TFY_PlayerGestureControl *)gestureControl panDirection:(PanDirection)direction panLocation:(PanLocation)location {
-    TFY_PLAYER_WS(myself);
+    PLAYER_WS(myself);
     if (direction == PanDirectionH && self.sumTime >= 0 && self.player.totalTime > 0) {
         [self.player seekToTime:self.sumTime completionHandler:^(BOOL finished) {
             /// 左右滑动调节播放进度
@@ -641,7 +642,7 @@
 
 - (TFY_PortraitView *)portraitControlView {
     if (!_portraitControlView) {
-        TFY_PLAYER_WS(myself);
+        PLAYER_WS(myself);
         _portraitControlView = [[TFY_PortraitView alloc] init];
         _portraitControlView.sliderValueChanging = ^(CGFloat value, BOOL forward) {
             
@@ -657,7 +658,7 @@
 
 - (TFY_LandScapeView *)landScapeControlView {
     if (!_landScapeControlView) {
-        TFY_PLAYER_WS(myself);
+        PLAYER_WS(myself);
         _landScapeControlView = [[TFY_LandScapeView alloc] init];
         _landScapeControlView.sliderValueChanging = ^(CGFloat value, BOOL forward) {
             
@@ -755,7 +756,7 @@
 - (TFY_SmallFloatControlView *)floatControlView {
     if (!_floatControlView) {
         _floatControlView = [[TFY_SmallFloatControlView alloc] init];
-        TFY_PLAYER_WS(myself);
+        PLAYER_WS(myself);
         _floatControlView.closeClickCallback = ^{
             if (myself.player.containerType == PlayerContainerTypeCell) {
                 [myself.player stopCurrentPlayingCell];

@@ -10,6 +10,8 @@
 #import "UIView+PlayerFrame.h"
 #import "TFY_ITools.h"
 
+#define PLAYER_WS(weakSelf)  __weak __typeof(&*self)weakSelf = self;
+
 @interface TFY_LandScapeView ()<TFY_SliderViewDelegate>
 /// 顶部工具栏
 @property (nonatomic, strong) UIView *topToolView;
@@ -166,7 +168,7 @@
 
 - (void)sliderTouchEnded:(float)value {
     if (self.player.totalTime > 0) {
-        TFY_PLAYER_WS(myself);
+        PLAYER_WS(myself);
         [self.player seekToTime:self.player.totalTime*value completionHandler:^(BOOL finished) {
            
             if (finished) {
@@ -196,7 +198,7 @@
 - (void)sliderTapped:(float)value {
     if (self.player.totalTime > 0) {
         self.slider.isdragging = YES;
-        TFY_PLAYER_WS(myself);
+        PLAYER_WS(myself);
         [self.player seekToTime:self.player.totalTime*value completionHandler:^(BOOL finished) {
             
             if (finished) {
