@@ -32,6 +32,8 @@ Pod::Spec.new do |spec|
     s.source_files  = "TFY_PlayerTools/TFY_PlayerToolsKit/TFY_PlayerView/**/*.{h,m}"
   end
 
+  spec.resources    = "TFY_PlayerTools/TFY_PlayerToolsKit/videoImages.bundle"
+
   spec.ios.frameworks = 'Foundation', 'UIKit'
 
   spec.xcconfig      = { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include" }
