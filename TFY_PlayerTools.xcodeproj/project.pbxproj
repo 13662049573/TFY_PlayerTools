@@ -63,6 +63,7 @@
 		3671A31624C1DFAF0010728D /* TFY_RootModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A31424C1DFAF0010728D /* TFY_RootModel.m */; };
 		3671A31A24C1E14E0010728D /* TFY_AutoPlayerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A31924C1E14E0010728D /* TFY_AutoPlayerController.m */; };
 		3671A31D24C1E9B00010728D /* TFY_AutoPlayerCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A31C24C1E9B00010728D /* TFY_AutoPlayerCell.m */; };
+		367C8F9B24C6CABC00DD5C9E /* UIViewController+LM_Util.m in Sources */ = {isa = PBXBuildFile; fileRef = 367C8F9924C6CABC00DD5C9E /* UIViewController+LM_Util.m */; };
 		368831A724C517FE00869B42 /* TFY_TableHeaderController.m in Sources */ = {isa = PBXBuildFile; fileRef = 368831A624C517FE00869B42 /* TFY_TableHeaderController.m */; };
 		368831AA24C5186F00869B42 /* TFY_TableHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 368831A924C5186F00869B42 /* TFY_TableHeaderView.m */; };
 		368831AD24C5192B00869B42 /* TFY_HerderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 368831AC24C5192B00869B42 /* TFY_HerderTableViewCell.m */; };
@@ -221,6 +222,8 @@
 		3671A31924C1E14E0010728D /* TFY_AutoPlayerController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_AutoPlayerController.m; sourceTree = "<group>"; };
 		3671A31B24C1E9B00010728D /* TFY_AutoPlayerCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_AutoPlayerCell.h; sourceTree = "<group>"; };
 		3671A31C24C1E9B00010728D /* TFY_AutoPlayerCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_AutoPlayerCell.m; sourceTree = "<group>"; };
+		367C8F9924C6CABC00DD5C9E /* UIViewController+LM_Util.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+LM_Util.m"; sourceTree = "<group>"; };
+		367C8F9A24C6CABC00DD5C9E /* UIViewController+LM_Util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+LM_Util.h"; sourceTree = "<group>"; };
 		368831A524C517FE00869B42 /* TFY_TableHeaderController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_TableHeaderController.h; sourceTree = "<group>"; };
 		368831A624C517FE00869B42 /* TFY_TableHeaderController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_TableHeaderController.m; sourceTree = "<group>"; };
 		368831A824C5186F00869B42 /* TFY_TableHeaderView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_TableHeaderView.h; sourceTree = "<group>"; };
@@ -515,6 +518,8 @@
 				3671A2C924C19A0E0010728D /* BaseCollectionView.m */,
 				3671A2CA24C19A0E0010728D /* BaseViewController.h */,
 				3671A2C624C19A0E0010728D /* BaseViewController.m */,
+				367C8F9A24C6CABC00DD5C9E /* UIViewController+LM_Util.h */,
+				367C8F9924C6CABC00DD5C9E /* UIViewController+LM_Util.m */,
 				3671A2C824C19A0E0010728D /* UIResponder+LM_Navigation.h */,
 				3671A2CB24C19A0E0010728D /* UIResponder+LM_Navigation.m */,
 			);
@@ -1041,6 +1046,7 @@
 				3671A2F324C1A8D10010728D /* UIImageView+PlayerImageView.m in Sources */,
 				3671A2F924C1ADCC0010728D /* TFY_SmallFloatControlView.m in Sources */,
 				364463CB24BFF4A5001D0DC4 /* TFY_PlayerNotification.m in Sources */,
+				367C8F9B24C6CABC00DD5C9E /* UIViewController+LM_Util.m in Sources */,
 				3671A2E024C19ADE0010728D /* LX_MineController.m in Sources */,
 				364D74AC24C3073200ECC7E9 /* TFY_CollectionController.m in Sources */,
 				364463C424BFF4A5001D0DC4 /* TFY_LoadingView.m in Sources */,

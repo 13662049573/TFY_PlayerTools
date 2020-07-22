@@ -34,6 +34,7 @@
     } else if (indexPath.section == 2) {
         TFY_DouyinCollectionView *douyiin = [TFY_DouyinCollectionView new];
         douyiin.scrollDirection = UICollectionViewScrollDirectionVertical;
+        douyiin.hidesBottomBarWhenPushed = YES;
         [self.navigationController pushViewController:douyiin animated:YES];
     } 
 }
