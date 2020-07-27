@@ -19,6 +19,8 @@
     // 启动图片延时: 2秒
     [NSThread sleepForTimeInterval:1.5];
     
+    [TFY_ServerConfig setTFY_ConfigEnv:@"01"];
+    
     if (![ScenePackage defaultPackage].isSceneApp) {
         self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
         self.window.backgroundColor = [UIColor whiteColor];

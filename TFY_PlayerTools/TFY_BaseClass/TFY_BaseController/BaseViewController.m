@@ -148,5 +148,39 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{}
 
+//下拉刷新
+-(void)addharder
+{
+    MJRefreshNormalHeader *header = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(loadNewData)];
+    // 隐藏时间
+    header.lastUpdatedTimeLabel.hidden = NO;
+    // 隐藏状态
+    header.stateLabel.hidden = NO;
+    
+    self.tableView.mj_header= header;
+    
+    [self.tableView.mj_header beginRefreshing];
+}
 
+- (void)loadNewData{}
+
+-(void)addfooter{
+    MJRefreshBackNormalFooter *footer=[MJRefreshBackNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(loadfooter)];
+    // 隐藏状态
+    footer.stateLabel.hidden = YES;
+    
+    self.tableView.mj_footer =footer;
+}
+
+-(void)loadfooter{}
+
+- (void)setNoMoreData:(BOOL)noMoreData{
+    
+    if (noMoreData) {
+        [self.tableView.mj_footer endRefreshingWithNoMoreData];
+    }
+    else{
+        [self.tableView.mj_footer resetNoMoreData];
+    }
+}
 @end

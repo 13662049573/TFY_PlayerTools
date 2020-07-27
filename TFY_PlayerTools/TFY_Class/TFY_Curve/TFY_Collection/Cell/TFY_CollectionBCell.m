@@ -27,7 +27,7 @@ TFY_CATEGORY_STRONG_PROPERTY UIImageView *coverImageView;
 -(void)setListModel:(TFY_ListModel *)listModel{
     _listModel = listModel;
     
-    [self.coverImageView setImageWithURLString:_listModel.thumbnail_url placeholder:[UIImage imageNamed:@"loading_bgView"]];
+    [self.coverImageView setImageWithURLString:_listModel.image_small placeholder:[UIImage imageNamed:@"loading_bgView"]];
 }
 
 - (UIImageView *)coverImageView{

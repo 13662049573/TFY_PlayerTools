@@ -101,16 +101,16 @@
 -(void)setListModel:(TFY_ListModel *)listModel{
     _listModel = listModel;
     
-    if (_listModel.thumbnail_width >= _listModel.thumbnail_height) {
+    if (_listModel.width >= _listModel.height) {
         self.coverImageView.contentMode = UIViewContentModeScaleAspectFit;
         self.coverImageView.clipsToBounds = NO;
     } else {
         self.coverImageView.contentMode = UIViewContentModeScaleAspectFill;
         self.coverImageView.clipsToBounds = YES;
     }
-    [self.coverImageView setImageWithURLString:_listModel.thumbnail_url placeholder:[UIImage imageNamed:@"loading_bgView"]];
-    [self.bgImgView setImageWithURLString:_listModel.thumbnail_url placeholder:[UIImage imageNamed:@"loading_bgView"]];
-    self.titleLabel.text = _listModel.title;
+    [self.coverImageView setImageWithURLString:_listModel.image_small placeholder:[UIImage imageNamed:@"loading_bgView"]];
+    [self.bgImgView setImageWithURLString:_listModel.image_small placeholder:[UIImage imageNamed:@"loading_bgView"]];
+    self.titleLabel.text = _listModel.name;
     
 }
 

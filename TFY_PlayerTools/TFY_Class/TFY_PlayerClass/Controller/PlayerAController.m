@@ -53,10 +53,11 @@ TFY_CATEGORY_ASSIGN_PROPERTY NSTimeInterval delay;
         self.urls = NSMutableArray.array;
         
         [models.list enumerateObjectsUsingBlock:^(TFY_ListModel * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            
+           
             TFY_PlayerVideoModel *model = [TFY_PlayerVideoModel new];
-            model.tfy_url = obj.video_url;
+            model.tfy_url = obj.videouri;
             [self.urls addObject:model];
+            
         }];
         
         self.player.assetUrlMododels = self.urls;

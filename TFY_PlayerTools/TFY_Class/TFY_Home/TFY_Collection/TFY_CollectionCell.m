@@ -38,7 +38,7 @@
 -(void)setListModel:(TFY_ListModel *)listModel{
     _listModel = listModel;
     
-    [self.coverImageView sd_setImageWithURL:[NSURL URLWithString:_listModel.thumbnail_url] placeholderImage:[UIImage imageNamed:@"loading_bgView"]];
+    [self.coverImageView sd_setImageWithURL:[NSURL URLWithString:_listModel.image_small] placeholderImage:[UIImage imageNamed:@"loading_bgView"]];
     
 }
 

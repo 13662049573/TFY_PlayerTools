@@ -8,11 +8,15 @@
 
 #import <Foundation/Foundation.h>
 
-@class TFY_PageModel;
 @class TFY_ListModel;
+@class TFY_InfoModel;
 
 @interface PlayerCommand : NSObject
+TFY_CATEGORY_CHAIN_PROPERTY NSString *maxtime;
+
 TFY_CATEGORY_STRONG_PROPERTY RACCommand *playerCommand;
+
+TFY_CATEGORY_STRONG_PROPERTY RACCommand *maxtimehelpCommand;
 @end
 
 
@@ -20,13 +24,40 @@ TFY_CATEGORY_STRONG_PROPERTY RACCommand *playerCommand;
 @interface TFY_RootModel : NSObject
 
 /**
- * page: page 
+ * info: info
  */
-@property (nonatomic, strong) TFY_PageModel *page;
+@property (nonatomic, strong) TFY_InfoModel *info;
 /**
- * list: list 
+ * list: list
  */
 @property (nonatomic, strong) NSArray <TFY_ListModel *> *list;
+
+@end
+
+
+
+@interface TFY_InfoModel : NSObject
+
+/**
+ * maxid:
+ */
+@property (nonatomic, copy) NSString *maxid;
+/**
+ * vendor: sheep
+ */
+@property (nonatomic, copy) NSString *vendor;
+/**
+ * count: 2000
+ */
+@property (nonatomic, assign) NSInteger count;
+/**
+ * maxtime:
+ */
+@property (nonatomic, copy) NSString *maxtime;
+/**
+ * page: 100
+ */
+@property (nonatomic, assign) NSInteger page;
 
 @end
 
@@ -35,151 +66,178 @@ TFY_CATEGORY_STRONG_PROPERTY RACCommand *playerCommand;
 @interface TFY_ListModel : NSObject
 
 /**
- * has_agree: 0 
+ * cache_version: 2
  */
-@property (nonatomic, copy) NSString *has_agree;
+@property (nonatomic, assign) NSInteger cache_version;
 /**
- * head: head 
+ * created_at: created_at
  */
-@property (nonatomic, copy) NSString *head;
+@property (nonatomic, copy) NSString *created_at;
 /**
- * video_width: 240 
+ * 31470784: 31470784
  */
-@property (nonatomic, assign) CGFloat video_width;
+@property (nonatomic, assign) NSInteger item_Id;
 /**
- * origin_video_url: origin_video_url 
+ * is_gif: 0
  */
-@property (nonatomic, copy) NSString *origin_video_url;
+@property (nonatomic, copy) NSString *is_gif;
 /**
- * video_size: 3612804 
+ * voicetime: 0
  */
-@property (nonatomic, assign) CGFloat video_size;
+@property (nonatomic, copy) NSString *voicetime;
 /**
- * post_num: 156 
+ * image2: image2
  */
-@property (nonatomic, assign) NSInteger post_num;
+@property (nonatomic, copy) NSString *image2;
 /**
- * first_post_id: 119310484126 
+ * voicelength: 0
  */
-@property (nonatomic, assign) NSInteger first_post_id;
+@property (nonatomic, assign) NSInteger voicelength;
 /**
- * agree_num: 714 
+ * playfcount: 2148
  */
-@property (nonatomic, assign) NSInteger agree_num;
+@property (nonatomic, copy) NSString *playfcount;
 /**
- * play_count: 278486 
+ * repost: 14
  */
-@property (nonatomic, assign) NSInteger play_count;
+@property (nonatomic, copy) NSString *repost;
 /**
- * nick_name: 紫枫 
+ * bimageuri: bimageuri
  */
-@property (nonatomic, copy) NSString *nick_name;
+@property (nonatomic, copy) NSString *bimageuri;
 /**
- * forum_id: 0 
+ * image1: image1
  */
-@property (nonatomic, assign) NSInteger forum_id;
+@property (nonatomic, copy) NSString *image1;
 /**
- * thread_id: 5661313780 
+ * text: text
  */
-@property (nonatomic, assign) NSInteger thread_id;
+@property (nonatomic, copy) NSString *text;
 /**
- * extra: extra 
+ * theme_type: 1
  */
-@property (nonatomic, copy) NSString *extra;
+@property (nonatomic, assign) NSInteger theme_type;
 /**
- * video_md5: video_md5 
+ * hate: 29
  */
-@property (nonatomic, copy) NSString *video_md5;
+@property (nonatomic, copy) NSString *hate;
 /**
- * create_time: 1524382168 
+ * image0: image0
+ */
+@property (nonatomic, copy) NSString *image0;
+/**
+ * comment: 26
+ */
+@property (nonatomic, copy) NSString *comment;
+/**
+ * passtime: passtime
+ */
+@property (nonatomic, copy) NSString *passtime;
+/**
+ * ding: 259
+ */
+@property (nonatomic, assign) NSInteger ding;
+/**
+ * type: 41
+ */
+@property (nonatomic, copy) NSString *type;
+/**
+ * playcount: 6322
+ */
+@property (nonatomic, copy) NSString *playcount;
+/**
+ * tag:
+ */
+@property (nonatomic, copy) NSString *tag;
+/**
+ * cdn_img: cdn_img
+ */
+@property (nonatomic, copy) NSString *cdn_img;
+/**
+ * theme_name: 搞笑视频
+ */
+@property (nonatomic, copy) NSString *theme_name;
+/**
+ * create_time: create_time
  */
 @property (nonatomic, copy) NSString *create_time;
 /**
- * freq_num: 24205 
+ * favourite: 12
  */
-@property (nonatomic, copy) NSString *freq_num;
+@property (nonatomic, copy) NSString *favourite;
 /**
- * source: 131027 
+ * name: 孤傲猎人
  */
-@property (nonatomic, copy) NSString *source;
+@property (nonatomic, copy) NSString *name;
 /**
- * thumbnail_width: 240 
+ * height: 960
  */
-@property (nonatomic, assign) CGFloat thumbnail_width;
+@property (nonatomic, assign) CGFloat height;
 /**
- * video_duration: 44 
+ * status: 4
  */
-@property (nonatomic, assign) CGFloat video_duration;
+@property (nonatomic, assign) NSInteger status;
 /**
- * video_height: 176 
+ * videotime: 25
  */
-@property (nonatomic, assign) CGFloat video_height;
+@property (nonatomic, assign) CGFloat videotime;
 /**
- * thumbnail_url: thumbnail_url 
+ * bookmark: 12
  */
-@property (nonatomic, copy) NSString *thumbnail_url;
+@property (nonatomic, assign) NSInteger bookmark;
 /**
- * thumbnail_height: 176 
+ * cai: 29
  */
-@property (nonatomic, assign) CGFloat thumbnail_height;
+@property (nonatomic, assign) NSInteger cai;
 /**
- * video_length: 3612804 
+ * screen_name: 孤傲猎人
  */
-@property (nonatomic, assign) NSInteger video_length;
+@property (nonatomic, copy) NSString *screen_name;
 /**
- * video_type: 2 
+ * profile_image: profile_image
  */
-@property (nonatomic, assign) NSInteger video_type;
+@property (nonatomic, copy) NSString *profile_image;
 /**
- * cover_text:  
+ * love: 259
  */
-@property (nonatomic, copy) NSString *cover_text;
+@property (nonatomic, copy) NSString *love;
 /**
- * video_log_id: video_log_id 
+ * user_id: 22281854
  */
-@property (nonatomic, copy) NSString *video_log_id;
+@property (nonatomic, assign) NSInteger user_id;
 /**
- * auditing: 0 
+ * theme_id: 58191
  */
-@property (nonatomic, copy) NSString *auditing;
+@property (nonatomic, assign) NSInteger theme_id;
 /**
- * video_url: video_url 
+ * original_pid: 0
  */
-@property (nonatomic, copy) NSString *video_url;
+@property (nonatomic, copy) NSString *original_pid;
 /**
- * share_num: 262 
+ * t: 1594729625
  */
-@property (nonatomic, assign) NSInteger share_num;
+@property (nonatomic, assign) NSInteger t;
 /**
- * title: title 
+ * image_small: image_small
  */
-@property (nonatomic, copy) NSString *title;
+@property (nonatomic, copy) NSString *image_small;
 /**
- * weight: weight 
+ * weixin_url: weixin_url
  */
-@property (nonatomic, copy) NSString *weight;
+@property (nonatomic, copy) NSString *weixin_url;
 /**
- * format_matched: 1 
+ * voiceuri:
  */
-@property (nonatomic, copy) NSString *format_matched;
+@property (nonatomic, copy) NSString *voiceuri;
 /**
- * abtest_tag: tag_15 
+ * videouri: videouri
  */
-@property (nonatomic, copy) NSString *abtest_tag;
+@property (nonatomic, copy) NSString *videouri;
+/**
+ * width: 544
+ */
+@property (nonatomic, assign) CGFloat width;
 
 @end
 
-
-@interface TFY_PageModel : NSObject
-
-/**
- * pn: 1 
- */
-@property (nonatomic, assign) NSInteger pn;
-/**
- * rn: 21 
- */
-@property (nonatomic, assign) NSInteger rn;
-
-@end
 

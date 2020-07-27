@@ -95,12 +95,12 @@ TFY_CATEGORY_STRONG_PROPERTY TFY_DouyinCollectionFlowLayout *layout;
     [self.controlView resetControlView];
     TFY_ListModel *data = self.playermodels.list[indexPath.row];
     UIViewContentMode imageMode;
-    if (data.thumbnail_width >= data.thumbnail_height) {
+    if (data.width >= data.height) {
         imageMode = UIViewContentModeScaleAspectFit;
     } else {
         imageMode = UIViewContentModeScaleAspectFill;
     }
-    [self.controlView showCoverViewWithUrl:data.thumbnail_url withImageMode:imageMode];
+    [self.controlView showCoverViewWithUrl:data.image_small withImageMode:imageMode];
 }
 
 - (void)playTheIndex:(NSInteger)index {

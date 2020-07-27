@@ -7,12 +7,23 @@
 //
 
 #import "TFY_AutoPlayerCell.h"
+#import "profileView.h"
+#import "HelpherderView.h"
 
 @interface TFY_AutoPlayerCell ()
-@property (nonatomic, strong) UIImageView *coverImageView,*headImageView,*bgImgView;
+@property(nonatomic , strong)profileView *profile_image;
+
+@property(nonatomic , strong)UILabel *text_label;
+
+@property(nonatomic , strong)UIImageView *bimageuri;
+
+@property(nonatomic , strong)UIImageView *video_play;
+
+@property(nonatomic , strong)HelpherderView *butom_View;
+
+@property (nonatomic, strong) UIView *fullMaskView;
+
 @property (nonatomic, strong) UIButton *playBtn;
-@property (nonatomic, strong) UILabel *nickNameLabel,*titleLabel;
-@property (nonatomic, strong) UIView *effectView;
 @end
 
 @implementation TFY_AutoPlayerCell
@@ -21,27 +32,24 @@
     if (self=[super initWithStyle:style reuseIdentifier:reuseIdentifier]) {
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         
-        [self.contentView addSubview:self.headImageView];
-        self.headImageView.tfy_LeftSpace(20).tfy_TopSpace(10).tfy_size(35, 35);
-        
-        [self.contentView addSubview:self.nickNameLabel];
-        self.nickNameLabel.tfy_LeftSpaceToView(10, self.headImageView).tfy_CenterYToView(0, self.headImageView).tfy_RightSpace(20).tfy_Height(30);
-        
-        [self.contentView addSubview:self.bgImgView];
-        self.bgImgView.tfy_LeftSpace(0).tfy_TopSpaceToView(10, self.headImageView).tfy_RightSpace(0).tfy_HeightAuto();
-        
-        [self.bgImgView addSubview:self.effectView];
-        self.effectView.tfy_SizeEqualView(self.bgImgView);
-        
-        [self.contentView addSubview:self.coverImageView];
-        self.coverImageView.tfy_LeftSpace(0).tfy_TopSpaceToView(10, self.headImageView).tfy_RightSpace(0).tfy_HeightAuto();
-        
-        [self.coverImageView addSubview:self.playBtn];
-        self.playBtn.tfy_Center(0, 0).tfy_size(44, 44);
-        
-        [self.contentView addSubview:self.titleLabel];
-        self.titleLabel.tfy_LeftSpace(20).tfy_TopSpaceToView(10, self.coverImageView).tfy_RightSpace(20).tfy_HeightAuto();
-        
+         [self.contentView addSubview:self.profile_image];
+       self.profile_image.tfy_LeftSpace(0).tfy_TopSpace(0).tfy_RightSpace(0).tfy_Height(60);
+       
+       [self.contentView addSubview:self.text_label];
+       self.text_label.tfy_LeftSpace(20).tfy_TopSpaceToView(0, self.profile_image).tfy_RightSpace(20).tfy_HeightAuto();
+       
+       [self.contentView addSubview:self.bimageuri];
+       self.bimageuri.tfy_LeftSpace(20).tfy_TopSpaceToView(10, self.text_label).tfy_RightSpace(20).tfy_HeightAuto();
+       
+       [self.bimageuri addSubview:self.video_play];
+       self.video_play.tfy_Center(0, 0).tfy_size(71, 71);
+       
+       [self.contentView addSubview:self.butom_View];
+       self.butom_View.tfy_LeftSpace(0).tfy_TopSpaceToView(0, self.bimageuri).tfy_RightSpace(0).tfy_Height(40);
+   
+       [self.contentView addSubview:self.playBtn];
+       self.playBtn.tfy_Center(0, 0).tfy_size(40, 40);
+       
     }
     return self;
 }
@@ -49,79 +57,78 @@
 -(void)setListModel:(TFY_ListModel *)listModel{
     _listModel = listModel;
     
-    [self.headImageView sd_setImageWithURL:[NSURL URLWithString:_listModel.head] placeholderImage:[UIImage imageNamed:@"defaultUserIcon"]];
+    self.profile_image.models = _listModel;
+       
+   self.text_label.tfy_text(_listModel.text);
+   
+   self.bimageuri.tfy_Height(self.videoHeight);
+   
+   [self.bimageuri tfy_setImageWithURLString:_listModel.bimageuri placeholderImageName:@"defaultUserIcon"];
+   
+   self.butom_View.models = _listModel;
     
-    [self.coverImageView sd_setImageWithURL:[NSURL URLWithString:_listModel.thumbnail_url] placeholderImage:[UIImage imageNamed:@"loading_bgView"]];
-    
-    self.nickNameLabel.tfy_text(_listModel.nick_name);
-    
-    self.titleLabel.tfy_text(_listModel.title);
-    
-    self.bgImgView.tfy_size(_listModel.video_width, _listModel.video_height);
-    self.coverImageView.tfy_size(_listModel.video_width, _listModel.video_height);
-    
 }
 
-- (UIImageView *)coverImageView {
-    if (!_coverImageView) {
-        _coverImageView = tfy_imageView();
-        _coverImageView.userInteractionEnabled = YES;
-        _coverImageView.tag = 100;
-        _coverImageView.contentMode = UIViewContentModeScaleAspectFit;
+- (BOOL)isVerticalVideo {
+    return _listModel.width < _listModel.height;
+}
+
+- (CGFloat)videoHeight {
+    CGFloat videoHeight;
+    if (self.isVerticalVideo) {
+        videoHeight = TFY_Width_W * 0.6 * self.listModel.height/self.listModel.width;
+    } else {
+        videoHeight = TFY_Width_W * self.listModel.height/self.listModel.width;
     }
-    return _coverImageView;
+    return videoHeight;
 }
 
--(UIImageView *)headImageView{
-    if (!_headImageView) {
-        _headImageView = tfy_imageView();
+-(profileView *)profile_image{
+    if (!_profile_image) {
+        _profile_image = [profileView new];
     }
-    return _headImageView;
+    return _profile_image;
 }
 
--(UIImageView *)bgImgView{
-    if (!_bgImgView) {
-        _bgImgView = tfy_imageView();
+-(UILabel *)text_label{
+    if (!_text_label) {
+        _text_label = tfy_label().tfy_textcolor(LCColor_B1,1).tfy_fontSize([UIFont systemFontOfSize:15 weight:UIFontWeightLight]).tfy_alignment(0);
     }
-    return _bgImgView;
+    return _text_label;
 }
 
--(UILabel *)nickNameLabel{
-    if (!_nickNameLabel) {
-        _nickNameLabel = tfy_label();
-        _nickNameLabel.tfy_textcolor(LCColor_B1, 1).tfy_fontSize([UIFont systemFontOfSize:14 weight:UIFontWeightRegular]).tfy_alignment(0).tfy_numberOfLines(0);
+-(UIImageView *)bimageuri{
+    if (!_bimageuri) {
+        _bimageuri = tfy_imageView();
+        _bimageuri.tag = 100;
+        _bimageuri.contentMode = UIViewContentModeScaleAspectFit;
+        _bimageuri.userInteractionEnabled = YES;
     }
-    return _nickNameLabel;
+    return _bimageuri;
 }
 
-- (UILabel *)titleLabel{
-    if (!_titleLabel) {
-        _titleLabel = tfy_label();
-        _titleLabel.tfy_textcolor(LCColor_B1, 1).tfy_fontSize([UIFont systemFontOfSize:14 weight:UIFontWeightBold]).tfy_alignment(0).tfy_numberOfLines(0);
+-(UIImageView *)video_play{
+    if (!_video_play) {
+        _video_play = tfy_imageView().tfy_imge(@"video-play");
     }
-    return _titleLabel;
+    return _video_play;
 }
 
-- (UIButton *)playBtn {
+-(HelpherderView *)butom_View{
+    if (!_butom_View) {
+        _butom_View = [HelpherderView new];
+    }
+    return _butom_View;
+}
+
+-(UIButton *)playBtn{
     if (!_playBtn) {
         _playBtn = tfy_button();
-        _playBtn.tfy_image(@"new_allPlay_44x44_", UIControlStateNormal).tfy_action(self, @selector(playBtnClick:), UIControlEventTouchUpInside);
+        _playBtn.tfy_image(@"", UIControlStateNormal).tfy_action(self, @selector(playBtnClick:),UIControlEventTouchUpInside);
     }
     return _playBtn;
 }
-- (UIView *)effectView {
-    if (!_effectView) {
-        if (@available(iOS 8.0, *)) {
-            UIBlurEffect *effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
-            _effectView = [[UIVisualEffectView alloc] initWithEffect:effect];
-        } else {
-            UIToolbar *effectView = [[UIToolbar alloc] init];
-            effectView.barStyle = UIBarStyleBlackTranslucent;
-            _effectView = effectView;
-        }
-    }
-    return _effectView;
-}
+
 - (void)playBtnClick:(UIButton *)sender {
     if ([self.delegate respondsToSelector:@selector(tfy_playTheVideoAtIndexPath:)]) {
         [self.delegate tfy_playTheVideoAtIndexPath:self.indexPath];

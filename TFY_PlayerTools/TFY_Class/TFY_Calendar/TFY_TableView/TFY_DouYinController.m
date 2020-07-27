@@ -90,12 +90,12 @@ TFY_CATEGORY_STRONG_PROPERTY TFY_DouYinPlayerView *controlView;
     [self.controlView resetControlView];
     TFY_ListModel *listModel = self.playermodels.list[indexPath.row];
     UIViewContentMode imageMode;
-    if (listModel.thumbnail_width >= listModel.thumbnail_height) {
+    if (listModel.width >= listModel.height) {
         imageMode = UIViewContentModeScaleAspectFit;
     } else {
         imageMode = UIViewContentModeScaleAspectFill;
     }
-    [self.controlView showCoverViewWithUrl:listModel.thumbnail_url withImageMode:imageMode];
+    [self.controlView showCoverViewWithUrl:listModel.image_small withImageMode:imageMode];
 }
 
 

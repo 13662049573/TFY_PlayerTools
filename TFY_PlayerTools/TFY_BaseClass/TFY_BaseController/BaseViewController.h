@@ -32,7 +32,30 @@ NS_ASSUME_NONNULL_BEGIN
 /***  token 失效  直接跳转到登录界面*/
 -(void)loginController;
 
+/**
+ *  下拉加载
+ */
+-(void)addharder;
+/**
+ *  下拉需要加载数据调用这个方法
+ */
+- (void)loadNewData;
+/**
+ *  上拉加载
+ */
+-(void)addfooter;
+/**
+ *  上拉需要加载数据调用这个方法
+ */
+-(void)loadfooter;
+/**
+ *  有数据是否加载显示文字
+ */
+- (void)setNoMoreData:(BOOL)noMoreData;
+
+
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
+
 @end
 
 NS_ASSUME_NONNULL_END

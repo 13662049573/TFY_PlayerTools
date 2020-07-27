@@ -109,10 +109,10 @@ TFY_CATEGORY_STRONG_PROPERTY TFY_TableHeaderView *headerView;
     TFY_ListModel *listModel = self.playermodels.list[index];
     
     TFY_PlayerVideoModel *player = [TFY_PlayerVideoModel new];
-    player.tfy_url = listModel.video_url;
+    player.tfy_url = listModel.videouri;
     self.player.assetUrlModel = player;
     
-    [self.controlView showTitle:listModel.title coverURLString:listModel.thumbnail_url fullScreenMode:FullScreenModeLandscape];
+    [self.controlView showTitle:listModel.screen_name coverURLString:listModel.image_small fullScreenMode:FullScreenModeLandscape];
     
     if (self.tableView.contentOffset.y > self.headerView.frame.size.height) {
         [self.player addPlayerViewToKeyWindow];

@@ -32,9 +32,9 @@ TFY_CATEGORY_STRONG_PROPERTY UILabel *nick_Label;
 -(void)setListModel:(TFY_ListModel *)listModel{
     _listModel = listModel;
     
-    self.nick_Label.tfy_text(_listModel.title);
+    self.nick_Label.tfy_text(_listModel.name);
     
-    [self.vido_imageView sd_setImageWithURL:[NSURL URLWithString:_listModel.thumbnail_url] placeholderImage:[UIImage imageNamed:@"loading_bgView"]];
+    [self.vido_imageView sd_setImageWithURL:[NSURL URLWithString:_listModel.image_small] placeholderImage:[UIImage imageNamed:@"loading_bgView"]];
 }
 
 -(UILabel *)nick_Label {

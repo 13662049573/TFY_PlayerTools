@@ -69,8 +69,7 @@ TFY_CATEGORY_STRONG_PROPERTY TFY_PlayerView *controlView;
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    TFY_ListModel *listmodel = self.playermodels.list[indexPath.row];
-    return listmodel.video_height+140;
+    return [TFY_LightTableViewCell tfy_CellHeightForIndexPath:indexPath tableVView:tableView];
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
