@@ -113,6 +113,7 @@
 
 /* Begin PBXFileReference section */
 		1C1DAF401246747A42050380 /* Pods-TFY_PlayerToolsTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TFY_PlayerToolsTests.release.xcconfig"; path = "Target Support Files/Pods-TFY_PlayerToolsTests/Pods-TFY_PlayerToolsTests.release.xcconfig"; sourceTree = "<group>"; };
+		3638B05D250883B000F71DC7 /* TFY_PlayerToolsKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_PlayerToolsKit.h; sourceTree = "<group>"; };
 		3644635F24BFF3CD001D0DC4 /* TFY_PlayerTools.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TFY_PlayerTools.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3644636E24BFF3CF001D0DC4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3644637124BFF3CF001D0DC4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -157,7 +158,6 @@
 		364463BE24BFF4A5001D0DC4 /* TFY_PlayerGestureControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TFY_PlayerGestureControl.m; sourceTree = "<group>"; };
 		364463BF24BFF4A5001D0DC4 /* TFY_FloatView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TFY_FloatView.h; sourceTree = "<group>"; };
 		364463C024BFF4A5001D0DC4 /* TFY_PlayerVideoModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TFY_PlayerVideoModel.h; sourceTree = "<group>"; };
-		364463CE24BFF4C8001D0DC4 /* TFY_PlayerToolsKitHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_PlayerToolsKitHeader.h; sourceTree = "<group>"; };
 		364D74AA24C3073200ECC7E9 /* TFY_CollectionController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_CollectionController.h; sourceTree = "<group>"; };
 		364D74AB24C3073200ECC7E9 /* TFY_CollectionController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_CollectionController.m; sourceTree = "<group>"; };
 		364D74AD24C3076A00ECC7E9 /* TFY_CollectionCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_CollectionCell.h; sourceTree = "<group>"; };
@@ -381,8 +381,8 @@
 		3644639724BFF44D001D0DC4 /* TFY_PlayerToolsKit */ = {
 			isa = PBXGroup;
 			children = (
+				3638B05D250883B000F71DC7 /* TFY_PlayerToolsKit.h */,
 				3671A2FA24C1AF630010728D /* videoImages.bundle */,
-				364463CE24BFF4C8001D0DC4 /* TFY_PlayerToolsKitHeader.h */,
 				3671A2ED24C1A2DF0010728D /* TFY_PlayerView */,
 				364463A324BFF4A5001D0DC4 /* TFY_PlayerTool */,
 			);
@@ -416,8 +416,8 @@
 			isa = PBXGroup;
 			children = (
 				364463BD24BFF4A5001D0DC4 /* TFY_PlayerToolsHeader.h */,
-				364463A624BFF4A5001D0DC4 /* TFY_PlayerMediaPlayback.h */,
 				364463BA24BFF4A5001D0DC4 /* TFY_PlayerMediaControl.h */,
+				364463A624BFF4A5001D0DC4 /* TFY_PlayerMediaPlayback.h */,
 				364463BF24BFF4A5001D0DC4 /* TFY_FloatView.h */,
 				364463B124BFF4A5001D0DC4 /* TFY_FloatView.m */,
 				364463B324BFF4A5001D0DC4 /* TFY_LoadingView.h */,
