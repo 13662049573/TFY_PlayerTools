@@ -12,14 +12,14 @@
 
 @implementation PlayerImageDownloader
 
-- (void)startDownloadImageWithUrl:(NSString *)url
+- (void)startDownloadImageWithUrl:(NSString *_Nullable)url
                          progress:(DownloadProgressBlock)progress
                          finished:(DownLoadDataCallBack)finished {
     self.progressBlock = progress;
     self.callbackOnFinished = finished;
     
     if ([NSURL URLWithString:url] == nil) {
-        if (finished) { finished(nil, nil); }
+        if (finished) { finished(nil,nil); }
         return;
     }
     
@@ -265,9 +265,9 @@
     return [self setImageWithURLString:url placeholder:placeholderImage completion:nil];
 }
 
-- (void)setImageWithURLString:(NSString *)url
-         placeholderImageName:(NSString *)placeholderImage
-                   completion:(void (^)(UIImage *image))completion {
+- (void)setImageWithURLString:(NSString *_Nullable)url
+         placeholderImageName:(NSString *_Nullable)placeholderImage
+                   completion:(void (^ _Nullable)(UIImage *_Nullable image))completion {
     NSString *path = [[NSBundle mainBundle] pathForResource:placeholderImage ofType:nil];
     UIImage *image = [UIImage imageWithContentsOfFile:path];
     if (image == nil) { image = [UIImage imageNamed:placeholderImage]; }
@@ -275,9 +275,9 @@
     [self setImageWithURLString:url placeholder:image completion:completion];
 }
 
-- (void)setImageWithURLString:(NSString *)url
-                  placeholder:(UIImage *)placeholderImageName
-                   completion:(void (^)(UIImage *image))completion {
+- (void)setImageWithURLString:(NSString *_Nullable)url
+                  placeholder:(UIImage *_Nullable)placeholderImageName
+                   completion:(void (^ _Nullable)(UIImage *_Nullable image))completion {
     [self.layer removeAllAnimations];
     self.completion = completion;
     
