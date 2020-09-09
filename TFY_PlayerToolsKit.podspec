@@ -3,7 +3,7 @@ Pod::Spec.new do |spec|
 
   spec.name         = "TFY_PlayerToolsKit"
 
-  spec.version      = "2.0.6"
+  spec.version      = "2.0.8"
 
   spec.summary      = "视频播放器主要使用工具封装"
 
@@ -21,7 +21,7 @@ Pod::Spec.new do |spec|
 
   spec.source       = { :git => "https://github.com/13662049573/TFY_PlayerTools.git", :tag => spec.version }
 
-  spec.source_files  = "TFY_PlayerTools/TFY_PlayerToolsKit/TFY_PlayerToolsKitHeader.h"
+  spec.source_files  = "TFY_PlayerTools/TFY_PlayerToolsKit/TFY_PlayerToolsKit.h"
 
   spec.subspec 'TFY_PlayerTool' do |s|
     s.source_files  = "TFY_PlayerTools/TFY_PlayerToolsKit/TFY_PlayerTool/**/*.{h,m}"
