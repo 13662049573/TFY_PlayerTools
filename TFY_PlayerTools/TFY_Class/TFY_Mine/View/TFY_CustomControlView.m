@@ -81,7 +81,7 @@
     [self.fullScreenBtn addTarget:self action:@selector(fullScreenButtonClickAction:) forControlEvents:UIControlEventTouchUpInside];
 }
 
-#pragma mark - ZFSliderViewDelegate
+#pragma mark - SliderViewDelegate
 
 - (void)sliderTouchBegan:(float)value {
     self.slider.isdragging = YES;
