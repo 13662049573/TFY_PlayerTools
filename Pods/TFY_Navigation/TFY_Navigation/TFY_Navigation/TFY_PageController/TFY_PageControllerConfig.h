@@ -214,7 +214,43 @@ NS_ASSUME_NONNULL_BEGIN
  分段选择器颜色 默认 黑色
  */
 @property (nonatomic, strong) UIColor *segmentedTintColor;
+/**
+  分段选择器背景颜色 默认 lightTextColor
+ */
+@property (nonatomic, strong) UIColor *segmentBackColor;
+/**
+  是否根据选项中的内容自适应选项宽度 默认 NO
+ */
+@property (nonatomic, assign) BOOL segmentWidthsByContent;
+/**
+ 分段选择器默认选择 颜色 黑色
+ */
+@property (nonatomic, strong) UIColor *segmentNormalColor;
+/**
+ 分段选择器默认选中 颜色 浅色
+ */
+@property (nonatomic, strong) UIColor *segmentSelectedColor;
+/**
+  分段选择器 默认 标准字体15
+ */
+@property (nonatomic, strong) UIFont *segmentNormalFont;
 
+/**
+ 分段选择器 选中字体 默认 标准粗体15
+ */
+@property (nonatomic, strong) UIFont *segmentSelectedFont;
+/**
+   分段选择器 圆角 默认 5
+ */
+@property (nonatomic, assign) CGFloat segmentCornerRadius;
+/**
+   分段选择器 边框宽度 默认 1
+ */
+@property (nonatomic, assign) CGFloat segmentBorderWidth;
+/**
+   分段选择器  边框颜色 默认 透明
+ */
+@property (nonatomic, strong) UIColor *segmentBorderColor;
 @end
 
 NS_ASSUME_NONNULL_END

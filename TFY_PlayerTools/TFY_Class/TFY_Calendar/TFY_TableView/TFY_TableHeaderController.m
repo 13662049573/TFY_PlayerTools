@@ -11,9 +11,9 @@
 #import "TFY_HerderTableViewCell.h"
 
 @interface TFY_TableHeaderController ()<UITableViewDelegate,UITableViewDataSource>
-TFY_CATEGORY_STRONG_PROPERTY BaseTableView *tableView6;
-TFY_CATEGORY_STRONG_PROPERTY TFY_PlayerView *controlView;
-TFY_CATEGORY_STRONG_PROPERTY TFY_TableHeaderView *headerView;
+TFY_PROPERTY_STRONG BaseTableView *tableView6;
+TFY_PROPERTY_STRONG TFY_PlayerView *controlView;
+TFY_PROPERTY_STRONG TFY_TableHeaderView *headerView;
 @end
 
 @implementation TFY_TableHeaderController
@@ -91,7 +91,7 @@ TFY_CATEGORY_STRONG_PROPERTY TFY_TableHeaderView *headerView;
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     NSString *identfier = [NSString stringWithFormat:@"%ld,%ld",indexPath.row,indexPath.section];
-    TFY_HerderTableViewCell *cell = [TFY_HerderTableViewCell cellFromCodeWithTableView:tableView identifier:identfier];
+    TFY_HerderTableViewCell *cell = [TFY_HerderTableViewCell tfy_cellFromCodeWithTableView:tableView identifier:identfier];
     
     cell.listModel = self.playermodels.list[indexPath.row];
     

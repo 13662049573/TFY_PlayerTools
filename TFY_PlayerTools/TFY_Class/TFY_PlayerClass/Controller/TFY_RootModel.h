@@ -12,11 +12,11 @@
 @class TFY_InfoModel;
 
 @interface PlayerCommand : NSObject
-TFY_CATEGORY_CHAIN_PROPERTY NSString *maxtime;
+TFY_PROPERTY_CHAIN NSString *maxtime;
 
-TFY_CATEGORY_STRONG_PROPERTY RACCommand *playerCommand;
+TFY_PROPERTY_STRONG RACCommand *playerCommand;
 
-TFY_CATEGORY_STRONG_PROPERTY RACCommand *maxtimehelpCommand;
+TFY_PROPERTY_STRONG RACCommand *maxtimehelpCommand;
 @end
 
 

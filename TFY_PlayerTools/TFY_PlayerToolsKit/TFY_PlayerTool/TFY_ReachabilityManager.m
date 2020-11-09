@@ -51,15 +51,33 @@ static ReachabilityStatus ReachabilityStatusForFlags(SCNetworkReachabilityFlags 
     }
 #if TARGET_OS_IPHONE
     else if ((flags & kSCNetworkReachabilityFlagsIsWWAN) != 0) {
-        CTTelephonyNetworkInfo * info = [[CTTelephonyNetworkInfo alloc] init];
-        NSString *currentRadioAccessTechnology = info.currentRadioAccessTechnology;
-        if (currentRadioAccessTechnology) {
-            if ([currentRadioAccessTechnology isEqualToString:CTRadioAccessTechnologyLTE]) {
-                status = ReachabilityStatusReachableVia4G;
-            } else if ([currentRadioAccessTechnology isEqualToString:CTRadioAccessTechnologyEdge] || [currentRadioAccessTechnology isEqualToString:CTRadioAccessTechnologyGPRS]) {
-                status = ReachabilityStatusReachableVia2G;
-            } else {
-                status = ReachabilityStatusReachableVia3G;
+        NSArray *typeStrings2G = @[CTRadioAccessTechnologyEdge,
+                CTRadioAccessTechnologyGPRS,
+                CTRadioAccessTechnologyCDMA1x];
+          
+         NSArray *typeStrings3G = @[CTRadioAccessTechnologyHSDPA,
+                CTRadioAccessTechnologyWCDMA,
+                CTRadioAccessTechnologyHSUPA,
+                CTRadioAccessTechnologyCDMAEVDORev0,
+                CTRadioAccessTechnologyCDMAEVDORevA,
+                CTRadioAccessTechnologyCDMAEVDORevB,
+                CTRadioAccessTechnologyeHRPD];
+          
+         NSArray *typeStrings4G = @[CTRadioAccessTechnologyLTE];
+        CTTelephonyNetworkInfo *teleInfo= [[CTTelephonyNetworkInfo alloc] init];
+        if (@available(iOS 12.0, *)) {
+            NSDictionary<NSString *, NSString *> *currentStatus = teleInfo.serviceCurrentRadioAccessTechnology;
+            if (currentStatus.allKeys.count==0) {
+                status = ReachabilityStatusUnknown;
+            }
+            for (NSString *obj in currentStatus.allValues) {
+                if ([typeStrings4G containsObject:obj]) {
+                    status = ReachabilityStatusReachableVia4G;
+                } else if ([typeStrings3G containsObject:obj]) {
+                    status = ReachabilityStatusReachableVia3G;
+                } else if ([typeStrings2G containsObject:obj]) {
+                    status = ReachabilityStatusReachableVia2G;
+                }
             }
         }
     }

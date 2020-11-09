@@ -14,9 +14,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * 是否开启圆角 默认 NO
  */
-TFY_CATEGORY_ASSIGN_PROPERTY BOOL fillet_bool;
+TFY_PROPERTY_ASSIGN BOOL fillet_bool;
 /***是否开启默认图片*/
-TFY_CATEGORY_ASSIGN_PROPERTY BOOL default_picture;
+TFY_PROPERTY_ASSIGN BOOL default_picture;
 /**
  *  下拉加载
  */

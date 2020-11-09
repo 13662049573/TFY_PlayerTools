@@ -59,11 +59,11 @@
     
     self.profile_image.models = _listModel;
        
-   self.text_label.tfy_text(_listModel.text);
+   self.text_label.makeChain.text(_listModel.text);
    
    self.bimageuri.tfy_Height(self.videoHeight);
    
-   [self.bimageuri tfy_setImageWithURLString:_listModel.bimageuri placeholderImageName:@"defaultUserIcon"];
+    [self.bimageuri sd_setImageWithURL:[NSURL URLWithString:_listModel.bimageuri] placeholderImage:[UIImage imageNamed:@"defaultUserIcon"]];
    
    self.butom_View.models = _listModel;
     
@@ -76,9 +76,9 @@
 - (CGFloat)videoHeight {
     CGFloat videoHeight;
     if (self.isVerticalVideo) {
-        videoHeight = TFY_Width_W * 0.6 * self.listModel.height/self.listModel.width;
+        videoHeight = TFY_Width_W() * 0.6 * self.listModel.height/self.listModel.width;
     } else {
-        videoHeight = TFY_Width_W * self.listModel.height/self.listModel.width;
+        videoHeight = TFY_Width_W() * self.listModel.height/self.listModel.width;
     }
     return videoHeight;
 }
@@ -92,24 +92,31 @@
 
 -(UILabel *)text_label{
     if (!_text_label) {
-        _text_label = tfy_label().tfy_textcolor(LCColor_B1,1).tfy_fontSize([UIFont systemFontOfSize:15 weight:UIFontWeightLight]).tfy_alignment(0);
+        _text_label = UILabelSet();
+        _text_label.makeChain
+        .textColor([UIColor tfy_colorWithHex:LCColor_B1])
+        .font([UIFont systemFontOfSize:15 weight:UIFontWeightLight])
+        .textAlignment(NSTextAlignmentCenter);
     }
     return _text_label;
 }
 
 -(UIImageView *)bimageuri{
     if (!_bimageuri) {
-        _bimageuri = tfy_imageView();
-        _bimageuri.tag = 100;
-        _bimageuri.contentMode = UIViewContentModeScaleAspectFit;
-        _bimageuri.userInteractionEnabled = YES;
+        _bimageuri = UIImageViewSet();
+        _bimageuri.makeChain
+        .makeTag(100)
+        .contentMode(UIViewContentModeScaleAspectFit)
+        .userInteractionEnabled(YES);
     }
     return _bimageuri;
 }
 
 -(UIImageView *)video_play{
     if (!_video_play) {
-        _video_play = tfy_imageView().tfy_imge(@"video-play");
+        _video_play = UIImageViewSet();
+        _video_play.makeChain
+        .image([UIImage imageNamed:@"video-play"]);
     }
     return _video_play;
 }
@@ -123,8 +130,10 @@
 
 -(UIButton *)playBtn{
     if (!_playBtn) {
-        _playBtn = tfy_button();
-        _playBtn.tfy_image(@"", UIControlStateNormal).tfy_action(self, @selector(playBtnClick:),UIControlEventTouchUpInside);
+        _playBtn = UIButtonSet();
+        _playBtn.makeChain
+        .image([UIImage imageNamed:@""], UIControlStateNormal)
+        .addTarget(self, @selector(playBtnClick:), UIControlEventTouchUpInside);
     }
     return _playBtn;
 }

@@ -11,7 +11,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface TFY_DouyinCollectionViewCell : UICollectionViewCell
-TFY_CATEGORY_STRONG_PROPERTY TFY_ListModel *listModel;
+TFY_PROPERTY_STRONG TFY_ListModel *listModel;
 @end
 
 NS_ASSUME_NONNULL_END

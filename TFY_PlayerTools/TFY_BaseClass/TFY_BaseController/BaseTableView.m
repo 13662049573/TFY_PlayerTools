@@ -10,7 +10,7 @@
 
 
 @interface BaseTableView ()
-TFY_CATEGORY_STRONG_PROPERTY UIView *back_View;
+TFY_PROPERTY_STRONG UIView *back_View;
 @end
 
 @implementation BaseTableView
@@ -22,7 +22,7 @@ TFY_CATEGORY_STRONG_PROPERTY UIView *back_View;
         self.showsVerticalScrollIndicator=NO;
         self.showsHorizontalScrollIndicator=NO;
         self.separatorInset= UIEdgeInsetsMake(0,20,0,20);
-        self.separatorColor = [UIColor tfy_ColorWithHexString:@"E8E8E8"];
+        self.separatorColor = [UIColor tfy_colorWithHex:@"E8E8E8"];
         self.estimatedRowHeight=0;
         self.rowHeight=UITableViewAutomaticDimension;
         self.estimatedSectionFooterHeight = 0;

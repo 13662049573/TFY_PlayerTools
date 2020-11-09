@@ -20,14 +20,20 @@
     [NSThread sleepForTimeInterval:1.5];
     
     [TFY_ServerConfig setTFY_ConfigEnv:@"01"];
+    //配置导航栏
+    [TFY_Configure setupCustomConfigure:^(TFYNavigationBarConfigure * _Nonnull configure) {
+        configure.backImage = [UIImage tfy_imageFromGradientColors:@[[UIColor tfy_colorWithHex:LCColor_A4],[UIColor tfy_colorWithHex:LCColor_A5]] gradientType:TFY_GradientTypeUprightToLowleft imageSize:CGSizeMake(TFY_Width_W(), TFY_kNavBarHeight())];
+        configure.backStyle = TFYNavigationBarBackStyleWhite;
+        configure.titleColor = [UIColor tfy_colorWithHex:LCColor_B5];
+    }];
     
-    if (![ScenePackage defaultPackage].isSceneApp) {
+    if (!TFY_ScenePackage.isSceneApp) {
         self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
         self.window.backgroundColor = [UIColor whiteColor];
         [self.window makeKeyAndVisible];
     }
-    [[ScenePackage defaultPackage] addBeforeWindowEvent:^(ScenePackage * _Nonnull application) {
-        [UIApplication window].rootViewController = [LM_TabBarController new];
+    [TFY_ScenePackage addBeforeWindowEvent:^(TFY_Scene * _Nonnull application) {
+        [UIApplication tfy_window].rootViewController = [LM_TabBarController new];
     }];
     return YES;
 }

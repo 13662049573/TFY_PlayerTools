@@ -10,7 +10,7 @@
 
 
 @interface LX_HomeController ()
-TFY_CATEGORY_STRONG_PROPERTY UIButton *player_Btn;
+TFY_PROPERTY_STRONG UIButton *player_Btn;
 @end
 
 @implementation LX_HomeController

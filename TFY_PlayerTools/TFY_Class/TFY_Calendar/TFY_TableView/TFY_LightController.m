@@ -10,8 +10,8 @@
 #import "TFY_LightTableViewCell.h"
 
 @interface TFY_LightController ()<UITableViewDelegate,UITableViewDataSource,TableViewCellDelegate>
-TFY_CATEGORY_STRONG_PROPERTY BaseTableView *tableView3;
-TFY_CATEGORY_STRONG_PROPERTY TFY_PlayerView *controlView;
+TFY_PROPERTY_STRONG BaseTableView *tableView3;
+TFY_PROPERTY_STRONG TFY_PlayerView *controlView;
 @end
 
 @implementation TFY_LightController
@@ -74,7 +74,7 @@ TFY_CATEGORY_STRONG_PROPERTY TFY_PlayerView *controlView;
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     NSString *identfier = [NSString stringWithFormat:@"%ld,%ld",indexPath.row,indexPath.section];
-    TFY_LightTableViewCell *cell = [TFY_LightTableViewCell cellFromCodeWithTableView:tableView identifier:identfier];
+    TFY_LightTableViewCell *cell = [TFY_LightTableViewCell tfy_cellFromCodeWithTableView:tableView identifier:identfier];
     
     [cell setDelegate:self withIndexPath:indexPath];
     

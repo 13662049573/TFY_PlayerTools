@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface TFY_LightTableViewCell : UITableViewCell
 
-TFY_CATEGORY_STRONG_PROPERTY TFY_ListModel *listModel;
+TFY_PROPERTY_STRONG TFY_ListModel *listModel;
 
 - (void)setDelegate:(id<TableViewCellDelegate>)delegate withIndexPath:(NSIndexPath *)indexPath;
 

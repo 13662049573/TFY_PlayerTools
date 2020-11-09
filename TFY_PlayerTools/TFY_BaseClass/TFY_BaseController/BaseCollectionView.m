@@ -30,16 +30,16 @@
 
 -(void)registerClass:(NSString *)cellClass herder_registerClass:(NSString *)viewClass  fooder_registerClass:(NSString *)viewClass2{
     
-    if (![TFY_CommonUtils judgeIsEmptyWithString:cellClass]) {
+    if (![TFY_Utils judgeIsEmptyWithString:cellClass]) {
         Class class_cell = NSClassFromString(cellClass);
         [self registerClass:class_cell forCellWithReuseIdentifier:cellClass];
     }
     Class class_register = NSClassFromString(viewClass);
-    if (![TFY_CommonUtils judgeIsEmptyWithString:viewClass]) {
+    if (![TFY_Utils judgeIsEmptyWithString:viewClass]) {
         [self registerClass:class_register forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:viewClass];
     }
     Class class_register2 = NSClassFromString(viewClass2);
-    if (![TFY_CommonUtils judgeIsEmptyWithString:viewClass2]) {
+    if (![TFY_Utils judgeIsEmptyWithString:viewClass2]) {
         [self registerClass:class_register2 forSupplementaryViewOfKind:UICollectionElementKindSectionFooter withReuseIdentifier:viewClass2];
     }
 }

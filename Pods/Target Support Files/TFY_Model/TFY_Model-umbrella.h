@@ -10,9 +10,11 @@
 #endif
 #endif
 
+#import "NSObject+TFY_Model 2.h"
 #import "NSObject+TFY_Model.h"
+#import "TFY_ModelKit.h"
+#import "TFY_ModelSqlite 2.h"
 #import "TFY_ModelSqlite.h"
-#import "TFY_ModelSqliteHeader.h"
 
 FOUNDATION_EXPORT double TFY_ModelVersionNumber;
 FOUNDATION_EXPORT const unsigned char TFY_ModelVersionString[];

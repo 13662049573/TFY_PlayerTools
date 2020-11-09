@@ -42,37 +42,47 @@
 -(void)setModels:(TFY_ListModel *)models{
     _models = models;
    
-    [self.profile_image tfy_setImageWithURLString:_models.profile_image placeholderImageName:@""];
+    [self.profile_image sd_setImageWithURL:[NSURL URLWithString:_models.profile_image]];
     
-    self.name_label.tfy_text(_models.name);
+    self.name_label.makeChain.text(_models.name);
 
-    self.time_label.tfy_text([NSDate timeInfoWithDateString:_models.passtime]);
+    self.time_label.makeChain.text([NSDate tfy_timeInfoWithDateString:_models.passtime]);
 }
 
 -(UIImageView *)profile_image{
     if (!_profile_image) {
-        _profile_image = tfy_imageView().tfy_cornerRadius(20);
+        _profile_image = UIImageViewSet();
+        _profile_image.makeChain.cornerRadius(10);
     }
     return _profile_image;
 }
 
 -(UILabel *)name_label{
     if (!_name_label) {
-        _name_label = tfy_label().tfy_textcolor(LCColor_B1, 1).tfy_alignment(0).tfy_fontSize([UIFont systemFontOfSize:14 weight:UIFontWeightHeavy]);
+        _name_label = UILabelSet();
+        _name_label.makeChain
+        .textColor([UIColor tfy_colorWithHex:LCColor_B1])
+        .textAlignment(NSTextAlignmentCenter)
+        .font([UIFont systemFontOfSize:14 weight:UIFontWeightHeavy]);
     }
     return _name_label;
 }
 
 -(UILabel *)time_label{
     if (!_time_label) {
-        _time_label = tfy_label().tfy_textcolor(LCColor_B3, 1).tfy_alignment(0).tfy_fontSize([UIFont systemFontOfSize:12 weight:UIFontWeightBold]);
+        _time_label = UILabelSet();
+        _time_label.makeChain
+        .textColor([UIColor tfy_colorWithHex:LCColor_B3])
+        .textAlignment(NSTextAlignmentCenter)
+        .font([UIFont systemFontOfSize:12 weight:UIFontWeightHeavy]);
     }
     return _time_label;
 }
 
 -(UIImageView *)images{
     if (!_images) {
-        _images = tfy_imageView().tfy_imge(@"cellmorebtnnormal");
+        _images = UIImageViewSet();
+        _images.makeChain.image([UIImage imageNamed:@"cellmorebtnnormal"]);
     }
     return _images;
 }

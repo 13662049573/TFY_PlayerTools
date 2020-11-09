@@ -10,8 +10,8 @@
 #import "TFY_AutoPlayerCell.h"
 
 @interface TFY_SmallPlayController ()<UITableViewDelegate,UITableViewDataSource,TableViewCellDelegate>
-TFY_CATEGORY_STRONG_PROPERTY BaseTableView *tableView4;
-TFY_CATEGORY_STRONG_PROPERTY TFY_PlayerView *controlView;
+TFY_PROPERTY_STRONG BaseTableView *tableView4;
+TFY_PROPERTY_STRONG TFY_PlayerView *controlView;
 @end
 
 @implementation TFY_SmallPlayController
@@ -88,7 +88,7 @@ TFY_CATEGORY_STRONG_PROPERTY TFY_PlayerView *controlView;
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     NSString *identfier = [NSString stringWithFormat:@"%ld,%ld",indexPath.row,indexPath.section];
-    TFY_AutoPlayerCell *cell = [TFY_AutoPlayerCell cellFromCodeWithTableView:tableView identifier:identfier];
+    TFY_AutoPlayerCell *cell = [TFY_AutoPlayerCell tfy_cellFromCodeWithTableView:tableView identifier:identfier];
     
     cell.indexPath = indexPath;
     

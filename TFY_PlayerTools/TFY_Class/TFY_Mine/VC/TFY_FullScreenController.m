@@ -9,7 +9,7 @@
 #import "TFY_FullScreenController.h"
 
 @interface TFY_FullScreenController ()
-TFY_CATEGORY_STRONG_PROPERTY TFY_PlayerView *controlView;
+TFY_PROPERTY_STRONG TFY_PlayerView *controlView;
 @end
 
 @implementation TFY_FullScreenController
@@ -24,7 +24,7 @@ TFY_CATEGORY_STRONG_PROPERTY TFY_PlayerView *controlView;
         [self.navigationController popViewControllerAnimated:NO];
     };
     
-    self.player = [[TFY_PlayerController alloc] initWithPlayerManagercontainerView:[ScenePackage defaultPackage].window];
+    self.player = [[TFY_PlayerController alloc] initWithPlayerManagercontainerView:TFY_ScenePackage.window];
     self.player.controlView = self.controlView;
     self.player.orientationObserver.supportInterfaceOrientation = InterfaceOrientationMaskLandscape;
     [self.player enterFullScreen:YES animated:NO];

@@ -9,11 +9,11 @@
 #import "TFY_NoramlController.h"
 
 @interface TFY_NoramlController ()
-TFY_CATEGORY_STRONG_PROPERTY TFY_PlayerView *controlView;
-TFY_CATEGORY_STRONG_PROPERTY NSArray <TFY_PlayerVideoModel *>*assetURLs;
-TFY_CATEGORY_STRONG_PROPERTY UIButton *playBtn;
-TFY_CATEGORY_STRONG_PROPERTY UIButton *changeBtn;
-TFY_CATEGORY_STRONG_PROPERTY UIButton *nextBtn;
+TFY_PROPERTY_STRONG TFY_PlayerView *controlView;
+TFY_PROPERTY_STRONG NSArray <TFY_PlayerVideoModel *>*assetURLs;
+TFY_PROPERTY_STRONG UIButton *playBtn;
+TFY_PROPERTY_STRONG UIButton *changeBtn;
+TFY_PROPERTY_STRONG UIButton *nextBtn;
 @end
 
 @implementation TFY_NoramlController
@@ -59,24 +59,37 @@ TFY_CATEGORY_STRONG_PROPERTY UIButton *nextBtn;
 
 - (UIButton *)playBtn{
     if (!_playBtn) {
-        _playBtn = tfy_button();
-        _playBtn.tfy_image(@"new_allPlay_44x44_", UIControlStateNormal).tfy_action(self, @selector(playClick:), UIControlEventTouchUpInside);
+        _playBtn = UIButtonSet();
+        _playBtn.makeChain
+        .image([UIImage imageNamed:@"new_allPlay_44x44_"], UIControlStateNormal)
+        .addTarget(self, @selector(playClick:), UIControlEventTouchUpInside);
     }
     return _playBtn;
 }
 
 - (UIButton *)changeBtn{
     if (!_changeBtn) {
-        _changeBtn = tfy_button();
-        _changeBtn.tfy_title(@"改变视频", UIControlStateNormal, LCColor_B5, UIControlStateNormal, [UIFont systemFontOfSize:16 weight:UIFontWeightBold]).tfy_cornerRadius(25).tfy_backgroundColor(LCColor_A3, 1).tfy_action(self, @selector(changeVideo), UIControlEventTouchUpInside);
+        _changeBtn = UIButtonSet();
+        _changeBtn.makeChain
+        .text(@"改变视频", UIControlStateNormal)
+        .textColor([UIColor tfy_colorWithHex:LCColor_B5], UIControlStateNormal)
+        .font([UIFont systemFontOfSize:16 weight:UIFontWeightBold])
+        .cornerRadius(25)
+        .backgroundColor([UIColor tfy_colorWithHex:LCColor_A3])
+        .addTarget(self, @selector(changeVideo), UIControlEventTouchUpInside);
     }
     return _changeBtn;
 }
 
 - (UIButton *)nextBtn{
     if (!_nextBtn) {
-        _nextBtn = tfy_button();
-        _nextBtn.tfy_title(@"下一个", UIControlStateNormal, LCColor_B5, UIControlStateNormal, [UIFont systemFontOfSize:16 weight:UIFontWeightBold]).tfy_cornerRadius(25).tfy_backgroundColor(LCColor_A3, 1).tfy_action(self, @selector(nextClick), UIControlEventTouchUpInside);
+        _nextBtn = UIButtonSet();
+        _nextBtn.makeChain
+        .text(@"下一个", UIControlStateNormal)
+        .textColor([UIColor tfy_colorWithHex:LCColor_B5], UIControlStateNormal)
+        .font([UIFont systemFontOfSize:16 weight:UIFontWeightBold])
+        .cornerRadius(25).backgroundColor([UIColor tfy_colorWithHex:LCColor_A3])
+        .addTarget(self, @selector(nextClick), UIControlEventTouchUpInside);
     }
     return _nextBtn;
 }

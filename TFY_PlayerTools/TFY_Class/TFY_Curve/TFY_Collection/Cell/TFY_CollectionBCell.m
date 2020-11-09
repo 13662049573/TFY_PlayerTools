@@ -9,7 +9,7 @@
 #import "TFY_CollectionBCell.h"
 
 @interface TFY_CollectionBCell ()
-TFY_CATEGORY_STRONG_PROPERTY UIImageView *coverImageView;
+TFY_PROPERTY_STRONG UIImageView *coverImageView;
 @end
 
 @implementation TFY_CollectionBCell
@@ -26,15 +26,15 @@ TFY_CATEGORY_STRONG_PROPERTY UIImageView *coverImageView;
 
 -(void)setListModel:(TFY_ListModel *)listModel{
     _listModel = listModel;
-    
-    [self.coverImageView setImageWithURLString:_listModel.image_small placeholder:[UIImage imageNamed:@"loading_bgView"]];
+    [self.coverImageView sd_setImageWithURL:[NSURL URLWithString:_listModel.image_small] placeholderImage:[UIImage imageNamed:@"loading_bgView"]];
 }
 
 - (UIImageView *)coverImageView{
     if (!_coverImageView) {
-        _coverImageView = tfy_imageView();
-        _coverImageView.userInteractionEnabled = YES;
-        _coverImageView.tag = 100;
+        _coverImageView = UIImageViewSet();
+        _coverImageView.makeChain
+        .userInteractionEnabled(YES)
+        .makeTag(100);
     }
     return _coverImageView;
 }

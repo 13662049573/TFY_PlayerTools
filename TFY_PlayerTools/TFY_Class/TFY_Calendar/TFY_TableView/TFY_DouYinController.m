@@ -10,8 +10,8 @@
 #import "TFY_DouYinPlayerView.h"
 #import "TFY_DouYinViewCell.h"
 @interface TFY_DouYinController ()<UITableViewDelegate,UITableViewDataSource>
-TFY_CATEGORY_STRONG_PROPERTY BaseTableView *tableView5;
-TFY_CATEGORY_STRONG_PROPERTY TFY_DouYinPlayerView *controlView;
+TFY_PROPERTY_STRONG BaseTableView *tableView5;
+TFY_PROPERTY_STRONG TFY_DouYinPlayerView *controlView;
 @property (nonatomic, strong) UIButton *backBtn;
 @end
 
@@ -74,7 +74,7 @@ TFY_CATEGORY_STRONG_PROPERTY TFY_DouYinPlayerView *controlView;
 }
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     NSString *identfier = [NSString stringWithFormat:@"%ld,%ld",(long)indexPath.row,(long)indexPath.section];
-    TFY_DouYinViewCell *cell = [TFY_DouYinViewCell cellFromCodeWithTableView:tableView identifier:identfier];
+    TFY_DouYinViewCell *cell = [TFY_DouYinViewCell tfy_cellFromCodeWithTableView:tableView identifier:identfier];
     
     cell.listModel = self.playermodels.list[indexPath.row];
     

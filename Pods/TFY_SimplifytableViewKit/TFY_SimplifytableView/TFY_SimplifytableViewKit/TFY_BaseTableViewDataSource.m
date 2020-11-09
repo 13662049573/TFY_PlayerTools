@@ -56,7 +56,7 @@
             }
         }];
     }
-    return _rowHeight+20;
+    return _rowHeight;
 }
 
 @end

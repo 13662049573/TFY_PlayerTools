@@ -10,9 +10,9 @@
 #import "TFY_ADPlayerView.h"
 
 @interface TFY_ADViewController ()
-TFY_CATEGORY_STRONG_PROPERTY TFY_PlayerController *adPlayer;
-TFY_CATEGORY_STRONG_PROPERTY TFY_ADPlayerView *adControlView;
-TFY_CATEGORY_STRONG_PROPERTY TFY_PlayerView *controlView;
+TFY_PROPERTY_STRONG TFY_PlayerController *adPlayer;
+TFY_PROPERTY_STRONG TFY_ADPlayerView *adControlView;
+TFY_PROPERTY_STRONG TFY_PlayerView *controlView;
 @end
 
 @implementation TFY_ADViewController

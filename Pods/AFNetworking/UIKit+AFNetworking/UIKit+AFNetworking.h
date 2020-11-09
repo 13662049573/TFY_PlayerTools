@@ -26,18 +26,18 @@
     #define _UIKIT_AFNETWORKING_
 
 #if TARGET_OS_IOS || TARGET_OS_TV
-    #import "AFAutoPurgingImageCache.h"
-    #import "AFImageDownloader.h"
-    #import "UIActivityIndicatorView+AFNetworking.h"
-    #import "UIButton+AFNetworking.h"
-    #import "UIImageView+AFNetworking.h"
-    #import "UIProgressView+AFNetworking.h"
+#import <AFNetworking/AFAutoPurgingImageCache.h>
+#import <AFNetworking/AFImageDownloader.h>
+#import <AFNetworking/UIActivityIndicatorView+AFNetworking.h>
+#import <AFNetworking/UIButton+AFNetworking.h>
+#import <AFNetworking/UIImageView+AFNetworking.h>
+#import <AFNetworking/UIProgressView+AFNetworking.h>
 #endif
 
 #if TARGET_OS_IOS
-    #import "AFNetworkActivityIndicatorManager.h"
-    #import "UIRefreshControl+AFNetworking.h"
-    #import "WKWebView+AFNetworking.h"
+#import <AFNetworking/AFNetworkActivityIndicatorManager.h>
+#import <AFNetworking/UIRefreshControl+AFNetworking.h>
+#import <AFNetworking/WKWebView+AFNetworking.h>
 #endif
 
 #endif /* _UIKIT_AFNETWORKING_ */

@@ -10,8 +10,8 @@
 #import "TFY_CollectionCell.h"
 
 @interface TFY_CollectionController ()<UICollectionViewDelegate,UICollectionViewDataSource,UICollectionCellDelegate>
-TFY_CATEGORY_STRONG_PROPERTY BaseCollectionView *collectionView;
-TFY_CATEGORY_STRONG_PROPERTY TFY_PlayerView *controlView;
+TFY_PROPERTY_STRONG BaseCollectionView *collectionView;
+TFY_PROPERTY_STRONG TFY_PlayerView *controlView;
 @end
 
 @implementation TFY_CollectionController

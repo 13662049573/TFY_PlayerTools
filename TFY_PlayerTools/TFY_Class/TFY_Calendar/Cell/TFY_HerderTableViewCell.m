@@ -9,8 +9,8 @@
 #import "TFY_HerderTableViewCell.h"
 
 @interface TFY_HerderTableViewCell ()
-TFY_CATEGORY_STRONG_PROPERTY UIImageView *vido_imageView;
-TFY_CATEGORY_STRONG_PROPERTY UILabel *nick_Label;
+TFY_PROPERTY_STRONG UIImageView *vido_imageView;
+TFY_PROPERTY_STRONG UILabel *nick_Label;
 @end
 
 @implementation TFY_HerderTableViewCell
@@ -32,23 +32,28 @@ TFY_CATEGORY_STRONG_PROPERTY UILabel *nick_Label;
 -(void)setListModel:(TFY_ListModel *)listModel{
     _listModel = listModel;
     
-    self.nick_Label.tfy_text(_listModel.name);
+    self.nick_Label.makeChain.text(_listModel.name);
     
     [self.vido_imageView sd_setImageWithURL:[NSURL URLWithString:_listModel.image_small] placeholderImage:[UIImage imageNamed:@"loading_bgView"]];
 }
 
 -(UILabel *)nick_Label {
     if (!_nick_Label) {
-        _nick_Label = tfy_label();
-        _nick_Label.tfy_textcolor(LCColor_B1, 1).tfy_numberOfLines(0).tfy_alignment(0).tfy_fontSize([UIFont systemFontOfSize:15 weight:UIFontWeightBold]);
+        _nick_Label = UILabelSet();
+        _nick_Label.makeChain
+        .textColor([UIColor tfy_colorWithHex:LCColor_B1])
+        .numberOfLines(0)
+        .textAlignment(NSTextAlignmentCenter)
+        .font([UIFont systemFontOfSize:15 weight:UIFontWeightBold]);
     }
     return _nick_Label;
 }
 
 -(UIImageView *)vido_imageView{
     if (!_vido_imageView) {
-        _vido_imageView = tfy_imageView();
-        _vido_imageView.userInteractionEnabled = YES;
+        _vido_imageView = UIImageViewSet();
+        _vido_imageView.makeChain
+        .userInteractionEnabled(YES);
     }
     return _vido_imageView;
 }

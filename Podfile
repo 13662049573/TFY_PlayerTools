@@ -9,7 +9,7 @@ pod 'TFY_AutoLayout'
 pod 'TFY_Model'
 pod 'TFY_TabBarKit'
 pod 'TFY_ProgressHUD'
-pod 'TFY_Category'
+pod 'TFY_LayoutCategoryKit'
 
 pod 'AFNetworking'
 pod 'IQKeyboardManager'

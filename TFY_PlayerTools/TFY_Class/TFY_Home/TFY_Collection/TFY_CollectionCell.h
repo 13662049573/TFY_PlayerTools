@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface TFY_CollectionCell : UICollectionViewCell
 
-TFY_CATEGORY_STRONG_PROPERTY TFY_ListModel *listModel;
+TFY_PROPERTY_STRONG TFY_ListModel *listModel;
 
 @property (weak, nonatomic)id<UICollectionCellDelegate> delegate;
 

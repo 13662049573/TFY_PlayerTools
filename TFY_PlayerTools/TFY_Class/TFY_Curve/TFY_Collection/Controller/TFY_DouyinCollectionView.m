@@ -11,9 +11,9 @@
 #import "TFY_DouyinCollectionViewCell.h"
 #import "TFY_DouYinPlayerView.h"
 @interface TFY_DouyinCollectionView ()<UICollectionViewDelegate,UICollectionViewDataSource>
-TFY_CATEGORY_STRONG_PROPERTY BaseCollectionView *collectionView;
-TFY_CATEGORY_STRONG_PROPERTY TFY_DouYinPlayerView *controlView;
-TFY_CATEGORY_STRONG_PROPERTY TFY_DouyinCollectionFlowLayout *layout;
+TFY_PROPERTY_STRONG BaseCollectionView *collectionView;
+TFY_PROPERTY_STRONG TFY_DouYinPlayerView *controlView;
+TFY_PROPERTY_STRONG TFY_DouyinCollectionFlowLayout *layout;
 @end
 
 @implementation TFY_DouyinCollectionView

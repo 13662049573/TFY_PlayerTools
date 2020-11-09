@@ -9,9 +9,9 @@
 #import "TFY_RotationController.h"
 
 @interface TFY_RotationController ()
-TFY_CATEGORY_STRONG_PROPERTY TFY_PlayerView *controlView;
-TFY_CATEGORY_STRONG_PROPERTY UISwitch *switch1,*switch2;
-TFY_CATEGORY_STRONG_PROPERTY UILabel *name_label1,*name_label2;
+TFY_PROPERTY_STRONG TFY_PlayerView *controlView;
+TFY_PROPERTY_STRONG UISwitch *switch1,*switch2;
+TFY_PROPERTY_STRONG UILabel *name_label1,*name_label2;
 @end
 
 @implementation TFY_RotationController
@@ -53,35 +53,40 @@ TFY_CATEGORY_STRONG_PROPERTY UILabel *name_label1,*name_label2;
 
 -(UISwitch *)switch1{
     if (!_switch1) {
-        _switch1 = [[UISwitch alloc] init];
-        _switch1.tag = 1;
-        [_switch1 addTarget:self action:@selector(switch1Click:) forControlEvents:UIControlEventTouchUpInside];
+        _switch1 = UISwitchSet();
+        _switch1.makeChain.makeTag(1).addTarget(self, @selector(switch1Click:), UIControlEventTouchUpInside);
     }
     return _switch1;
 }
 
 -(UISwitch *)switch2{
     if (!_switch2) {
-        _switch2 = [[UISwitch alloc] init];
-        _switch2.tag = 2;
-        _switch2.on = YES;
-        [_switch2 addTarget:self action:@selector(switch1Click:) forControlEvents:UIControlEventTouchUpInside];
+        _switch2 = UISwitchSet();
+        _switch2.makeChain.makeTag(2).on(YES).addTarget(self, @selector(switch1Click:), UIControlEventTouchUpInside);
     }
     return _switch2;
 }
 
 -(UILabel *)name_label1{
     if (!_name_label1) {
-        _name_label1 = tfy_label();
-        _name_label1.tfy_text(@"开启控制器旋转").tfy_fontSize([UIFont systemFontOfSize:14 weight:UIFontWeightRegular]).tfy_alignment(0).tfy_textcolor(LCColor_A1, 1);
+        _name_label1 =UILabelSet();
+        _name_label1.makeChain
+        .text(@"开启控制器旋转")
+        .font([UIFont systemFontOfSize:14 weight:UIFontWeightRegular])
+        .textAlignment(NSTextAlignmentCenter)
+        .textColor([UIColor tfy_colorWithHex:LCColor_A1]);
     }
     return _name_label1;
 }
 
 -(UILabel *)name_label2{
     if (!_name_label2) {
-        _name_label2 = tfy_label();
-        _name_label2.tfy_text(@"是否开启自动旋转").tfy_fontSize([UIFont systemFontOfSize:14 weight:UIFontWeightRegular]).tfy_alignment(2).tfy_textcolor(LCColor_A1, 1);
+        _name_label2 = UILabelSet();
+        _name_label2.makeChain
+        .text(@"是否开启自动旋转")
+        .font([UIFont systemFontOfSize:14 weight:UIFontWeightRegular])
+        .textAlignment(NSTextAlignmentRight)
+        .textColor([UIColor tfy_colorWithHex:LCColor_A1]);
     }
     return _name_label2;
 }

@@ -19,7 +19,7 @@
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
-    [self.window showOnScene:scene];
+    [self.window tfy_showOnScene:scene];
 }
 
 @end

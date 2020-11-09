@@ -10,9 +10,13 @@
 #endif
 #endif
 
-#import "TFY_SimplifytableHeader.h"
+#import "TFY_BaseTableViewDataSource 2.h"
 #import "TFY_BaseTableViewDataSource.h"
+#import "TFY_SimplifytableHeader 2.h"
+#import "TFY_SimplifytableHeader.h"
+#import "UITableView+TFY_TableViewMaker 2.h"
 #import "UITableView+TFY_TableViewMaker.h"
+#import "UITableViewCell+TFY_TableViewMaker 2.h"
 #import "UITableViewCell+TFY_TableViewMaker.h"
 
 FOUNDATION_EXPORT double TFY_SimplifytableViewKitVersionNumber;

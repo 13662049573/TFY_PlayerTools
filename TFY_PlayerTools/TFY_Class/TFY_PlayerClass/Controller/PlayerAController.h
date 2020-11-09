@@ -16,15 +16,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PlayerAController : BaseViewController
 
-TFY_CATEGORY_STRONG_PROPERTY TFY_PlayerController *player;
+TFY_PROPERTY_STRONG TFY_PlayerController *player;
 
-TFY_CATEGORY_STRONG_PROPERTY UIImageView *imageViews;
+TFY_PROPERTY_STRONG UIImageView *imageViews;
 
-TFY_CATEGORY_STRONG_PROPERTY TFY_PlayerVideoModel *models;
+TFY_PROPERTY_STRONG TFY_PlayerVideoModel *models;
 
-TFY_CATEGORY_STRONG_PROPERTY TFY_RootModel *playermodels;
+TFY_PROPERTY_STRONG TFY_RootModel *playermodels;
 
-TFY_CATEGORY_STRONG_PROPERTY NSMutableArray<TFY_PlayerVideoModel *> *urls;
+TFY_PROPERTY_STRONG NSMutableArray<TFY_PlayerVideoModel *> *urls;
 
 - (void)requestData:(void (^)(id x))nextBlock;
 @end

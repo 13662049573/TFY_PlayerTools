@@ -10,13 +10,13 @@
 
 @interface PlayerAController ()
 
-TFY_CATEGORY_STRONG_PROPERTY NSMutableArray *urlArray;
+TFY_PROPERTY_STRONG NSMutableArray *urlArray;
 
-TFY_CATEGORY_STRONG_PROPERTY NSString *ids;
+TFY_PROPERTY_STRONG NSString *ids;
 
-TFY_CATEGORY_ASSIGN_PROPERTY NSInteger seekpalyertime;
+TFY_PROPERTY_ASSIGN NSInteger seekpalyertime;
 
-TFY_CATEGORY_ASSIGN_PROPERTY NSTimeInterval delay;
+TFY_PROPERTY_ASSIGN NSTimeInterval delay;
 @end
 
 @implementation PlayerAController
@@ -92,8 +92,8 @@ TFY_CATEGORY_ASSIGN_PROPERTY NSTimeInterval delay;
 }
 -(UIImageView *)imageViews{
     if (!_imageViews) {
-        _imageViews = tfy_imageView();
-        [_imageViews tfy_setImageWithURLString:kVideoCover placeholder:[UIImage imageNamed:@"loading_bgView"]];
+        _imageViews = UIImageViewSet();
+        [_imageViews sd_setImageWithURL:[NSURL URLWithString:kVideoCover] placeholderImage:[UIImage imageNamed:@"loading_bgView"]];
     }
     return _imageViews;
 }

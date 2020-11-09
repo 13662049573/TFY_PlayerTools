@@ -9,9 +9,9 @@
 #import "TFY_ScrollViewController.h"
 
 @interface TFY_ScrollViewController ()<UIScrollViewDelegate>
-TFY_CATEGORY_STRONG_PROPERTY TFY_PlayerView *controlView;
-TFY_CATEGORY_STRONG_PROPERTY UIScrollView *scrollView;
-TFY_CATEGORY_STRONG_PROPERTY UIButton *playBtn;
+TFY_PROPERTY_STRONG TFY_PlayerView *controlView;
+TFY_PROPERTY_STRONG UIScrollView *scrollView;
+TFY_PROPERTY_STRONG UIButton *playBtn;
 @end
 
 @implementation TFY_ScrollViewController
@@ -65,8 +65,10 @@ TFY_CATEGORY_STRONG_PROPERTY UIButton *playBtn;
 }
 - (UIButton *)playBtn{
     if (!_playBtn) {
-        _playBtn = tfy_button();
-        _playBtn.tfy_image(@"new_allPlay_44x44_", UIControlStateNormal).tfy_action(self, @selector(playClick:), UIControlEventTouchUpInside);
+        _playBtn = UIButtonSet();
+        _playBtn.makeChain
+        .image([UIImage imageNamed:@"new_allPlay_44x44_"], UIControlStateNormal)
+        .addTarget(self, @selector(playClick:), UIControlEventTouchUpInside);
     }
     return _playBtn;
 }

@@ -16,17 +16,8 @@
 
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-    [TFY_CommonUtils BackstatusBarStyle:0];
-    NSString *className = NSStringFromClass([self class]);
-    if ([className hasPrefix:@"UI"] == NO) {
-//        if ([className isEqualToString:@"LM_HomeController"] || [className isEqualToString:@"LM_CurveController"] || [className isEqualToString:@"LM_CalendarController"] || [className isEqualToString:@"LM_KnowledgeController"] || [className isEqualToString:@"LM_LoginController"] || [className isEqualToString:@"LM_HealthController"]) {
-//
-//            [TFY_CommonUtils BackstatusBarStyle:1];
-//        }
-//        else{
-//            [TFY_CommonUtils BackstatusBarStyle:0];
-//        }
-    }
+    [TFY_Utils BackstatusBarStyle:0];
+
 }
 
 - (void)viewDidLoad {
@@ -37,7 +28,7 @@
 
 /*不传数据，直接push到下一个界面*/
 -(void)push:(NSString*)controllerName{
-    if (![TFY_CommonUtils judgeIsEmptyWithString:controllerName]) {
+    if (![TFY_Utils judgeIsEmptyWithString:controllerName]) {
         Class class=NSClassFromString(controllerName);
         UIViewController *controller=[[class alloc] init];
         controller.hidesBottomBarWhenPushed = YES;
@@ -46,7 +37,7 @@
 }
 
 -(void)presenting:(NSString *)controllerName{
-    if (![TFY_CommonUtils judgeIsEmptyWithString:controllerName]) {
+    if (![TFY_Utils judgeIsEmptyWithString:controllerName]) {
         Class class=NSClassFromString(controllerName);
         UIViewController *controller=[[class alloc] init];
         controller.hidesBottomBarWhenPushed = YES;
@@ -68,7 +59,7 @@
 
 /*返回到固定界面*/
 -(void)popToController:(NSString*)controllerName{
-    if (![TFY_CommonUtils judgeIsEmptyWithString:controllerName]) {
+    if (![TFY_Utils judgeIsEmptyWithString:controllerName]) {
         Class class=NSClassFromString(controllerName);
         id controller=[[class alloc] init];
         NSArray *temArray = self.navigationController.viewControllers;
@@ -90,7 +81,7 @@
  *  跳过方法实现
  */
 -(void)taoguoClick{
-    [TFY_CommonUtils saveIntValueInUD:0 forKey:@"Switch"];
+    [TFY_Utils saveIntValueInUD:0 forKey:@"Switch"];
 //    TFY_APPDelegate.window.rootViewController = [LM_TabBarController new];
 }
 
@@ -98,7 +89,7 @@
  *  token 失效  直接跳转到登录界面
  */
 -(void)loginController{
-    [TFY_CommonUtils saveBoolValueInUD:NO forKey:@"isCompanion"];
+    [TFY_Utils saveBoolValueInUD:NO forKey:@"isCompanion"];
 //    TFY_NavigationController *nav = [self navcontroller:[LM_LoginController new]];
 //    TFY_APPDelegate.window.rootViewController = nav;
 }
@@ -138,7 +129,7 @@
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    UITableViewCell *cell = [UITableViewCell cellFromCodeWithTableView:tableView];
+    UITableViewCell *cell = [UITableViewCell tfy_cellFromCodeWithTableView:tableView];
     
     cell.textLabel.text = self.dataSouceArr[indexPath.section];
     

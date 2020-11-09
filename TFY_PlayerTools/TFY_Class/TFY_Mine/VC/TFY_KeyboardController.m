@@ -9,7 +9,7 @@
 #import "TFY_KeyboardController.h"
 
 @interface TFY_KeyboardController ()
-TFY_CATEGORY_STRONG_PROPERTY TFY_PlayerView *controlView;
+TFY_PROPERTY_STRONG TFY_PlayerView *controlView;
 @property (nonatomic, strong) UITextField *textField;
 @end
 

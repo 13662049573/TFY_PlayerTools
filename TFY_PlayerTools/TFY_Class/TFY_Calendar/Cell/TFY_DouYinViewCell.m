@@ -42,7 +42,7 @@
        [self.coverImageView tfy_AutoSize:0 top:0 right:0 bottom:0];
         
        [self.contentView addSubview:self.titleLabel];
-        self.titleLabel.tfy_LeftSpace(20).tfy_BottomSpace(0).tfy_RightSpace(20).tfy_Height(TFY_kBottomBarHeight);
+        self.titleLabel.tfy_LeftSpace(20).tfy_BottomSpace(0).tfy_RightSpace(20).tfy_Height(TFY_kBottomBarHeight());
     
        [self.contentView addSubview:self.shareBtn];
         self.shareBtn.tfy_RightSpace(20).tfy_BottomSpaceToView(-10, self.titleLabel).tfy_size(60, 60);

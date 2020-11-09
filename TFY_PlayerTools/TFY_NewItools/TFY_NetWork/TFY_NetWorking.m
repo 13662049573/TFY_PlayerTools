@@ -268,7 +268,7 @@ static inline NSString *cachePath() {
 
 + (TFY_URLSessionTask *)tfy_requestWithUrl:(NSString *)url refreshCache:(BOOL)refreshCache isShowHUD:(BOOL)isShowHUD showHUD:(NSString *)statusText httpMedth:(NSUInteger)httpMethod params:(NSDictionary *)params progress:(TFY_DownloadProgress)progress success:(TFY_ResponseSuccess)success fail:(TFY_ResponseFail)fail {
     
-    if ([[TFY_CommonUtils getNetconnType] isEqualToString:@"network"]) {
+    if ([[TFY_Utils getNetconnType] isEqualToString:@"network"]) {
         
         [self NetworkStatesNone];
         return nil;
@@ -300,7 +300,7 @@ static inline NSString *cachePath() {
     if (httpMethod == 1) {
         if (cacheGet) {
             if (shoulObtainLocalWhenUnconnected) {
-                if ([[TFY_CommonUtils getNetconnType] isEqualToString:@"network"]) {
+                if ([[TFY_Utils getNetconnType] isEqualToString:@"network"]) {
                     id response = [TFY_NetWorking cahceResponseWithURL:absolute parameters:params];
                     
                     if (response) {
@@ -389,7 +389,7 @@ static inline NSString *cachePath() {
     else if (httpMethod == 2) {
         if (cachePost ) {// 获取缓存
             if (shoulObtainLocalWhenUnconnected) {
-                if ([[TFY_CommonUtils getNetconnType] isEqualToString:@"network"]) {
+                if ([[TFY_Utils getNetconnType] isEqualToString:@"network"]) {
                     id response = [TFY_NetWorking cahceResponseWithURL:absolute parameters:params];
                     if (response) {
                         if (success) {
@@ -530,7 +530,7 @@ static inline NSString *cachePath() {
 }
 
 + (TFY_URLSessionTask *)uploadWithImage:(UIImage *)image url:(NSString *)url filename:(NSString *)filename name:(NSString *)name mimeType:(NSString *)mimeType parameters:(NSDictionary *)parameters progress:(TFY_UploadProgress)progress success:(TFY_ResponseSuccess)success fail:(TFY_ResponseFail)fail {
-    if ([[TFY_CommonUtils getNetconnType] isEqualToString:@"network"]) {
+    if ([[TFY_Utils getNetconnType] isEqualToString:@"network"]) {
         
         [self NetworkStatesNone];
         return nil;
@@ -727,9 +727,9 @@ static inline NSString *cachePath() {
 }
 //这里填写请求头里的z固定参数
 +(NSDictionary *)requestHeaderFieldValueDictionary{
-    NSString *userid = [TFY_CommonUtils getStrValueInUDWithKey:@"openid"];
-    NSString *accessToken = [TFY_CommonUtils getStrValueInUDWithKey:@"accessToken"];
-    if (![TFY_CommonUtils judgeIsEmptyWithString:userid] && ![TFY_CommonUtils judgeIsEmptyWithString:accessToken]) {
+    NSString *userid = [TFY_Utils getStrValueInUDWithKey:@"openid"];
+    NSString *accessToken = [TFY_Utils getStrValueInUDWithKey:@"accessToken"];
+    if (![TFY_Utils judgeIsEmptyWithString:userid] && ![TFY_Utils judgeIsEmptyWithString:accessToken]) {
         http_Headers = @{@"user-token":accessToken,@"user-id":userid};
     }
     return http_Headers;
@@ -868,9 +868,6 @@ static inline NSString *cachePath() {
 
 +(TFY_NavigationController *)navcontroller:(UIViewController *)vc{
     TFY_NavigationController *nav = [[TFY_NavigationController alloc] initWithRootViewController:vc];
-    nav.backimage = [UIImage tfy_imageFromGradientColors:@[[UIColor tfy_colorWithHex:LCColor_A4],[UIColor tfy_colorWithHex:LCColor_A5]] gradientType:TFY_GradientTypeLeftToRight imageSize:CGSizeMake(TFY_Width_W, TFY_kNavBarHeight)];
-    nav.backIconImage = [[UIImage imageNamed:@"Return-white"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
-    nav.titleColor = [UIColor tfy_colorWithHex:LCColor_B5];
     return nav;
 }
 
@@ -943,7 +940,7 @@ static inline NSString *cachePath() {
         
         NSString *directoryPath = cachePath();
         NSString *absoluteURL = [self generateGETAbsoluteURL:url params:params];
-        NSString *key = [absoluteURL md5String];
+        NSString *key = [absoluteURL tfy_md5String];
         NSString *path = [directoryPath stringByAppendingPathComponent:key];
         
         NSData *data = [[NSFileManager defaultManager] contentsAtPath:path];
@@ -974,7 +971,7 @@ static inline NSString *cachePath() {
         }
         
         NSString *absoluteURL = [self generateGETAbsoluteURL:request.URL.absoluteString params:params];
-        NSString *key = [absoluteURL md5String];
+        NSString *key = [absoluteURL tfy_md5String];
         NSString *path = [directoryPath stringByAppendingPathComponent:key];
         NSDictionary *dict = (NSDictionary *)responseObject;
         
@@ -1050,7 +1047,7 @@ static inline NSString *cachePath() {
     
     if (cookies && cookies.count != 0) {
     
-        NSData *cookiesData = [NSKeyedArchiver archivedDataWithRootObject: [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]];
+        NSData *cookiesData = [NSKeyedArchiver archivedDataWithRootObject:[[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies] requiringSecureCoding:YES error:nil];
         //存储归档后的cookie
         [self saveValueInUD:cookiesData forKey:@"UserCookie"];
         
@@ -1086,7 +1083,7 @@ static inline NSString *cachePath() {
     //取出保存的cookie
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     //对取出的cookie进行反归档处理
-    NSArray *cookies = [NSKeyedUnarchiver unarchiveObjectWithData:[userDefaults objectForKey:@"UserCookie"]];
+    NSArray *cookies = [NSKeyedUnarchiver unarchivedObjectOfClass:NSDictionary.class fromData:[userDefaults objectForKey:@"UserCookie"] error:nil];
     
     if (cookies && cookies.count != 0) {
         //设置cookie

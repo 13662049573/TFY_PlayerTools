@@ -44,23 +44,25 @@
 
 - (UIImageView *)coverImageView {
     if (!_coverImageView) {
-        _coverImageView = tfy_imageView();
-        _coverImageView.userInteractionEnabled = YES;
-        _coverImageView.tag = 100;
-        _coverImageView.contentMode = UIViewContentModeScaleAspectFit;
+        _coverImageView = UIImageViewSet();
+        _coverImageView.makeChain
+        .userInteractionEnabled(YES)
+        .makeTag(100).contentMode(UIViewContentModeScaleAspectFit);
     }
     return _coverImageView;
 }
 -(UIImageView *)bgImgView{
     if (!_bgImgView) {
-        _bgImgView = tfy_imageView();
+        _bgImgView = UIImageViewSet();
     }
     return _bgImgView;
 }
 - (UIButton *)playBtn {
     if (!_playBtn) {
-        _playBtn = tfy_button();
-        _playBtn.tfy_image(@"new_allPlay_44x44_", UIControlStateNormal).tfy_action(self, @selector(playBtnClick:), UIControlEventTouchUpInside);
+        _playBtn = UIButtonSet();
+        _playBtn.makeChain
+        .image([UIImage imageNamed:@"new_allPlay_44x44_"], UIControlStateNormal)
+        .addTarget(self, @selector(playBtnClick:), UIControlEventTouchUpInside);
     }
     return _playBtn;
 }
