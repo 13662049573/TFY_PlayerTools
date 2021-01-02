@@ -1,5 +1,5 @@
 
-platform :ios, '10.0'
+platform :ios, '12.0'
 
 target 'TFY_PlayerTools' do
   use_frameworks!

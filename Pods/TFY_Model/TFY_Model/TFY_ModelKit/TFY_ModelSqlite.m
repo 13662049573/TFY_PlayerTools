@@ -743,22 +743,22 @@ static sqlite3 * _tfy_database;
         }else {
             switch (property_info.type) {
                 case _MutableArray: {
-                    NSData * array_value = [NSKeyedArchiver archivedDataWithRootObject:[NSMutableArray array]];
+                    NSData * array_value = [NSKeyedArchiver archivedDataWithRootObject:[NSMutableArray array] requiringSecureCoding:YES error:nil];
                     [value_array addObject:array_value];
                 }
                     break;
                 case _MutableDictionary: {
-                    NSData * dictionary_value = [NSKeyedArchiver archivedDataWithRootObject:[NSMutableDictionary dictionary]];
+                    NSData * dictionary_value = [NSKeyedArchiver archivedDataWithRootObject:[NSMutableDictionary dictionary] requiringSecureCoding:YES error:nil];
                     [value_array addObject:dictionary_value];
                 }
                     break;
                 case _Array: {
-                    NSData * array_value = [NSKeyedArchiver archivedDataWithRootObject:[NSArray array]];
+                    NSData * array_value = [NSKeyedArchiver archivedDataWithRootObject:[NSArray array] requiringSecureCoding:YES error:nil];
                     [value_array addObject:array_value];
                 }
                     break;
                 case _Dictionary: {
-                    NSData * dictionary_value = [NSKeyedArchiver archivedDataWithRootObject:[NSDictionary dictionary]];
+                    NSData * dictionary_value = [NSKeyedArchiver archivedDataWithRootObject:[NSDictionary dictionary] requiringSecureCoding:YES error:nil];
                     [value_array addObject:dictionary_value];
                 }
                     break;
@@ -828,7 +828,7 @@ static sqlite3 * _tfy_database;
                     @try {
                         if ([value isKindOfClass:[NSArray class]] ||
                             [value isKindOfClass:[NSDictionary class]]) {
-                            NSData * data = [NSKeyedArchiver archivedDataWithRootObject:value];
+                            NSData * data = [NSKeyedArchiver archivedDataWithRootObject:value requiringSecureCoding:YES error:nil];
                             sqlite3_bind_blob(pp_stmt, index, [data bytes], (int)[data length], SQLITE_TRANSIENT);
                         }else {
                             sqlite3_bind_blob(pp_stmt, index, [value bytes], (int)[value length], SQLITE_TRANSIENT);
@@ -1138,7 +1138,7 @@ static sqlite3 * _tfy_database;
                         if (blob != NULL) {
                             NSData * value = [NSData dataWithBytes:blob length:length];
                             @try {
-                                id set_value = [NSKeyedUnarchiver unarchiveObjectWithData:value];
+                                id set_value = [NSKeyedUnarchiver unarchivedObjectOfClass:NSArray.class fromData:value error:nil];
                                 if (set_value) {
                                     switch (property_info.type) {
                                         case _MutableArray:
@@ -1454,7 +1454,7 @@ static sqlite3 * _tfy_database;
                         value = property_info.type == _MutableDictionary ? [NSMutableDictionary dictionary] : [NSMutableArray array];
                     }
                     @try {
-                        NSData * set_value = [NSKeyedArchiver archivedDataWithRootObject:value];
+                        NSData * set_value = [NSKeyedArchiver archivedDataWithRootObject:value requiringSecureCoding:YES error:nil];
                         sqlite3_bind_blob(pp_stmt, index, [set_value bytes], (int)[set_value length], SQLITE_TRANSIENT);
                     } @catch (NSException *exception) {
                         [self log:@"update 操作异常 Array/Dictionary 元素没实现NSCoding协议归档失败"];
@@ -1468,7 +1468,7 @@ static sqlite3 * _tfy_database;
                         value = property_info.type == _Dictionary ? [NSDictionary dictionary] : [NSArray array];
                     }
                     @try {
-                        NSData * set_value = [NSKeyedArchiver archivedDataWithRootObject:value];
+                        NSData * set_value = [NSKeyedArchiver archivedDataWithRootObject:value requiringSecureCoding:YES error:nil];
                         sqlite3_bind_blob(pp_stmt, index, [set_value bytes], (int)[set_value length], SQLITE_TRANSIENT);
                     } @catch (NSException *exception) {
                         [self log:@"update 操作异常 Array/Dictionary 元素没实现NSCoding协议归档失败"];

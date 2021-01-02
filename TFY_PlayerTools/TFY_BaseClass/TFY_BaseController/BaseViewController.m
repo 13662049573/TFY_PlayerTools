@@ -22,7 +22,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.automaticallyAdjustsScrollViewInsets = false;
     self.view.backgroundColor = [UIColor tfy_colorWithHex:LCColor_B7];
 }
 
