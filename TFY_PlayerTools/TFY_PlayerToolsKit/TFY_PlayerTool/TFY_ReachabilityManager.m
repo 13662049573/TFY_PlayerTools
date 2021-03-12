@@ -32,6 +32,8 @@ NSString * StringFromNetworkReachabilityStatus(ReachabilityStatus status) {
             return NSLocalizedStringFromTable(@"Reachable via 3G", @"TFY_Player", nil);
         case ReachabilityStatusReachableVia4G:
             return NSLocalizedStringFromTable(@"Reachable via 4G", @"TFY_Player", nil);
+        case ReachabilityStatusReachableVia5G:
+            return NSLocalizedStringFromTable(@"Reachable via 5G", @"TFY_Player", nil);
         case ReachabilityStatusUnknown:
         default:
             return NSLocalizedStringFromTable(@"Unknown", @"TFY_Player", nil);
@@ -64,6 +66,13 @@ static ReachabilityStatus ReachabilityStatusForFlags(SCNetworkReachabilityFlags 
                 CTRadioAccessTechnologyeHRPD];
           
          NSArray *typeStrings4G = @[CTRadioAccessTechnologyLTE];
+        
+        NSArray *typeStrings5G;
+        if (@available(iOS 14.0, *)) {
+            typeStrings5G = @[CTRadioAccessTechnologyNRNSA,
+                              CTRadioAccessTechnologyNR];
+        }
+        
         CTTelephonyNetworkInfo *teleInfo= [[CTTelephonyNetworkInfo alloc] init];
         if (@available(iOS 12.0, *)) {
             NSDictionary<NSString *, NSString *> *currentStatus = teleInfo.serviceCurrentRadioAccessTechnology;
@@ -71,7 +80,9 @@ static ReachabilityStatus ReachabilityStatusForFlags(SCNetworkReachabilityFlags 
                 status = ReachabilityStatusUnknown;
             }
             for (NSString *obj in currentStatus.allValues) {
-                if ([typeStrings4G containsObject:obj]) {
+                if ([typeStrings5G containsObject:obj]) {
+                   status = ReachabilityStatusReachableVia5G;
+                } else if ([typeStrings4G containsObject:obj]) {
                     status = ReachabilityStatusReachableVia4G;
                 } else if ([typeStrings3G containsObject:obj]) {
                     status = ReachabilityStatusReachableVia3G;
@@ -190,7 +201,7 @@ static void ReachabilityReleaseCallback(const void *info) {
 }
 
 - (BOOL)isReachableViaWWAN {
-    return (self.networkReachabilityStatus == ReachabilityStatusReachableVia2G ||self.networkReachabilityStatus == ReachabilityStatusReachableVia3G || self.networkReachabilityStatus == ReachabilityStatusReachableVia4G);
+    return (self.networkReachabilityStatus == ReachabilityStatusReachableVia2G ||self.networkReachabilityStatus == ReachabilityStatusReachableVia3G || self.networkReachabilityStatus == ReachabilityStatusReachableVia4G || self.networkReachabilityStatus == ReachabilityStatusReachableVia5G);
 }
 
 - (BOOL)isReachableViaWiFi {
@@ -230,7 +241,6 @@ static void ReachabilityReleaseCallback(const void *info) {
     if (!self.networkReachability) {
         return;
     }
-    
     SCNetworkReachabilityUnscheduleFromRunLoop(self.networkReachability, CFRunLoopGetMain(), kCFRunLoopCommonModes);
 }
 

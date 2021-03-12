@@ -11,6 +11,19 @@
 
 #define SysVersion [[UIDevice currentDevice] systemVersion].floatValue
 
+
+CG_INLINE UIWindow * _Nonnull Palyer_LastWindow() {
+    NSEnumerator  *frontToBackWindows = [[UIApplication sharedApplication].windows reverseObjectEnumerator];
+    for (UIWindow *window in frontToBackWindows) {
+        BOOL windowOnMainScreen = window.screen == UIScreen.mainScreen;
+        BOOL windowIsVisible = !window.hidden && window.alpha>0;
+        BOOL windowLevelSupported = (window.windowLevel >= UIWindowLevelNormal && window.windowLevel <= UIWindowLevelNormal);
+        BOOL windowKeyWindow = window.isKeyWindow;
+        if (windowOnMainScreen && windowIsVisible && windowLevelSupported && windowKeyWindow) {return window;}
+    }
+    return [UIApplication sharedApplication].keyWindow;
+}
+
 @interface UIWindow (CurrentViewController)
 
 /*!
@@ -24,7 +37,7 @@
 @implementation UIWindow (CurrentViewController)
 
 + (UIViewController*)tfy_currentViewController; {
-    UIWindow *window = [[UIApplication sharedApplication].delegate window];
+    UIWindow *window = Palyer_LastWindow();
     UIViewController *topViewController = [window rootViewController];
     while (true) {
         if (topViewController.presentedViewController) {
@@ -359,7 +372,7 @@
 
 - (UIView *)fullScreenContainerView {
     if (!_fullScreenContainerView) {
-        _fullScreenContainerView = [UIApplication sharedApplication].keyWindow;
+        _fullScreenContainerView = Palyer_LastWindow();
     }
     return _fullScreenContainerView;
 }

@@ -17,6 +17,7 @@ typedef NS_ENUM(NSInteger, ReachabilityStatus) {
     ReachabilityStatusReachableVia2G   = 2,
     ReachabilityStatusReachableVia3G   = 3,
     ReachabilityStatusReachableVia4G   = 4,
+    ReachabilityStatusReachableVia5G   = 5,
 };
 
 NS_ASSUME_NONNULL_BEGIN
