@@ -28,7 +28,7 @@
                     
                 } fail:^(NSError *error) {
                     
-                    [subscriber sendNext:@""];
+                    [subscriber sendError:error];
                     [subscriber sendCompleted];
                     
                 }];
