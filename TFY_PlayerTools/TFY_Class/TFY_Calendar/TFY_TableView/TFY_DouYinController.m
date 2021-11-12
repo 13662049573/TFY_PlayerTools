@@ -28,8 +28,7 @@ TFY_PROPERTY_STRONG TFY_DouYinPlayerView *controlView;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self.navigationController tfy_navigationBarTransparent];
-    
+
     [self.view addSubview:self.tableView5];
     [self.tableView5 tfy_AutoSize:0 top:0 right:0 bottom:0];
     
