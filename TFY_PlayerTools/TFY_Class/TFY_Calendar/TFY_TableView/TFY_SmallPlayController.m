@@ -24,6 +24,7 @@ TFY_PROPERTY_STRONG TFY_PlayerView *controlView;
         [self playTheVideoAtIndexPath:indexPath scrollToTop:NO];
     }];
 }
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self.view addSubview:self.tableView4];
