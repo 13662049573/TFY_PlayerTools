@@ -20,12 +20,6 @@
     [NSThread sleepForTimeInterval:1.5];
     
     [TFY_ServerConfig setTFY_ConfigEnv:@"01"];
-    //配置导航栏
-    [TFY_Configure setupCustomConfigure:^(TFYNavigationBarConfigure * _Nonnull configure) {
-        configure.backImage = [UIImage tfy_imageFromGradientColors:@[[UIColor tfy_colorWithHex:LCColor_A4],[UIColor tfy_colorWithHex:LCColor_A5]] gradientType:TFY_GradientTypeUprightToLowleft imageSize:CGSizeMake(TFY_Width_W(), TFY_kNavBarHeight())];
-        configure.backStyle = TFYNavigationBarBackStyleWhite;
-        configure.titleColor = [UIColor tfy_colorWithHex:LCColor_B5];
-    }];
     
     if (!TFY_ScenePackage.isSceneApp) {
         self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];

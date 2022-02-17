@@ -31,8 +31,6 @@ TFY_PROPERTY_STRONG TFY_DouyinCollectionFlowLayout *layout;
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    [self.navigationController tfy_navigationBarTransparent];
-    
     [self.view addSubview:self.collectionView];
     [self.collectionView tfy_AutoSize:0 top:0 right:0 bottom:0];
     

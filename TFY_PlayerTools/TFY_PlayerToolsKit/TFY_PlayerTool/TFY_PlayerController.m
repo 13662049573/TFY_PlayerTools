@@ -10,8 +10,6 @@
 #import <objc/runtime.h>
 #import <MediaPlayer/MediaPlayer.h>
 #import <AVFoundation/AVFoundation.h>
-#import <CallKit/CXCallObserver.h>
-#import <CallKit/CXCall.h>
 
 #import "TFY_PlayerBaseView.h"
 #import "TFY_PlayerToolsHeader.h"
@@ -19,7 +17,7 @@
 
 #define PLAYER_WS(weakSelf)  __weak __typeof(&*self)weakSelf = self;
 
-@interface TFY_PlayerController ()<CXCallObserverDelegate>
+@interface TFY_PlayerController ()
 
 @property (nonatomic, strong) TFY_PlayerNotification *notification;
 @property (nonatomic, weak) UIScrollView *scrollView;
@@ -36,7 +34,6 @@
  * 播放数据字典
  */
 @property(nonatomic , strong)NSMutableDictionary *dictModel;
-@property (nonatomic, strong) CXCallObserver *callObserver;
 @end
 
 @implementation TFY_PlayerController
@@ -55,12 +52,10 @@
         
         self.continuouslybool = NO;
         [self configureVolume];
-        [self monitorTelephoneCall];
-        
-        
     }
     return self;
 }
+
 -(void)setRate:(float)rate{
     _rate = rate;
     self.currentPlayerManager.rate = _rate;
@@ -74,39 +69,6 @@
             self.volumeViewSlider = (UISlider *)view;
             break;
         }
-    }
-}
-
-#pragma mark - ************************************ 监听相关
-#pragma mark - 监听电话
-/**
- 监听电话介入
- */
-- (void)monitorTelephoneCall {// 监听电话介入
-    self.callObserver = [[CXCallObserver alloc] init];
-    [self.callObserver setDelegate:self queue:dispatch_get_main_queue()];
-}
- 
-- (void)callObserver:(CXCallObserver *)callObserver callChanged:(CXCall *)call {
-    NSInteger outgoing = call.outgoing;
-    NSInteger onHold = call.onHold;
-    NSInteger hasConnected = call.hasConnected;
-    NSInteger hasEnded = call.hasEnded;
-    BOOL isOutCall = NO;
-    if (outgoing == 0 && hasEnded && onHold==0 && hasConnected ==0) {
-        isOutCall = YES;//----拒绝
-    }else if (outgoing && onHold==0 && hasConnected == 0 && hasEnded){
-        isOutCall = YES;//----挂断
-    }else if (hasConnected && outgoing == 0 && onHold == 0 && hasEnded == 0){
-        isOutCall = YES;//----另一个挂掉
-    }else if (hasConnected && outgoing == 0 && onHold == 0 && hasEnded){
-        isOutCall = YES;//----对方挂掉
-    }
-    if (isOutCall) {
-        if (!self.currentPlayerManager.isPlaying) return;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.currentPlayerManager pause];
-        });
     }
 }
 
