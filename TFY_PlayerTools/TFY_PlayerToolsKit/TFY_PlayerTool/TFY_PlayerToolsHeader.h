@@ -94,6 +94,7 @@ typedef NS_ENUM(NSInteger, PlayerScalingMode) {
 #import "TFY_OrientationObserver.h"
 #import "TFY_NetworkSpeedMonitor.h"
 #import "TFY_LoadingView.h"
-
+#import "TFY_LandscapeWindow.h"
+#import "TFY_LandscapeRotationManager.h"
 
 #endif /* TFY_PlayerToolsHeader_h */

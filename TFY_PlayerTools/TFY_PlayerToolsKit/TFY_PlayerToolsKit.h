@@ -18,12 +18,10 @@ FOUNDATION_EXPORT const unsigned char TFY_PlayerToolsKitVersionString[];
 
 #import <TFY_PlayerTool/TFY_PlayerToolsHeader.h>
 #import <TFY_PlayerView/TFY_PlayerControlView.h>
-#import <TFY_PlayerView/TFY_LandscapeRotationManager.h>
 
 #else
 
 #import "TFY_PlayerToolsHeader.h"
 #import "TFY_PlayerControlView.h"
-#import "TFY_LandscapeRotationManager.h"
 
 #endif
