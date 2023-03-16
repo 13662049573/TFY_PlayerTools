@@ -3,7 +3,7 @@ Pod::Spec.new do |spec|
 
   spec.name         = "TFY_PlayerToolsKit"
 
-  spec.version      = "2.2.0"
+  spec.version      = "2.2.1"
 
   spec.summary      = "视频播放器主要使用工具封装"
 
