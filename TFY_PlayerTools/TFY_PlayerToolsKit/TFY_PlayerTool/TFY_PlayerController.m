@@ -11,56 +11,54 @@
 #import <MediaPlayer/MediaPlayer.h>
 #import <AVFoundation/AVFoundation.h>
 
-#import "TFY_PlayerBaseView.h"
+#import "UIScrollView+TFY_Player.h"
 #import "TFY_PlayerToolsHeader.h"
+#import "TFY_ReachabilityManager.h"
 #import "TFY_AVPlayerManager.h"
 
-#define PLAYER_WS(weakSelf)  __weak __typeof(&*self)weakSelf = self;
+static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 
 @interface TFY_PlayerController ()
 
 @property (nonatomic, strong) TFY_PlayerNotification *notification;
-@property (nonatomic, weak) UIScrollView *scrollView;
 @property (nonatomic, strong) UISlider *volumeViewSlider;
 @property (nonatomic, assign) NSInteger containerViewTag;
 @property (nonatomic, assign) PlayerContainerType containerType;
-/// 播放的小容器视图。
+/// The player's small container view.
 @property (nonatomic, strong) TFY_FloatView *smallFloatView;
-/// 是否显示小窗口。
+/// Whether the small window is displayed.
 @property (nonatomic, assign) BOOL isSmallFloatViewShow;
-/// indexPath正在播放。
+/// The indexPath is playing.
 @property (nonatomic, nullable) NSIndexPath *playingIndexPath;
-/**
- * 播放数据字典
- */
-@property(nonatomic , strong)NSMutableDictionary *dictModel;
+
 @end
 
 @implementation TFY_PlayerController
 
+@dynamic containerViewTag;
+@dynamic playingIndexPath;
+
 - (instancetype)init {
     self = [super init];
     if (self) {
-        PLAYER_WS(myself);
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            _tfyPlayRecords = @{}.mutableCopy;
+        });
+        @player_weakify(self)
         [[TFY_ReachabilityManager sharedManager] startMonitoring];
         [[TFY_ReachabilityManager sharedManager] setReachabilityStatusChangeBlock:^(ReachabilityStatus status) {
-           
-            if ([myself.controlView respondsToSelector:@selector(videoPlayer:reachabilityChanged:)]) {
-                [myself.controlView videoPlayer:myself reachabilityChanged:status];
+            @player_strongify(self)
+            if ([self.controlView respondsToSelector:@selector(videoPlayer:reachabilityChanged:)]) {
+                [self.controlView videoPlayer:self reachabilityChanged:status];
             }
         }];
-        
-        self.continuouslybool = NO;
         [self configureVolume];
     }
     return self;
 }
 
--(void)setRate:(float)rate{
-    _rate = rate;
-    self.currentPlayerManager.rate = _rate;
-}
-/// 获取系统卷
+/// Get system volume
 - (void)configureVolume {
     MPVolumeView *volumeView = [[MPVolumeView alloc] init];
     self.volumeViewSlider = nil;
@@ -76,151 +74,155 @@
     [self.currentPlayerManager stop];
 }
 
-+ (instancetype)playerWithPlayerManagercontainerView:(nonnull UIView *)containerView {
-    TFY_PlayerController *player = [[self alloc] initWithPlayerManagercontainerView:containerView];
++ (instancetype)playerWithPlayerManager:(id<TFY_PlayerMediaPlayback>)playerManager containerView:(nonnull UIView *)containerView {
+    TFY_PlayerController *player = [[self alloc] initWithPlayerManager:playerManager containerView:containerView];
     return player;
 }
 
-+ (instancetype)playerWithScrollView:(UIScrollView *)scrollView containerViewTag:(NSInteger)containerViewTag {
-    TFY_PlayerController *player = [[self alloc] initWithScrollView:scrollView containerViewTag:containerViewTag];
++ (instancetype)playerWithScrollView:(UIScrollView *)scrollView playerManager:(id<TFY_PlayerMediaPlayback>)playerManager containerViewTag:(NSInteger)containerViewTag {
+    TFY_PlayerController *player = [[self alloc] initWithScrollView:scrollView playerManager:playerManager containerViewTag:containerViewTag];
     return player;
 }
 
-+ (instancetype)playerWithScrollView:(UIScrollView *)scrollView containerView:(UIView *)containerView {
-    TFY_PlayerController *player = [[self alloc] initWithScrollView:scrollView containerView:containerView];
++ (instancetype)playerWithScrollView:(UIScrollView *)scrollView playerManager:(id<TFY_PlayerMediaPlayback>)playerManager containerView:(UIView *)containerView {
+    TFY_PlayerController *player = [[self alloc] initWithScrollView:scrollView playerManager:playerManager containerView:containerView];
     return player;
 }
 
-- (instancetype)initWithPlayerManagercontainerView:(nonnull UIView *)containerView {
-    TFY_AVPlayerManager *manger = [TFY_AVPlayerManager new];
+- (instancetype)initWithPlayerManager:(id<TFY_PlayerMediaPlayback>)playerManager containerView:(nonnull UIView *)containerView {
     TFY_PlayerController *player = [self init];
     player.containerView = containerView;
-    player.currentPlayerManager = manger;
+    player.currentPlayerManager = playerManager;
     player.containerType = PlayerContainerTypeView;
     return player;
 }
 
-- (instancetype)initWithScrollView:(UIScrollView *)scrollView containerViewTag:(NSInteger)containerViewTag {
-    TFY_AVPlayerManager *manger = [TFY_AVPlayerManager new];
+- (instancetype)initWithScrollView:(UIScrollView *)scrollView playerManager:(id<TFY_PlayerMediaPlayback>)playerManager containerViewTag:(NSInteger)containerViewTag {
     TFY_PlayerController *player = [self init];
     player.scrollView = scrollView;
     player.containerViewTag = containerViewTag;
-    player.currentPlayerManager = manger;
+    player.currentPlayerManager = playerManager;
     player.containerType = PlayerContainerTypeCell;
     return player;
 }
 
-- (instancetype)initWithScrollView:(UIScrollView *)scrollView containerView:(UIView *)containerView {
-    TFY_AVPlayerManager *manger = [TFY_AVPlayerManager new];
+- (instancetype)initWithScrollView:(UIScrollView *)scrollView playerManager:(id<TFY_PlayerMediaPlayback>)playerManager containerView:(UIView *)containerView {
     TFY_PlayerController *player = [self init];
     player.scrollView = scrollView;
     player.containerView = containerView;
-    player.currentPlayerManager = manger;
+    player.currentPlayerManager = playerManager;
     player.containerType = PlayerContainerTypeView;
     return player;
 }
 
 - (void)playerManagerCallbcak {
-    PLAYER_WS(myself);
-    self.currentPlayerManager.playerPrepareToPlay = ^(id<TFY_PlayerMediaPlayback>  _Nonnull asset, NSString * _Nonnull assetURL) {
-    
-        myself.currentPlayerManager.view.hidden = NO;
-        [myself.notification addNotification];
-        [myself addDeviceOrientationObserver];
-        if (myself.scrollView) {
-            myself.scrollView.tfy_stopPlay = NO;
+    @player_weakify(self)
+    self.currentPlayerManager.playerPrepareToPlay = ^(id<TFY_PlayerMediaPlayback>  _Nonnull asset, NSURL * _Nonnull assetURL) {
+        @player_strongify(self)
+        if (self.resumePlayRecord && [_tfyPlayRecords valueForKey:assetURL.absoluteString]) {
+            NSTimeInterval seekTime = [_tfyPlayRecords valueForKey:assetURL.absoluteString].doubleValue;
+            self.currentPlayerManager.seekTime = seekTime;
         }
-        [myself layoutPlayerSubViews];
-        if (myself.playerPrepareToPlay) myself.playerPrepareToPlay(asset,assetURL);
-        if ([myself.controlView respondsToSelector:@selector(videoPlayer:prepareToPlay:)]) {
-            [myself.controlView videoPlayer:myself prepareToPlay:assetURL];
+        [self.notification addNotification];
+        [self addDeviceOrientationObserver];
+        if (self.scrollView) {
+            self.scrollView.tfy_stopPlay = NO;
+        }
+        [self layoutPlayerSubViews];
+        if (self.playerPrepareToPlay) self.playerPrepareToPlay(asset,assetURL);
+        if ([self.controlView respondsToSelector:@selector(videoPlayer:prepareToPlay:)]) {
+            [self.controlView videoPlayer:self prepareToPlay:assetURL];
         }
     };
     
-    self.currentPlayerManager.playerReadyToPlay = ^(id<TFY_PlayerMediaPlayback>  _Nonnull asset, NSString * _Nonnull assetURL) {
-        
-        if (myself.playerReadyToPlay) myself.playerReadyToPlay(asset,assetURL);
-        if (!myself.customAudioSession) {
-            // 使用此类别的应用程序在手机的静音按钮打开时不会静音，但在手机静音时播放声音
+    self.currentPlayerManager.playerReadyToPlay = ^(id<TFY_PlayerMediaPlayback>  _Nonnull asset, NSURL * _Nonnull assetURL) {
+        @player_strongify(self)
+        if (self.playerReadyToPlay) self.playerReadyToPlay(asset,assetURL);
+        if (!self.customAudioSession) {
+            // Apps using this category don't mute when the phone's mute button is turned on, but play sound when the phone is silent
             [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback withOptions:AVAudioSessionCategoryOptionAllowBluetooth error:nil];
             [[AVAudioSession sharedInstance] setActive:YES error:nil];
         }
+        if (self.viewControllerDisappear) self.pauseByEvent = YES;
     };
     
     self.currentPlayerManager.playerPlayTimeChanged = ^(id<TFY_PlayerMediaPlayback>  _Nonnull asset, NSTimeInterval currentTime, NSTimeInterval duration) {
-        
-        if (myself.playerPlayTimeChanged) myself.playerPlayTimeChanged(asset,currentTime,duration);
-        if ([myself.controlView respondsToSelector:@selector(videoPlayer:currentTime:totalTime:)]) {
-            [myself.controlView videoPlayer:myself currentTime:currentTime totalTime:duration];
+        @player_strongify(self)
+        if (self.playerPlayTimeChanged) self.playerPlayTimeChanged(asset,currentTime,duration);
+        if ([self.controlView respondsToSelector:@selector(videoPlayer:currentTime:totalTime:)]) {
+            [self.controlView videoPlayer:self currentTime:currentTime totalTime:duration];
+        }
+        if (self.currentPlayerManager.assetURL.absoluteString) {
+            [_tfyPlayRecords setValue:@(currentTime) forKey:self.currentPlayerManager.assetURL.absoluteString];
         }
     };
     
     self.currentPlayerManager.playerBufferTimeChanged = ^(id<TFY_PlayerMediaPlayback>  _Nonnull asset, NSTimeInterval bufferTime) {
-        
-        if ([myself.controlView respondsToSelector:@selector(videoPlayer:bufferTime:)]) {
-            [myself.controlView videoPlayer:myself bufferTime:bufferTime];
+        @player_strongify(self)
+        if ([self.controlView respondsToSelector:@selector(videoPlayer:bufferTime:)]) {
+            [self.controlView videoPlayer:self bufferTime:bufferTime];
         }
-        if (myself.playerBufferTimeChanged) myself.playerBufferTimeChanged(asset,bufferTime);
+        if (self.playerBufferTimeChanged) self.playerBufferTimeChanged(asset,bufferTime);
     };
     
     self.currentPlayerManager.playerPlayStateChanged = ^(id  _Nonnull asset, PlayerPlaybackState playState) {
-        
-        if (myself.playerPlayStateChanged) myself.playerPlayStateChanged(asset, playState);
-        if ([myself.controlView respondsToSelector:@selector(videoPlayer:playStateChanged:)]) {
-            [myself.controlView videoPlayer:myself playStateChanged:playState];
+        @player_strongify(self)
+        if (self.playerPlayStateChanged) self.playerPlayStateChanged(asset, playState);
+        if ([self.controlView respondsToSelector:@selector(videoPlayer:playStateChanged:)]) {
+            [self.controlView videoPlayer:self playStateChanged:playState];
         }
     };
     
     self.currentPlayerManager.playerLoadStateChanged = ^(id  _Nonnull asset, PlayerLoadState loadState) {
-        
-        if (myself.playerLoadStateChanged) myself.playerLoadStateChanged(asset, loadState);
-        if ([myself.controlView respondsToSelector:@selector(videoPlayer:loadStateChanged:)]) {
-            [myself.controlView videoPlayer:myself loadStateChanged:loadState];
+        @player_strongify(self)
+        if (loadState == PlayerLoadStatePrepare && CGSizeEqualToSize(CGSizeZero, self.currentPlayerManager.presentationSize)) {
+            CGSize size = self.currentPlayerManager.view.frame.size;
+            self.orientationObserver.presentationSize = size;
+        }
+        if (self.playerLoadStateChanged) self.playerLoadStateChanged(asset, loadState);
+        if ([self.controlView respondsToSelector:@selector(videoPlayer:loadStateChanged:)]) {
+            [self.controlView videoPlayer:self loadStateChanged:loadState];
         }
     };
     
     self.currentPlayerManager.playerDidToEnd = ^(id  _Nonnull asset) {
-        
-        if (myself.playerDidToEnd) myself.playerDidToEnd(asset);
-        if ([myself.controlView respondsToSelector:@selector(videoPlayerPlayEnd:)]) {
-            [myself.controlView videoPlayerPlayEnd:myself];
+        @player_strongify(self)
+        if (self.currentPlayerManager.assetURL.absoluteString) {
+            [_tfyPlayRecords setValue:@(0) forKey:self.currentPlayerManager.assetURL.absoluteString];
         }
-        //这里开始连续播放视频t调用
-        if (myself.continuouslybool) {
-            [myself.currentPlayerManager replay];
-            [myself playTheNext];
+        if (self.playerDidToEnd) self.playerDidToEnd(asset);
+        if ([self.controlView respondsToSelector:@selector(videoPlayerPlayEnd:)]) {
+            [self.controlView videoPlayerPlayEnd:self];
         }
     };
     
     self.currentPlayerManager.playerPlayFailed = ^(id<TFY_PlayerMediaPlayback>  _Nonnull asset, id  _Nonnull error) {
-        
-        if (myself.playerPlayFailed) myself.playerPlayFailed(asset, error);
-        if ([myself.controlView respondsToSelector:@selector(videoPlayerPlayFailed:error:)]) {
-            [myself.controlView videoPlayerPlayFailed:myself error:error];
+        @player_strongify(self)
+        if (self.playerPlayFailed) self.playerPlayFailed(asset, error);
+        if ([self.controlView respondsToSelector:@selector(videoPlayerPlayFailed:error:)]) {
+            [self.controlView videoPlayerPlayFailed:self error:error];
         }
     };
     
     self.currentPlayerManager.presentationSizeChanged = ^(id<TFY_PlayerMediaPlayback>  _Nonnull asset, CGSize size){
-        
-        if (myself.orientationObserver.fullScreenMode == FullScreenModeAutomatic) {
+        @player_strongify(self)
+        self.orientationObserver.presentationSize = size;
+        if (self.orientationObserver.fullScreenMode == FullScreenModeAutomatic) {
             if (size.width > size.height) {
-                myself.orientationObserver.fullScreenMode = FullScreenModeLandscape;
+                self.orientationObserver.fullScreenMode = FullScreenModeLandscape;
             } else {
-                myself.orientationObserver.fullScreenMode = FullScreenModePortrait;
+                self.orientationObserver.fullScreenMode = FullScreenModePortrait;
             }
         }
-        if (myself.presentationSizeChanged) myself.presentationSizeChanged(asset, size);
-        if ([myself.controlView respondsToSelector:@selector(videoPlayer:presentationSizeChanged:)]) {
-            [myself.controlView videoPlayer:myself presentationSizeChanged:size];
+        if (self.presentationSizeChanged) self.presentationSizeChanged(asset, size);
+        if ([self.controlView respondsToSelector:@selector(videoPlayer:presentationSizeChanged:)]) {
+            [self.controlView videoPlayer:self presentationSizeChanged:size];
         }
     };
 }
 
-
-
-
 - (void)layoutPlayerSubViews {
-    if (self.containerView && self.currentPlayerManager.view) {
+    if (self.containerView && self.currentPlayerManager.view && self.currentPlayerManager.isPreparedToPlay) {
         UIView *superview = nil;
         if (self.isFullScreen) {
             superview = self.orientationObserver.fullScreenContainerView;
@@ -229,10 +231,12 @@
         }
         [superview addSubview:self.currentPlayerManager.view];
         [self.currentPlayerManager.view addSubview:self.controlView];
+        
         self.currentPlayerManager.view.frame = superview.bounds;
         self.currentPlayerManager.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         self.controlView.frame = self.currentPlayerManager.view.bounds;
         self.controlView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        [self.orientationObserver updateRotateView:self.currentPlayerManager.view containerView:self.containerView];
     }
 }
 
@@ -241,30 +245,30 @@
 - (TFY_PlayerNotification *)notification {
     if (!_notification) {
         _notification = [[TFY_PlayerNotification alloc] init];
-        PLAYER_WS(myslef);
+        @player_weakify(self)
         _notification.willResignActive = ^(TFY_PlayerNotification * _Nonnull registrar) {
-            
-            if (myslef.isViewControllerDisappear) return;
-            if (myslef.pauseWhenAppResignActive && myslef.currentPlayerManager.isPlaying) {
-                myslef.pauseByEvent = YES;
+            @player_strongify(self)
+            if (self.isViewControllerDisappear) return;
+            if (self.pauseWhenAppResignActive && self.currentPlayerManager.isPlaying) {
+                self.pauseByEvent = YES;
             }
-            if (myslef.isFullScreen && !myslef.isLockedScreen) myslef.orientationObserver.lockedScreen = YES;
+            self.orientationObserver.lockedScreen = YES;
             [[UIApplication sharedApplication].keyWindow endEditing:YES];
-            if (!myslef.pauseWhenAppResignActive) {
+            if (!self.pauseWhenAppResignActive) {
                 [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
                 [[AVAudioSession sharedInstance] setActive:YES error:nil];
             }
         };
         _notification.didBecomeActive = ^(TFY_PlayerNotification * _Nonnull registrar) {
-            
-            if (myslef.isViewControllerDisappear) return;
-            if (myslef.isPauseByEvent) myslef.pauseByEvent = NO;
-            if (myslef.isFullScreen && !myslef.isLockedScreen) myslef.orientationObserver.lockedScreen = NO;
+            @player_strongify(self)
+            if (self.isViewControllerDisappear) return;
+            if (self.isPauseByEvent) self.pauseByEvent = NO;
+            self.orientationObserver.lockedScreen = NO;
         };
         _notification.oldDeviceUnavailable = ^(TFY_PlayerNotification * _Nonnull registrar) {
-            
-            if (myslef.currentPlayerManager.isPlaying) {
-                [myslef.currentPlayerManager play];
+            @player_strongify(self)
+            if (self.currentPlayerManager.isPlaying) {
+                [self.currentPlayerManager play];
             }
         };
     }
@@ -280,13 +284,6 @@
     return _smallFloatView;
 }
 
--(NSMutableDictionary *)dictModel{
-    if (!_dictModel) {
-        _dictModel = [NSMutableDictionary dictionary];
-    }
-    return _dictModel;
-}
-
 #pragma mark - setter
 
 - (void)setCurrentPlayerManager:(id<TFY_PlayerMediaPlayback>)currentPlayerManager {
@@ -294,31 +291,36 @@
     if (_currentPlayerManager.isPreparedToPlay) {
         [_currentPlayerManager stop];
         [_currentPlayerManager.view removeFromSuperview];
-        [self.orientationObserver removeDeviceOrientationObserver];
+        [self removeDeviceOrientationObserver];
         [self.gestureControl removeGestureToView:self.currentPlayerManager.view];
     }
     _currentPlayerManager = currentPlayerManager;
-    _currentPlayerManager.view.hidden = YES;
     self.gestureControl.disableTypes = self.disableGestureTypes;
     [self.gestureControl addGestureToView:currentPlayerManager.view];
     [self playerManagerCallbcak];
-    [self.orientationObserver updateRotateView:currentPlayerManager.view containerView:self.containerView];
     self.controlView.player = self;
     [self layoutPlayerSubViews];
+    if (currentPlayerManager.isPreparedToPlay) {
+        [self addDeviceOrientationObserver];
+    }
+    [self.orientationObserver updateRotateView:currentPlayerManager.view containerView:self.containerView];
 }
 
--(void)setContainerView:(UIView *)containerView{
+- (void)setContainerView:(UIView *)containerView {
     _containerView = containerView;
     if (self.scrollView) {
-        self.scrollView.tfy_containerView = _containerView;
+        self.scrollView.tfy_containerView = containerView;
     }
-    if (!_containerView) return;
-    _containerView.userInteractionEnabled = YES;
+    if (!containerView) return;
+    containerView.userInteractionEnabled = YES;
     [self layoutPlayerSubViews];
+    [self.orientationObserver updateRotateView:self.currentPlayerManager.view containerView:containerView];
 }
 
-
 - (void)setControlView:(UIView<TFY_PlayerMediaControl> *)controlView {
+    if (controlView && controlView != _controlView) {
+        [_controlView removeFromSuperview];
+    }
     _controlView = controlView;
     if (!controlView) return;
     controlView.player = self;
@@ -330,6 +332,111 @@
     if (self.scrollView) {
         self.scrollView.tfy_containerType = containerType;
     }
+}
+
+- (void)setScrollView:(UIScrollView *)scrollView {
+    _scrollView = scrollView;
+    self.scrollView.tfy_WWANAutoPlay = self.isWWANAutoPlay;
+    @player_weakify(self)
+    scrollView.tfy_playerWillAppearInScrollView = ^(NSIndexPath * _Nonnull indexPath) {
+        @player_strongify(self)
+        if (self.isFullScreen) return;
+        if (self.tfy_playerWillAppearInScrollView) self.tfy_playerWillAppearInScrollView(indexPath);
+        if ([self.controlView respondsToSelector:@selector(playerDidAppearInScrollView:)]) {
+            [self.controlView playerDidAppearInScrollView:self];
+        }
+    };
+    
+    scrollView.tfy_playerDidAppearInScrollView = ^(NSIndexPath * _Nonnull indexPath) {
+        @player_strongify(self)
+        if (self.isFullScreen) return;
+        if (self.tfy_playerDidAppearInScrollView) self.tfy_playerDidAppearInScrollView(indexPath);
+        if ([self.controlView respondsToSelector:@selector(playerDidAppearInScrollView:)]) {
+            [self.controlView playerDidAppearInScrollView:self];
+        }
+    };
+    
+    scrollView.tfy_playerWillDisappearInScrollView = ^(NSIndexPath * _Nonnull indexPath) {
+        @player_strongify(self)
+        if (self.isFullScreen) return;
+        if (self.tfy_playerWillDisappearInScrollView) self.tfy_playerWillDisappearInScrollView(indexPath);
+        if ([self.controlView respondsToSelector:@selector(playerWillDisappearInScrollView:)]) {
+            [self.controlView playerWillDisappearInScrollView:self];
+        }
+    };
+    
+    scrollView.tfy_playerDidDisappearInScrollView = ^(NSIndexPath * _Nonnull indexPath) {
+        @player_strongify(self)
+        if (self.isFullScreen) return;
+        if (self.tfy_playerDidDisappearInScrollView) self.tfy_playerDidDisappearInScrollView(indexPath);
+        if ([self.controlView respondsToSelector:@selector(playerDidDisappearInScrollView:)]) {
+            [self.controlView playerDidDisappearInScrollView:self];
+        }
+       
+        if (self.stopWhileNotVisible) { /// stop playing
+            if (self.containerType == PlayerContainerTypeView) {
+                [self stopCurrentPlayingView];
+            } else if (self.containerType == PlayerContainerTypeCell) {
+                [self stopCurrentPlayingCell];
+            }
+        } else { /// add to window
+            if (!self.isSmallFloatViewShow) {
+                [self addPlayerViewToSmallFloatView];
+            }
+        }
+    };
+    
+    scrollView.tfy_playerAppearingInScrollView = ^(NSIndexPath * _Nonnull indexPath, CGFloat playerApperaPercent) {
+        @player_strongify(self)
+        if (self.isFullScreen) return;
+        if (self.tfy_playerAppearingInScrollView) self.tfy_playerAppearingInScrollView(indexPath, playerApperaPercent);
+        if ([self.controlView respondsToSelector:@selector(playerAppearingInScrollView:playerApperaPercent:)]) {
+            [self.controlView playerAppearingInScrollView:self playerApperaPercent:playerApperaPercent];
+        }
+        if (!self.stopWhileNotVisible && playerApperaPercent >= self.playerApperaPercent) {
+            if (self.containerType == PlayerContainerTypeView) {
+                if (self.isSmallFloatViewShow) {
+                    [self addPlayerViewToContainerView:self.containerView];
+                }
+            } else if (self.containerType == PlayerContainerTypeCell) {
+                if (self.isSmallFloatViewShow) {
+                    [self addPlayerViewToCell];
+                }
+            }
+        }
+    };
+    
+    scrollView.tfy_playerDisappearingInScrollView = ^(NSIndexPath * _Nonnull indexPath, CGFloat playerDisapperaPercent) {
+        @player_strongify(self)
+        if (self.isFullScreen) return;
+        if (self.tfy_playerDisappearingInScrollView) self.tfy_playerDisappearingInScrollView(indexPath, playerDisapperaPercent);
+        if ([self.controlView respondsToSelector:@selector(playerDisappearingInScrollView:playerDisapperaPercent:)]) {
+            [self.controlView playerDisappearingInScrollView:self playerDisapperaPercent:playerDisapperaPercent];
+        }
+        if (playerDisapperaPercent >= self.playerDisapperaPercent) {
+            if (self.stopWhileNotVisible) { /// stop playing
+                if (self.containerType == PlayerContainerTypeView) {
+                    [self stopCurrentPlayingView];
+                } else if (self.containerType == PlayerContainerTypeCell) {
+                    [self stopCurrentPlayingCell];
+                }
+            } else {  /// add to window
+                if (!self.isSmallFloatViewShow) {
+                    [self addPlayerViewToSmallFloatView];
+                }
+            }
+        }
+    };
+    
+    scrollView.tfy_playerShouldPlayInScrollView = ^(NSIndexPath * _Nonnull indexPath) {
+        @player_strongify(self)
+        if (self.tfy_playerShouldPlayInScrollView) self.tfy_playerShouldPlayInScrollView(indexPath);
+    };
+    
+    scrollView.tfy_scrollViewDidEndScrollingCallback = ^(NSIndexPath * _Nonnull indexPath) {
+        @player_strongify(self)
+        if (self.tfy_scrollViewDidEndScrollingCallback) self.tfy_scrollViewDidEndScrollingCallback(indexPath);
+    };
 }
 
 @end
@@ -361,72 +468,63 @@
 - (void)seekToTime:(NSTimeInterval)time completionHandler:(void (^)(BOOL))completionHandler {
     [self.currentPlayerManager seekToTime:time completionHandler:completionHandler];
 }
-/**
- *  视频分解
- */
-- (void)splitVideofps:(float)fps progressImageBlock:(void (NS_NOESCAPE ^)(CGFloat progress))progressImageBlock splitCompleteBlock:(void (NS_NOESCAPE ^)(BOOL success, NSMutableArray *splitimgs))splitCompleteBlock{
-    [self.currentPlayerManager splitVideofps:fps progressImageBlock:progressImageBlock splitCompleteBlock:splitCompleteBlock];
-}
+
 @end
 
 @implementation TFY_PlayerController (PlayerPlaybackControl)
 
 - (void)playTheNext {
-    if (self.assetUrlMododels.count > 0) {
+    if (self.assetURLs.count > 0) {
         NSInteger index = self.currentPlayIndex + 1;
-        if (index >= self.assetUrlMododels.count) return;
-        TFY_PlayerVideoModel *model = [self.assetUrlMododels objectAtIndex:index];
-        self.assetUrlModel = model;
-        self.currentPlayIndex = [self.assetUrlMododels indexOfObject:model];
-        if (self.continuouslybool) {
-            self.playvideocontinuously(self, model);
-        }
+        if (index >= self.assetURLs.count) return;
+        NSURL *assetURL = [self.assetURLs objectAtIndex:index];
+        self.assetURL = assetURL;
+        self.currentPlayIndex = [self.assetURLs indexOfObject:assetURL];
     }
 }
 
 - (void)playThePrevious {
-    if (self.assetUrlMododels.count > 0) {
+    if (self.assetURLs.count > 0) {
         NSInteger index = self.currentPlayIndex - 1;
         if (index < 0) return;
-        TFY_PlayerVideoModel *model = [self.assetUrlMododels objectAtIndex:index];
-        self.assetUrlModel = model;
-        self.currentPlayIndex = [self.assetUrlMododels indexOfObject:model];
-        if (self.continuouslybool) {
-            self.playvideocontinuously(self, model);
-        }
+        NSURL *assetURL = [self.assetURLs objectAtIndex:index];
+        self.assetURL = assetURL;
+        self.currentPlayIndex = [self.assetURLs indexOfObject:assetURL];
     }
 }
 
 - (void)playTheIndex:(NSInteger)index {
-    if (self.assetUrlMododels.count > 0) {
-        if (index >= self.assetUrlMododels.count) return;
-        TFY_PlayerVideoModel *model = [self.assetUrlMododels objectAtIndex:index];
-        self.assetUrlModel = model;
+    if (self.assetURLs.count > 0) {
+        if (index >= self.assetURLs.count) return;
+        NSURL *assetURL = [self.assetURLs objectAtIndex:index];
+        self.assetURL = assetURL;
         self.currentPlayIndex = index;
-        if (self.continuouslybool) {
-            self.playvideocontinuously(self, model);
-        }
     }
 }
 
 - (void)stop {
+    if (self.isFullScreen && self.exitFullScreenWhenStop) {
+        @player_weakify(self)
+        [self.orientationObserver enterFullScreen:NO animated:NO completion:^{
+            @player_strongify(self)
+            [self.currentPlayerManager stop];
+            [self.currentPlayerManager.view removeFromSuperview];
+        }];
+    } else {
+        [self.currentPlayerManager stop];
+        [self.currentPlayerManager.view removeFromSuperview];
+    }
+    self.lockedScreen = NO;
+    if (self.scrollView) self.scrollView.tfy_stopPlay = YES;
     [self.notification removeNotification];
     [self.orientationObserver removeDeviceOrientationObserver];
-    if (self.isFullScreen && self.exitFullScreenWhenStop) {
-        [self.orientationObserver exitFullScreenWithAnimated:NO];
-    }
-    [self.currentPlayerManager stop];
-    [self.currentPlayerManager.view removeFromSuperview];
-    if (self.scrollView) {
-        self.scrollView.tfy_stopPlay = YES;
-    }
 }
 
 - (void)replaceCurrentPlayerManager:(id<TFY_PlayerMediaPlayback>)playerManager {
     self.currentPlayerManager = playerManager;
 }
 
-//// 将视频添加到单元格
+/// Add video to the cell
 - (void)addPlayerViewToCell {
     self.isSmallFloatViewShow = NO;
     self.smallFloatView.hidden = YES;
@@ -435,13 +533,13 @@
     [self.containerView addSubview:self.currentPlayerManager.view];
     self.currentPlayerManager.view.frame = self.containerView.bounds;
     self.currentPlayerManager.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    [self.orientationObserver cellModelRotateView:self.currentPlayerManager.view rotateViewAtCell:cell playerViewTag:self.containerViewTag];
     if ([self.controlView respondsToSelector:@selector(videoPlayer:floatViewShow:)]) {
         [self.controlView videoPlayer:self floatViewShow:NO];
     }
+    [self layoutPlayerSubViews];
 }
 
-//// 将视频添加到容器视图
+//// Add video to the container view
 - (void)addPlayerViewToContainerView:(UIView *)containerView {
     self.isSmallFloatViewShow = NO;
     self.smallFloatView.hidden = YES;
@@ -449,20 +547,19 @@
     [self.containerView addSubview:self.currentPlayerManager.view];
     self.currentPlayerManager.view.frame = self.containerView.bounds;
     self.currentPlayerManager.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    [self.orientationObserver cellOtherModelRotateView:self.currentPlayerManager.view containerView:self.containerView];
+    [self.orientationObserver updateRotateView:self.currentPlayerManager.view containerView:self.containerView];
     if ([self.controlView respondsToSelector:@selector(videoPlayer:floatViewShow:)]) {
         [self.controlView videoPlayer:self floatViewShow:NO];
     }
 }
 
-/// 添加到keyWindow
-- (void)addPlayerViewToKeyWindow {
+- (void)addPlayerViewToSmallFloatView {
     self.isSmallFloatViewShow = YES;
     self.smallFloatView.hidden = NO;
     [self.smallFloatView addSubview:self.currentPlayerManager.view];
     self.currentPlayerManager.view.frame = self.smallFloatView.bounds;
     self.currentPlayerManager.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    [self.orientationObserver cellOtherModelRotateView:self.currentPlayerManager.view containerView:self.smallFloatView];
+    [self.orientationObserver updateRotateView:self.currentPlayerManager.view containerView:self.smallFloatView];
     if ([self.controlView respondsToSelector:@selector(videoPlayer:floatViewShow:)]) {
         [self.controlView videoPlayer:self floatViewShow:YES];
     }
@@ -484,45 +581,31 @@
         if (self.smallFloatView) self.smallFloatView.hidden = YES;
     }
 }
-/**
- * 获取播放视频所有数据
- */
--(NSDictionary *)ModelDict{
-    if (self.assetUrlModel.tfy_url !=nil || ![self.assetUrlModel.tfy_url isEqualToString:@""]) {
-        [self.dictModel setObject:self.assetUrlModel.tfy_url forKey:@"tfy_url"];
-        [self.dictModel setObject:self.assetUrlModel.tfy_name forKey:@"tfy_name"];
-        [self.dictModel setObject:[NSString stringWithFormat:@"%.2f",self.currentTime] forKey:@"tfy_seconds"];
-        [self.dictModel setObject:[NSString stringWithFormat:@"%ld",(long)self.currentPlayIndex] forKey:@"tfy_videoId"];
-    }
-    if (self.assetUrlModel.tfy_ids!=nil || ![self.assetUrlModel.tfy_ids isEqualToString:@""]) {
-        [self.dictModel setObject:self.assetUrlModel.tfy_ids forKey:@"tfy_ids"];
-    }
-    if (self.assetUrlModel.tfy_pic!=nil || ![self.assetUrlModel.tfy_pic isEqualToString:@""]) {
-        [self.dictModel setObject:self.assetUrlModel.tfy_pic forKey:@"tfy_pic"];
-    }
-    return self.dictModel;
-}
+
 #pragma mark - getter
 
--(TFY_PlayerVideoModel *)assetUrlModel{
+- (BOOL)resumePlayRecord {
+    return [objc_getAssociatedObject(self, _cmd) boolValue];
+}
+
+- (NSURL *)assetURL {
     return objc_getAssociatedObject(self, _cmd);
 }
 
-
--(NSArray<TFY_PlayerVideoModel *> *)assetUrlMododels{
+- (NSArray<NSURL *> *)assetURLs {
     return objc_getAssociatedObject(self, _cmd);
 }
 
 - (BOOL)isLastAssetURL {
-    if (self.assetUrlMododels.count > 0) {
-        return self.assetUrlModel == self.assetUrlMododels.lastObject;
+    if (self.assetURLs.count > 0) {
+        return [self.assetURL isEqual:self.assetURLs.lastObject];
     }
     return NO;
 }
 
 - (BOOL)isFirstAssetURL {
-    if (self.assetUrlMododels.count > 0) {
-        return self.assetUrlModel == self.assetUrlMododels.firstObject;
+    if (self.assetURLs.count > 0) {
+        return [self.assetURL isEqual:self.assetURLs.firstObject];
     }
     return NO;
 }
@@ -566,11 +649,11 @@
     return YES;
 }
 
-- (void (^)(id<TFY_PlayerMediaPlayback> _Nonnull, NSString * _Nonnull assetURL))playerPrepareToPlay {
+- (void (^)(id<TFY_PlayerMediaPlayback> _Nonnull, NSURL * _Nonnull))playerPrepareToPlay {
     return objc_getAssociatedObject(self, _cmd);
 }
 
-- (void (^)(id<TFY_PlayerMediaPlayback> _Nonnull, NSString * _Nonnull assetURL))playerReadyToPlay {
+- (void (^)(id<TFY_PlayerMediaPlayback> _Nonnull, NSURL * _Nonnull))playerReadyToPlay {
     return objc_getAssociatedObject(self, _cmd);
 }
 
@@ -602,10 +685,6 @@
     return objc_getAssociatedObject(self, _cmd);
 }
 
--(void (^)(TFY_PlayerController *player, TFY_PlayerVideoModel *model))playvideocontinuously{
-    return objc_getAssociatedObject(self, _cmd);
-}
-
 - (NSInteger)currentPlayIndex {
     return [objc_getAssociatedObject(self, _cmd) integerValue];
 }
@@ -620,16 +699,18 @@
 
 #pragma mark - setter
 
--(void)setAssetUrlModel:(TFY_PlayerVideoModel *)assetUrlModel{
-    objc_setAssociatedObject(self, @selector(assetUrlModel), assetUrlModel, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    self.currentPlayerManager.assetURL = assetUrlModel.tfy_url;
+- (void)setResumePlayRecord:(BOOL)resumePlayRecord {
+    objc_setAssociatedObject(self, @selector(resumePlayRecord), @(resumePlayRecord), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-
--(void)setAssetUrlMododels:(NSArray<TFY_PlayerVideoModel *> *)assetUrlMododels{
-    objc_setAssociatedObject(self, @selector(assetUrlMododels), assetUrlMododels, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+- (void)setAssetURL:(NSURL *)assetURL {
+    objc_setAssociatedObject(self, @selector(assetURL), assetURL, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    self.currentPlayerManager.assetURL = assetURL;
 }
 
+- (void)setAssetURLs:(NSArray<NSURL *> * _Nullable)assetURLs {
+    objc_setAssociatedObject(self, @selector(assetURLs), assetURLs, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
 
 - (void)setVolume:(float)volume {
     volume = MIN(MAX(0, volume), 1);
@@ -671,11 +752,11 @@
     objc_setAssociatedObject(self, @selector(pauseWhenAppResignActive), @(pauseWhenAppResignActive), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-- (void)setPlayerPrepareToPlay:(void (^)(id<TFY_PlayerMediaPlayback> _Nonnull, NSString * _Nonnull url))playerPrepareToPlay {
+- (void)setPlayerPrepareToPlay:(void (^)(id<TFY_PlayerMediaPlayback> _Nonnull, NSURL * _Nonnull))playerPrepareToPlay {
     objc_setAssociatedObject(self, @selector(playerPrepareToPlay), playerPrepareToPlay, OBJC_ASSOCIATION_COPY);
 }
 
-- (void)setPlayerReadyToPlay:(void (^)(id<TFY_PlayerMediaPlayback> _Nonnull, NSString * _Nonnull url))playerReadyToPlay {
+- (void)setPlayerReadyToPlay:(void (^)(id<TFY_PlayerMediaPlayback> _Nonnull, NSURL * _Nonnull))playerReadyToPlay {
     objc_setAssociatedObject(self, @selector(playerReadyToPlay), playerReadyToPlay, OBJC_ASSOCIATION_COPY);
 }
 
@@ -707,10 +788,6 @@
     objc_setAssociatedObject(self, @selector(presentationSizeChanged), presentationSizeChanged, OBJC_ASSOCIATION_COPY);
 }
 
--(void)setPlayvideocontinuously:(void (^)(TFY_PlayerController *player, TFY_PlayerVideoModel * _Nonnull))playvideocontinuously{
-    objc_setAssociatedObject(self, @selector(playvideocontinuously), playvideocontinuously, OBJC_ASSOCIATION_COPY);
-}
-
 - (void)setCurrentPlayIndex:(NSInteger)currentPlayIndex {
     objc_setAssociatedObject(self, @selector(currentPlayIndex), @(currentPlayIndex), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
@@ -722,9 +799,11 @@
     if (viewControllerDisappear) {
         [self removeDeviceOrientationObserver];
         if (self.currentPlayerManager.isPlaying) self.pauseByEvent = YES;
+        if (self.isSmallFloatViewShow) self.smallFloatView.hidden = YES;
     } else {
-        if (self.isPauseByEvent) self.pauseByEvent = NO;
         [self addDeviceOrientationObserver];
+        if (self.isPauseByEvent) self.pauseByEvent = NO;
+        if (self.isSmallFloatViewShow) self.smallFloatView.hidden = NO;
     }
 }
 
@@ -737,67 +816,70 @@
 @implementation TFY_PlayerController (PlayerOrientationRotation)
 
 - (void)addDeviceOrientationObserver {
-    [self.orientationObserver addDeviceOrientationObserver];
+    if (self.allowOrentitaionRotation) {
+        [self.orientationObserver addDeviceOrientationObserver];
+    }
 }
 
 - (void)removeDeviceOrientationObserver {
     [self.orientationObserver removeDeviceOrientationObserver];
 }
 
-- (void)enterLandscapeFullScreen:(UIInterfaceOrientation)orientation animated:(BOOL)animated {
+/// Enter the fullScreen while the TFY_FullScreenMode is TFY_FullScreenModeLandscape.
+- (void)rotateToOrientation:(UIInterfaceOrientation)orientation animated:(BOOL)animated {
+    [self rotateToOrientation:orientation animated:animated completion:nil];
+}
+
+/// Enter the fullScreen while the TFY_FullScreenMode is TFY_FullScreenModeLandscape.
+- (void)rotateToOrientation:(UIInterfaceOrientation)orientation animated:(BOOL)animated completion:(void(^ __nullable)(void))completion {
     self.orientationObserver.fullScreenMode = FullScreenModeLandscape;
-    [self.orientationObserver enterLandscapeFullScreen:orientation animated:animated];
+    [self.orientationObserver rotateToOrientation:orientation animated:animated completion:completion];
+}
+
+- (void)enterPortraitFullScreen:(BOOL)fullScreen animated:(BOOL)animated completion:(void (^ _Nullable)(void))completion {
+    self.orientationObserver.fullScreenMode = FullScreenModePortrait;
+    [self.orientationObserver enterPortraitFullScreen:fullScreen animated:animated completion:completion];
 }
 
 - (void)enterPortraitFullScreen:(BOOL)fullScreen animated:(BOOL)animated {
-    self.orientationObserver.fullScreenMode = FullScreenModePortrait;
-    [self.orientationObserver enterPortraitFullScreen:fullScreen animated:animated];
+    [self enterPortraitFullScreen:fullScreen animated:animated completion:nil];
 }
 
-- (void)enterFullScreen:(BOOL)fullScreen animated:(BOOL)animated {
+- (void)enterFullScreen:(BOOL)fullScreen animated:(BOOL)animated completion:(void (^ _Nullable)(void))completion {
     if (self.orientationObserver.fullScreenMode == FullScreenModePortrait) {
-        [self.orientationObserver enterPortraitFullScreen:fullScreen animated:animated];
+        [self.orientationObserver enterPortraitFullScreen:fullScreen animated:animated completion:completion];
     } else {
         UIInterfaceOrientation orientation = UIInterfaceOrientationUnknown;
         orientation = fullScreen? UIInterfaceOrientationLandscapeRight : UIInterfaceOrientationPortrait;
-        [self.orientationObserver enterLandscapeFullScreen:orientation animated:animated];
+        [self.orientationObserver rotateToOrientation:orientation animated:animated completion:completion];
     }
 }
 
-- (BOOL)shouldForceDeviceOrientation {
-    if (self.forceDeviceOrientation) return YES;
-    NSArray<NSString *> *versionStrArr = [[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."];
-    int firstVer = [[versionStrArr objectAtIndex:0] intValue];
-    int secondVer = [[versionStrArr objectAtIndex:1] intValue];
-    if (firstVer == 8) {
-        if (secondVer >= 1 && secondVer <= 3) {
-            return YES;
-        }
-    }
-    return NO;
+- (void)enterFullScreen:(BOOL)fullScreen animated:(BOOL)animated {
+    [self enterFullScreen:fullScreen animated:animated completion:nil];
 }
 
 #pragma mark - getter
 
 - (TFY_OrientationObserver *)orientationObserver {
-    PLAYER_WS(myself);
+    @player_weakify(self)
     TFY_OrientationObserver *orientationObserver = objc_getAssociatedObject(self, _cmd);
     if (!orientationObserver) {
         orientationObserver = [[TFY_OrientationObserver alloc] init];
         orientationObserver.orientationWillChange = ^(TFY_OrientationObserver * _Nonnull observer, BOOL isFullScreen) {
-            
-            if (myself.orientationWillChange) myself.orientationWillChange(self, isFullScreen);
-            if ([myself.controlView respondsToSelector:@selector(videoPlayer:orientationWillChange:)]) {
-                [myself.controlView videoPlayer:myself orientationWillChange:observer];
+            @player_strongify(self)
+            if (self.orientationWillChange) self.orientationWillChange(self, isFullScreen);
+            if ([self.controlView respondsToSelector:@selector(videoPlayer:orientationWillChange:)]) {
+                [self.controlView videoPlayer:self orientationWillChange:observer];
             }
-            [myself.controlView setNeedsLayout];
-            [myself.controlView layoutIfNeeded];
+            [self.controlView setNeedsLayout];
+            [self.controlView layoutIfNeeded];
         };
         orientationObserver.orientationDidChanged = ^(TFY_OrientationObserver * _Nonnull observer, BOOL isFullScreen) {
-            
-            if (myself.orientationDidChanged) myself.orientationDidChanged(myself, isFullScreen);
-            if ([myself.controlView respondsToSelector:@selector(videoPlayer:orientationDidChanged:)]) {
-                [myself.controlView videoPlayer:myself orientationDidChanged:observer];
+            @player_strongify(self)
+            if (self.orientationDidChanged) self.orientationDidChanged(self, isFullScreen);
+            if ([self.controlView respondsToSelector:@selector(videoPlayer:orientationDidChanged:)]) {
+                [self.controlView videoPlayer:self orientationDidChanged:observer];
             }
         };
         objc_setAssociatedObject(self, _cmd, orientationObserver, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -824,10 +906,6 @@
     return YES;
 }
 
-- (UIInterfaceOrientation)currentOrientation {
-    return self.orientationObserver.currentOrientation;
-}
-
 - (BOOL)isStatusBarHidden {
     return [objc_getAssociatedObject(self, _cmd) boolValue];
 }
@@ -837,7 +915,7 @@
 }
 
 - (BOOL)shouldAutorotate {
-    return [self shouldForceDeviceOrientation];
+    return NO;
 }
 
 - (BOOL)allowOrentitaionRotation {
@@ -847,16 +925,18 @@
     return YES;
 }
 
--(BOOL)systemrotationbool{
+- (UIStatusBarStyle)fullScreenStatusBarStyle {
     NSNumber *number = objc_getAssociatedObject(self, _cmd);
-    if (number) return number.boolValue;
-    self.systemrotationbool = NO;
-    return NO;
+    if (number) return number.integerValue;
+    self.fullScreenStatusBarStyle = UIStatusBarStyleLightContent;
+    return UIStatusBarStyleLightContent;
 }
 
-
-- (BOOL)forceDeviceOrientation {
-    return [objc_getAssociatedObject(self, _cmd) boolValue];
+- (UIStatusBarAnimation)fullScreenStatusBarAnimation {
+    NSNumber *number = objc_getAssociatedObject(self, _cmd);
+    if (number) return number.integerValue;
+    self.fullScreenStatusBarAnimation = UIStatusBarAnimationSlide;
+    return UIStatusBarAnimationSlide;
 }
 
 #pragma mark - setter
@@ -871,7 +951,7 @@
 
 - (void)setStatusBarHidden:(BOOL)statusBarHidden {
     objc_setAssociatedObject(self, @selector(isStatusBarHidden), @(statusBarHidden), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    self.orientationObserver.statusBarHidden = statusBarHidden;
+    self.orientationObserver.fullScreenStatusBarHidden = statusBarHidden;
 }
 
 - (void)setLockedScreen:(BOOL)lockedScreen {
@@ -884,22 +964,21 @@
 
 - (void)setAllowOrentitaionRotation:(BOOL)allowOrentitaionRotation {
     objc_setAssociatedObject(self, @selector(allowOrentitaionRotation), @(allowOrentitaionRotation), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    self.orientationObserver.allowOrentitaionRotation = allowOrentitaionRotation;
+    self.orientationObserver.allowOrientationRotation = allowOrentitaionRotation;
 }
-
-- (void)setForceDeviceOrientation:(BOOL)forceDeviceOrientation {
-    objc_setAssociatedObject(self, @selector(forceDeviceOrientation), @(forceDeviceOrientation), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    self.orientationObserver.forceDeviceOrientation = forceDeviceOrientation;
-}
-
--(void)setSystemrotationbool:(BOOL)systemrotationbool{
-    objc_setAssociatedObject(self, @selector(systemrotationbool), @(systemrotationbool), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    self.orientationObserver.systemrotationbool = systemrotationbool;
-}
-
 
 - (void)setExitFullScreenWhenStop:(BOOL)exitFullScreenWhenStop {
     objc_setAssociatedObject(self, @selector(exitFullScreenWhenStop), @(exitFullScreenWhenStop), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (void)setFullScreenStatusBarStyle:(UIStatusBarStyle)fullScreenStatusBarStyle {
+    objc_setAssociatedObject(self, @selector(fullScreenStatusBarStyle), @(fullScreenStatusBarStyle), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    self.orientationObserver.fullScreenStatusBarStyle = fullScreenStatusBarStyle;
+}
+
+- (void)setFullScreenStatusBarAnimation:(UIStatusBarAnimation)fullScreenStatusBarAnimation {
+    objc_setAssociatedObject(self, @selector(fullScreenStatusBarAnimation), @(fullScreenStatusBarAnimation), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    self.orientationObserver.fullScreenStatusBarAnimation = fullScreenStatusBarAnimation;
 }
 
 @end
@@ -913,54 +992,61 @@
     TFY_PlayerGestureControl *gestureControl = objc_getAssociatedObject(self, _cmd);
     if (!gestureControl) {
         gestureControl = [[TFY_PlayerGestureControl alloc] init];
-        PLAYER_WS(myself);
+        @player_weakify(self)
         gestureControl.triggerCondition = ^BOOL(TFY_PlayerGestureControl * _Nonnull control, PlayerGestureType type, UIGestureRecognizer * _Nonnull gesture, UITouch *touch) {
-           
-            if ([myself.controlView respondsToSelector:@selector(gestureTriggerCondition:gestureType:gestureRecognizer:touch:)]) {
-                return [myself.controlView gestureTriggerCondition:control gestureType:type gestureRecognizer:gesture touch:touch];
+            @player_strongify(self)
+            if ([self.controlView respondsToSelector:@selector(gestureTriggerCondition:gestureType:gestureRecognizer:touch:)]) {
+                return [self.controlView gestureTriggerCondition:control gestureType:type gestureRecognizer:gesture touch:touch];
             }
             return YES;
         };
         
         gestureControl.singleTapped = ^(TFY_PlayerGestureControl * _Nonnull control) {
-            
-            if ([myself.controlView respondsToSelector:@selector(gestureSingleTapped:)]) {
-                [myself.controlView gestureSingleTapped:control];
+            @player_strongify(self)
+            if ([self.controlView respondsToSelector:@selector(gestureSingleTapped:)]) {
+                [self.controlView gestureSingleTapped:control];
             }
         };
         
         gestureControl.doubleTapped = ^(TFY_PlayerGestureControl * _Nonnull control) {
-            
-            if ([myself.controlView respondsToSelector:@selector(gestureDoubleTapped:)]) {
-                [myself.controlView gestureDoubleTapped:control];
+            @player_strongify(self)
+            if ([self.controlView respondsToSelector:@selector(gestureDoubleTapped:)]) {
+                [self.controlView gestureDoubleTapped:control];
             }
         };
         
         gestureControl.beganPan = ^(TFY_PlayerGestureControl * _Nonnull control, PanDirection direction, PanLocation location) {
-           
-            if ([myself.controlView respondsToSelector:@selector(gestureBeganPan:panDirection:panLocation:)]) {
-                [myself.controlView gestureBeganPan:control panDirection:direction panLocation:location];
+            @player_strongify(self)
+            if ([self.controlView respondsToSelector:@selector(gestureBeganPan:panDirection:panLocation:)]) {
+                [self.controlView gestureBeganPan:control panDirection:direction panLocation:location];
             }
         };
         
         gestureControl.changedPan = ^(TFY_PlayerGestureControl * _Nonnull control, PanDirection direction, PanLocation location, CGPoint velocity) {
-           
-            if ([myself.controlView respondsToSelector:@selector(gestureChangedPan:panDirection:panLocation:withVelocity:)]) {
-                [myself.controlView gestureChangedPan:control panDirection:direction panLocation:location withVelocity:velocity];
+            @player_strongify(self)
+            if ([self.controlView respondsToSelector:@selector(gestureChangedPan:panDirection:panLocation:withVelocity:)]) {
+                [self.controlView gestureChangedPan:control panDirection:direction panLocation:location withVelocity:velocity];
             }
         };
         
         gestureControl.endedPan = ^(TFY_PlayerGestureControl * _Nonnull control, PanDirection direction, PanLocation location) {
-            
-            if ([myself.controlView respondsToSelector:@selector(gestureEndedPan:panDirection:panLocation:)]) {
-                [myself.controlView gestureEndedPan:control panDirection:direction panLocation:location];
+            @player_strongify(self)
+            if ([self.controlView respondsToSelector:@selector(gestureEndedPan:panDirection:panLocation:)]) {
+                [self.controlView gestureEndedPan:control panDirection:direction panLocation:location];
             }
         };
         
         gestureControl.pinched = ^(TFY_PlayerGestureControl * _Nonnull control, float scale) {
-            
-            if ([myself.controlView respondsToSelector:@selector(gesturePinched:scale:)]) {
-                [myself.controlView gesturePinched:control scale:scale];
+            @player_strongify(self)
+            if ([self.controlView respondsToSelector:@selector(gesturePinched:scale:)]) {
+                [self.controlView gesturePinched:control scale:scale];
+            }
+        };
+        
+        gestureControl.longPressed = ^(TFY_PlayerGestureControl * _Nonnull control, LongPressGestureRecognizerState state) {
+            @player_strongify(self)
+            if ([self.controlView respondsToSelector:@selector(longPressed:state:)]) {
+                [self.controlView longPressed:control state:state];
             }
         };
         objc_setAssociatedObject(self, _cmd, gestureControl, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -992,7 +1078,7 @@
 
 @implementation TFY_PlayerController (PlayerScrollView)
 
-+ (void)load {
++ (void)initialize {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         SEL selectors[] = {
@@ -1021,82 +1107,6 @@
 
 #pragma mark - setter
 
-- (void)setScrollView:(UIScrollView *)scrollView {
-    objc_setAssociatedObject(self, @selector(scrollView), scrollView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    self.scrollView.tfy_WWANAutoPlay = self.isWWANAutoPlay;
-    PLAYER_WS(myself);
-    scrollView.tfy_playerWillAppearInScrollView = ^(NSIndexPath * _Nonnull indexPath) {
-        
-        if (myself.isFullScreen) return;
-        if (myself.tfy_playerWillAppearInScrollView) myself.tfy_playerWillAppearInScrollView(indexPath);
-        if ([myself.controlView respondsToSelector:@selector(playerDidAppearInScrollView:)]) {
-            [myself.controlView playerDidAppearInScrollView:myself];
-        }
-    };
-    
-    scrollView.tfy_playerDidAppearInScrollView = ^(NSIndexPath * _Nonnull indexPath) {
-        
-        if (myself.isFullScreen) return;
-        if (myself.tfy_playerDidAppearInScrollView) myself.tfy_playerDidAppearInScrollView(indexPath);
-        if ([myself.controlView respondsToSelector:@selector(playerDidAppearInScrollView:)]) {
-            [myself.controlView playerDidAppearInScrollView:myself];
-        }
-    };
-    
-    scrollView.tfy_playerWillDisappearInScrollView = ^(NSIndexPath * _Nonnull indexPath) {
-        
-        if (myself.isFullScreen) return;
-        if (myself.tfy_playerWillDisappearInScrollView) myself.tfy_playerWillDisappearInScrollView(indexPath);
-        if ([myself.controlView respondsToSelector:@selector(playerWillDisappearInScrollView:)]) {
-            [myself.controlView playerWillDisappearInScrollView:myself];
-        }
-    };
-    
-    scrollView.tfy_playerDidDisappearInScrollView = ^(NSIndexPath * _Nonnull indexPath) {
-        
-        if (myself.isFullScreen) return;
-        if (myself.tfy_playerDidDisappearInScrollView) myself.tfy_playerDidDisappearInScrollView(indexPath);
-        if ([myself.controlView respondsToSelector:@selector(playerDidDisappearInScrollView:)]) {
-            [myself.controlView playerDidDisappearInScrollView:myself];
-        }
-    };
-    
-    scrollView.tfy_playerAppearingInScrollView = ^(NSIndexPath * _Nonnull indexPath, CGFloat playerApperaPercent) {
-        
-        if (myself.isFullScreen) return;
-        if (myself.tfy_playerAppearingInScrollView) myself.tfy_playerAppearingInScrollView(indexPath, playerApperaPercent);
-        if ([myself.controlView respondsToSelector:@selector(playerAppearingInScrollView:playerApperaPercent:)]) {
-            [myself.controlView playerAppearingInScrollView:myself playerApperaPercent:playerApperaPercent];
-        }
-        if (!myself.stopWhileNotVisible && playerApperaPercent >= myself.playerApperaPercent) {
-            if (myself.containerType == PlayerContainerTypeView) {
-                [myself addPlayerViewToContainerView:myself.containerView];
-            } else if (myself.containerType == PlayerContainerTypeCell) {
-                [myself addPlayerViewToCell];
-            }
-        }
-    };
-    
-    scrollView.tfy_playerDisappearingInScrollView = ^(NSIndexPath * _Nonnull indexPath, CGFloat playerDisapperaPercent) {
-        
-        if (myself.isFullScreen) return;
-        if (myself.tfy_playerDisappearingInScrollView) myself.tfy_playerDisappearingInScrollView(indexPath, playerDisapperaPercent);
-        if ([myself.controlView respondsToSelector:@selector(playerDisappearingInScrollView:playerDisapperaPercent:)]) {
-            [myself.controlView playerDisappearingInScrollView:myself playerDisapperaPercent:playerDisapperaPercent];
-        }
-        
-        if (myself.stopWhileNotVisible && playerDisapperaPercent >= myself.playerDisapperaPercent) {
-            if (myself.containerType == PlayerContainerTypeView) {
-                [myself stopCurrentPlayingView];
-            } else if (myself.containerType == PlayerContainerTypeCell) {
-                [myself stopCurrentPlayingCell];
-            }
-        }
-    
-        if (!myself.stopWhileNotVisible && playerDisapperaPercent >= myself.playerDisapperaPercent) [myself addPlayerViewToKeyWindow];
-    };
-}
-
 - (void)setWWANAutoPlay:(BOOL)WWANAutoPlay {
     objc_setAssociatedObject(self, @selector(isWWANAutoPlay), @(WWANAutoPlay), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     if (self.scrollView) self.scrollView.tfy_WWANAutoPlay = self.isWWANAutoPlay;
@@ -1115,10 +1125,11 @@
 - (void)setPlayingIndexPath:(NSIndexPath *)playingIndexPath {
     objc_setAssociatedObject(self, @selector(playingIndexPath), playingIndexPath, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     if (playingIndexPath) {
-        [self stopCurrentPlayingCell];
+        self.isSmallFloatViewShow = NO;
+        if (self.smallFloatView) self.smallFloatView.hidden = YES;
+        
         UIView *cell = [self.scrollView tfy_getCellForIndexPath:playingIndexPath];
         self.containerView = [cell viewWithTag:self.containerViewTag];
-        [self.orientationObserver cellModelRotateView:self.currentPlayerManager.view rotateViewAtCell:cell playerViewTag:self.containerViewTag];
         [self addDeviceOrientationObserver];
         self.scrollView.tfy_playingIndexPath = playingIndexPath;
         [self layoutPlayerSubViews];
@@ -1132,7 +1143,7 @@
     self.scrollView.tfy_shouldAutoPlay = shouldAutoPlay;
 }
 
-- (void)setSectionAssetURLs:(NSArray<NSArray<TFY_PlayerVideoModel *> *> * _Nullable)sectionAssetURLs {
+- (void)setSectionAssetURLs:(NSArray<NSArray<NSURL *> *> * _Nullable)sectionAssetURLs {
     objc_setAssociatedObject(self, @selector(sectionAssetURLs), sectionAssetURLs, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
@@ -1172,16 +1183,15 @@
     objc_setAssociatedObject(self, @selector(tfy_playerDidDisappearInScrollView), tfy_playerDidDisappearInScrollView, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
 
-- (void)setTfy_scrollViewDidStopScrollCallback:(void (^)(NSIndexPath * _Nonnull))tfy_scrollViewDidStopScrollCallback {
-    objc_setAssociatedObject(self, @selector(tfy_scrollViewDidStopScrollCallback), tfy_scrollViewDidStopScrollCallback, OBJC_ASSOCIATION_COPY_NONATOMIC);
+- (void)setTfy_playerShouldPlayInScrollView:(void (^)(NSIndexPath * _Nonnull))tfy_playerShouldPlayInScrollView {
+    objc_setAssociatedObject(self, @selector(tfy_playerShouldPlayInScrollView), tfy_playerShouldPlayInScrollView, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+- (void)setTfy_scrollViewDidEndScrollingCallback:(void (^)(NSIndexPath * _Nonnull))tfy_scrollViewDidEndScrollingCallback {
+    objc_setAssociatedObject(self, @selector(tfy_scrollViewDidEndScrollingCallback), tfy_scrollViewDidEndScrollingCallback, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
 
 #pragma mark - getter
-
-- (UIScrollView *)scrollView {
-    UIScrollView *scrollView = objc_getAssociatedObject(self, _cmd);
-    return scrollView;
-}
 
 - (BOOL)isWWANAutoPlay {
     return [objc_getAssociatedObject(self, _cmd) boolValue];
@@ -1202,7 +1212,11 @@
     return objc_getAssociatedObject(self, _cmd);
 }
 
-- (NSArray<NSArray<TFY_PlayerVideoModel *> *> *)sectionAssetURLs {
+- (NSIndexPath *)shouldPlayIndexPath {
+    return self.scrollView.tfy_shouldPlayIndexPath;
+}
+
+- (NSArray<NSArray<NSURL *> *> *)sectionAssetURLs {
     return objc_getAssociatedObject(self, _cmd);
 }
 
@@ -1248,87 +1262,86 @@
     return objc_getAssociatedObject(self, _cmd);
 }
 
-- (void (^)(NSIndexPath * _Nonnull))tfy_scrollViewDidStopScrollCallback {
+- (void (^)(NSIndexPath * _Nonnull))tfy_playerShouldPlayInScrollView {
+    return objc_getAssociatedObject(self, _cmd);
+}
+
+- (void (^)(NSIndexPath * _Nonnull))tfy_scrollViewDidEndScrollingCallback {
     return objc_getAssociatedObject(self, _cmd);
 }
 
 #pragma mark - Public method
 
+- (void)tfy_filterShouldPlayCellWhileScrolled:(void (^ __nullable)(NSIndexPath *indexPath))handler {
+    [self.scrollView tfy_filterShouldPlayCellWhileScrolled:handler];
+}
+
+- (void)tfy_filterShouldPlayCellWhileScrolling:(void (^ __nullable)(NSIndexPath *indexPath))handler {
+    [self.scrollView tfy_filterShouldPlayCellWhileScrolling:handler];
+}
+
 - (void)playTheIndexPath:(NSIndexPath *)indexPath {
     self.playingIndexPath = indexPath;
-    TFY_PlayerVideoModel *assetURL=[TFY_PlayerVideoModel new];
+    NSURL *assetURL;
     if (self.sectionAssetURLs.count) {
         assetURL = self.sectionAssetURLs[indexPath.section][indexPath.row];
-    } else if (self.assetUrlMododels.count) {
-        assetURL = self.assetUrlMododels[indexPath.row];
+    } else if (self.assetURLs.count) {
+        assetURL = self.assetURLs[indexPath.row];
         self.currentPlayIndex = indexPath.row;
     }
-    self.assetUrlModel = assetURL;
+    self.assetURL = assetURL;
 }
 
-- (void)playTheIndexPath:(NSIndexPath *)indexPath scrollToTop:(BOOL)scrollToTop completionHandler:(void (^ _Nullable)(void))completionHandler {
-    TFY_PlayerVideoModel *assetURL=[TFY_PlayerVideoModel new];;
+
+- (void)playTheIndexPath:(NSIndexPath *)indexPath scrollPosition:(PlayerScrollViewScrollPosition)scrollPosition animated:(BOOL)animated {
+    [self playTheIndexPath:indexPath scrollPosition:scrollPosition animated:animated completionHandler:nil];
+}
+
+- (void)playTheIndexPath:(NSIndexPath *)indexPath scrollPosition:(PlayerScrollViewScrollPosition)scrollPosition animated:(BOOL)animated completionHandler:(void (^ __nullable)(void))completionHandler {
+    NSURL *assetURL;
     if (self.sectionAssetURLs.count) {
         assetURL = self.sectionAssetURLs[indexPath.section][indexPath.row];
-    } else if (self.assetUrlMododels.count) {
-        assetURL = self.assetUrlMododels[indexPath.row];
+    } else if (self.assetURLs.count) {
+        assetURL = self.assetURLs[indexPath.row];
         self.currentPlayIndex = indexPath.row;
     }
-    if (scrollToTop) {
-        PLAYER_WS(myself);
-        [self.scrollView tfy_scrollToRowAtIndexPath:indexPath completionHandler:^{
-            
-            if (completionHandler) completionHandler();
-            myself.playingIndexPath = indexPath;
-            myself.assetUrlModel = assetURL;
-        }];
-    } else {
+    @player_weakify(self)
+    [self.scrollView tfy_scrollToRowAtIndexPath:indexPath atScrollPosition:scrollPosition animated:animated completionHandler:^{
+        @player_strongify(self)
         if (completionHandler) completionHandler();
         self.playingIndexPath = indexPath;
-        self.assetUrlModel = assetURL;
-    }
+        self.assetURL = assetURL;
+    }];
 }
 
-- (void)playTheIndexPath:(NSIndexPath *)indexPath scrollToTop:(BOOL)scrollToTop {
-    if ([indexPath compare:self.playingIndexPath] == NSOrderedSame) return;
-    if (scrollToTop) {
-        PLAYER_WS(myself);
-        [self.scrollView tfy_scrollToRowAtIndexPath:indexPath completionHandler:^{
-            
-            [myself playTheIndexPath:indexPath];
-        }];
-    } else {
-        [self playTheIndexPath:indexPath];
-    }
-}
 
-- (void)playTheIndexPath:(NSIndexPath *)indexPath assetURL:(NSString *)assetURL scrollToTop:(BOOL)scrollToTop {
+- (void)playTheIndexPath:(NSIndexPath *)indexPath assetURL:(NSURL *)assetURL {
     self.playingIndexPath = indexPath;
-    self.assetUrlModel.tfy_url = assetURL;
-    if (scrollToTop) {
-        [self.scrollView tfy_scrollToRowAtIndexPath:indexPath completionHandler:nil];
-    }
+    self.assetURL = assetURL;
+}
+
+
+- (void)playTheIndexPath:(NSIndexPath *)indexPath
+                assetURL:(NSURL *)assetURL
+          scrollPosition:(PlayerScrollViewScrollPosition)scrollPosition
+                animated:(BOOL)animated {
+    [self playTheIndexPath:indexPath assetURL:assetURL scrollPosition:scrollPosition animated:animated completionHandler:nil];
+}
+
+
+- (void)playTheIndexPath:(NSIndexPath *)indexPath
+                assetURL:(NSURL *)assetURL
+          scrollPosition:(PlayerScrollViewScrollPosition)scrollPosition
+                animated:(BOOL)animated
+       completionHandler:(void (^ __nullable)(void))completionHandler {
+    @player_weakify(self)
+    [self.scrollView tfy_scrollToRowAtIndexPath:indexPath atScrollPosition:scrollPosition animated:animated completionHandler:^{
+        @player_strongify(self)
+        if (completionHandler) completionHandler();
+        self.playingIndexPath = indexPath;
+        self.assetURL = assetURL;
+    }];
 }
 
 @end
 
-@implementation TFY_PlayerController (PlayerDeprecated)
-
-- (void)updateScrollViewPlayerToCell {
-    if (self.currentPlayerManager.view && self.playingIndexPath && self.containerViewTag) {
-        UIView *cell = [self.scrollView tfy_getCellForIndexPath:self.playingIndexPath];
-        self.containerView = [cell viewWithTag:self.containerViewTag];
-        [self.orientationObserver cellModelRotateView:self.currentPlayerManager.view rotateViewAtCell:cell playerViewTag:self.containerViewTag];
-        [self layoutPlayerSubViews];
-    }
-}
-
-- (void)updateNoramlPlayerWithContainerView:(UIView *)containerView {
-    if (self.currentPlayerManager.view && self.containerView) {
-        self.containerView = containerView;
-        [self.orientationObserver cellOtherModelRotateView:self.currentPlayerManager.view containerView:self.containerView];
-        [self layoutPlayerSubViews];
-    }
-}
-
-@end

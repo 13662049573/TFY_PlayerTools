@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import "LM_TabBarController.h"
+
 @interface AppDelegate ()
 
 @end
@@ -33,14 +34,14 @@
 }
 
 
+/// 在这里写支持的旋转方向，为了防止横屏方向，应用启动时候界面变为横屏模式
 - (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
-    if(self.enablePortrait)
-    {
-        if (self.lockedScreen) {
-            return UIInterfaceOrientationMaskLandscape;
-        }
-        return UIInterfaceOrientationMaskLandscape | UIInterfaceOrientationMaskPortrait;
+    InterfaceOrientationMask orientationMask = [TFY_LandscapeRotationManager supportedInterfaceOrientationsForWindow:window];
+    if (orientationMask != InterfaceOrientationMaskUnknow) {
+        return (UIInterfaceOrientationMask)orientationMask;
     }
+    /// 这里是非播放器VC支持的方向
     return UIInterfaceOrientationMaskPortrait;
 }
+
 @end

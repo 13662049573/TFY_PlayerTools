@@ -35,78 +35,71 @@ typedef NS_ENUM(NSInteger, PlayerContainerType) {
     PlayerContainerTypeView
 };
 
+typedef NS_ENUM(NSInteger , PlayerScrollViewScrollPosition) {
+    PlayerScrollViewScrollPositionNone,
+    /// 应用于UITableView和UICollectionViewDirection是垂直滚动。
+    PlayerScrollViewScrollPositionTop,
+    PlayerScrollViewScrollPositionCenteredVertically,
+    PlayerScrollViewScrollPositionBottom,
+    
+    /// 只适用于UICollectionViewDirection是水平滚动。
+    PlayerScrollViewScrollPositionLeft,
+    PlayerScrollViewScrollPositionCenteredHorizontally,
+    PlayerScrollViewScrollPositionRight
+};
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface UIScrollView (TFY_Player)
 
-/// 当ZFPlayerScrollViewDirection是ZFPlayerScrollViewDirectionVertical时，该属性具有值。
+/// 当 PlayerScrollViewDirection是 PlayerScrollViewDirectionVertical时，该属性具有值。
 @property (nonatomic, readonly) CGFloat tfy_lastOffsetY;
 
-/// 当ZFPlayerScrollViewDirection是ZFPlayerScrollViewDirectionHorizo​​ntal时，该属性具有值。
+/// 当PlayerScrollViewDirection是PlayerScrollViewDirectionHorizo​​ntal时，该属性具有值。
 @property (nonatomic, readonly) CGFloat tfy_lastOffsetX;
 
-///indexPath正在播放。
-@property (nonatomic, nullable) NSIndexPath *tfy_playingIndexPath;
-
-/// 应该播放的indexPath，一个亮起来的。
-@property (nonatomic, nullable) NSIndexPath *tfy_shouldPlayIndexPath;
-
-/// WWANA网络自动播放，默认为NO。
-@property (nonatomic, getter=tfy_isWWANAutoPlay) BOOL tfy_WWANAutoPlay;
-
-/// 播放器应该是自动播放器，默认为YES。
-@property (nonatomic) BOOL tfy_shouldAutoPlay;
-
-/// 播放器在scrollView中显示的视图标记。
-@property (nonatomic) NSInteger tfy_containerViewTag;
-
-/// scrollView滚动方向，默认为ZFPlayerScrollViewDirectionVertical。
+/// scrollView滚动方向，默认为PlayerScrollViewDirectionVertical。
 @property (nonatomic) PlayerScrollViewDirection tfy_scrollViewDirection;
 
 ///滚动时scrollView的滚动方向。
-///当ZFPlayerScrollViewDirection为ZFPlayerScrollViewDirectionVertical时，此值只能是ZFPlayerScrollDirectionUp或ZFPlayerScrollDirectionDown。
-///当ZFPlayerScrollViewDirection为ZFPlayerScrollViewDirectionVertical时，此值只能是ZFPlayerScrollDirectionLeft或ZFPlayerScrollDirectionRight。
+///当PlayerScrollViewDirection为tfyPlayerScrollViewDirectionVertical时，此值只能是PlayerScrollDirectionUp或tfyPlayerScrollDirectionDown。
+///当PlayerScrollViewDirection为tfyPlayerScrollViewDirectionVertical时，此值只能是PlayerScrollDirectionLeft或tfyPlayerScrollDirectionRight。
 @property (nonatomic, readonly) PlayerScrollDirection tfy_scrollDirection;
 
-/// 视频contrainerView类型。
-@property (nonatomic, assign) PlayerContainerType tfy_containerType;
-
-/// 正常模型中的视频contrainerView。
-@property (nonatomic, strong) UIView *tfy_containerView;
-
-/// 当单元格离开屏幕时，当前正在播放的单元格停止播放，默认为YES。
-@property (nonatomic, assign) BOOL tfy_stopWhileNotVisible;
-
-/// 已经停止了比赛
-@property (nonatomic, assign) BOOL tfy_stopPlay;
-
-/// 调用的块当播放停止滚动时。
-@property (nonatomic, copy, nullable) void(^tfy_scrollViewDidStopScrollCallback)(NSIndexPath *indexPath);
-
-/// 调用的块当播放应该玩的时候。
-@property (nonatomic, copy, nullable) void(^tfy_shouldPlayIndexPathCallback)(NSIndexPath *indexPath);
-
-/// 过滤滚动停止时应播放的单元格（滚动停止时播放）。
-- (void)tfy_filterShouldPlayCellWhileScrolled:(void (^ __nullable)(NSIndexPath *indexPath))handler;
-
-/// 过滤滚动时应播放的单元格（可以使用此过滤器突出显示的单元格）。
-- (void)tfy_filterShouldPlayCellWhileScrolling:(void (^ __nullable)(NSIndexPath *indexPath))handler;
-
-/// 根据indexPath获取单元格。
+/// Get the cell according to indexPath.
 - (UIView *)tfy_getCellForIndexPath:(NSIndexPath *)indexPath;
 
-/// 使用动画滚动到indexPath。
-- (void)tfy_scrollToRowAtIndexPath:(NSIndexPath *)indexPath completionHandler:(void (^ __nullable)(void))completionHandler;
+/// Get the indexPath for cell.
+- (NSIndexPath *)tfy_getIndexPathForCell:(UIView *)cell;
 
-///使用动画滚动到indexPath。
-- (void)tfy_scrollToRowAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated completionHandler:(void (^ __nullable)(void))completionHandler;
+/**
+Scroll to indexPath with position.
+ 
+@param indexPath scroll the  indexPath.
+@param scrollPosition  scrollView scroll position.
+@param animated animate.
+@param completionHandler  Scroll completion callback.
+*/
+- (void)tfy_scrollToRowAtIndexPath:(NSIndexPath *)indexPath
+                 atScrollPosition:(PlayerScrollViewScrollPosition)scrollPosition
+                         animated:(BOOL)animated
+                completionHandler:(void (^ __nullable)(void))completionHandler;
 
-///滚动到带有动画持续时间的indexPath。
-- (void)tfy_scrollToRowAtIndexPath:(NSIndexPath *)indexPath animateWithDuration:(NSTimeInterval)duration completionHandler:(void (^ __nullable)(void))completionHandler;
+/**
+Scroll to indexPath with position.
+ 
+@param indexPath scroll the  indexPath.
+@param scrollPosition  scrollView scroll position.
+@param duration animate duration.
+@param completionHandler  Scroll completion callback.
+*/
+- (void)tfy_scrollToRowAtIndexPath:(NSIndexPath *)indexPath
+                 atScrollPosition:(PlayerScrollViewScrollPosition)scrollPosition
+                  animateDuration:(NSTimeInterval)duration
+                completionHandler:(void (^ __nullable)(void))completionHandler;
 
 ///------------------------------------
-/// 必须在UIScrollViewDelegate中实现以下方法。
+/// The following method must be implemented in UIScrollViewDelegate.
 ///------------------------------------
 
 - (void)tfy_scrollViewDidEndDecelerating;
@@ -119,49 +112,86 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)tfy_scrollViewWillBeginDragging;
 
-///------------------------------------
-/// end
-///------------------------------------
-
-
 @end
 
 @interface UIScrollView (PlayerCannotCalled)
 
-/// 当播放出现时调用该块。
+/// 当出现时，方块被调用。
 @property (nonatomic, copy, nullable) void(^tfy_playerAppearingInScrollView)(NSIndexPath *indexPath, CGFloat playerApperaPercent);
 
-/// 当播放消失时调用该块。
+/// 当玩家消失时，方块被调用。
 @property (nonatomic, copy, nullable) void(^tfy_playerDisappearingInScrollView)(NSIndexPath *indexPath, CGFloat playerDisapperaPercent);
 
-/// 调用块当播放器出现时。
+/// 当玩家出现时，块被调用。
 @property (nonatomic, copy, nullable) void(^tfy_playerWillAppearInScrollView)(NSIndexPath *indexPath);
 
-/// 当播放出现时，调用该块。
+/// 当玩家出现时，方块被调用。
 @property (nonatomic, copy, nullable) void(^tfy_playerDidAppearInScrollView)(NSIndexPath *indexPath);
 
-/// 调用的块当播放消失时。
+/// 当玩家消失时调用的块。
 @property (nonatomic, copy, nullable) void(^tfy_playerWillDisappearInScrollView)(NSIndexPath *indexPath);
 
-/// 调用的块当播放消失时。
+/// 当玩家消失时，方块被调用。
 @property (nonatomic, copy, nullable) void(^tfy_playerDidDisappearInScrollView)(NSIndexPath *indexPath);
 
-///当前播放器滚动滑出屏幕百分比。
-///当`stopWhileNotVisible`为YES时使用的属性，停止当前播放的播放器。
-///当`stopWhileNotVisible`为NO时使用的属性，当前播放的播放器添加到小容器视图。
-/// 0.0~1.0，defalut为0.5。
-/// 0.0是播放将消失。
-/// 1.0是播放确实消失了。
+/// 当玩家停止滚动时，方块被调用。
+@property (nonatomic, copy, nullable) void(^tfy_scrollViewDidEndScrollingCallback)(NSIndexPath *indexPath);
+
+/// 当玩家滚动时，块被调用。
+@property (nonatomic, copy, nullable) void(^tfy_scrollViewDidScrollCallback)(NSIndexPath *indexPath);
+
+/// 当玩家应该游戏时调用的块。
+@property (nonatomic, copy, nullable) void(^tfy_playerShouldPlayInScrollView)(NSIndexPath *indexPath);
+
+///当前播放器滚动滑动百分比。
+///当' stopWhileNotVisible '为YES时使用的属性，停止当前播放的播放器。
+///当' stopWhileNotVisible '为NO时使用的属性，当前播放的播放器添加到小容器视图。
+/// 0.0~1.0，默认为0.5。
+/// 0.0表示播放器将消失。
+/// 1.0是播放器消失。
 @property (nonatomic) CGFloat tfy_playerDisapperaPercent;
 
-///当前播放器滚动到屏幕百分比以播放视频。
+///当前播放器滚动到屏幕百分比来播放视频。
 /// 0.0~1.0，默认值为0.0。
-/// 0.0是播放将出现的。
-/// 1.0是播放确实出现的。
+/// 0.0表示播放器将会出现。
+/// 1.0是播放器确实出现。
 @property (nonatomic) CGFloat tfy_playerApperaPercent;
 
-/// 当前的播放控制器消失了，而不是dealloc
+/// 当前的播放器控制器是消失，而不是释放
 @property (nonatomic) BOOL tfy_viewControllerDisappear;
+
+/// 已经停止播放了
+@property (nonatomic, assign) BOOL tfy_stopPlay;
+
+/// 当前正在播放的单元格在单元格离开屏幕时停止播放，默认为YES。
+@property (nonatomic, assign) BOOL tfy_stopWhileNotVisible;
+
+/// indexPath正在播放。
+@property (nonatomic, nullable) NSIndexPath *tfy_playingIndexPath;
+
+/// 滚动时应该播放indexPath。
+@property (nonatomic, nullable) NSIndexPath *tfy_shouldPlayIndexPath;
+
+/// WWANA网络自动播放，默认NO。
+@property (nonatomic, getter=tfy_isWWANAutoPlay) BOOL tfy_WWANAutoPlay;
+
+/// 播放器应该自动播放，默认是YES。
+@property (nonatomic) BOOL tfy_shouldAutoPlay;
+
+/// 播放器在scrollView中显示的视图标签。
+@property (nonatomic) NSInteger tfy_containerViewTag;
+
+/// 正常模式下的视频容器视图。
+@property (nonatomic, strong) UIView *tfy_containerView;
+
+/// 视频containerview类型。
+@property (nonatomic, assign) PlayerContainerType tfy_containerType;
+
+/// 筛选当滚动停止时应该播放的单元格(当滚动停止时播放)。
+- (void)tfy_filterShouldPlayCellWhileScrolled:(void (^ __nullable)(NSIndexPath *indexPath))handler;
+
+///在滚动时过滤应该播放的单元格(您可以使用此功能来过滤突出显示的单元格)。
+- (void)tfy_filterShouldPlayCellWhileScrolling:(void (^ __nullable)(NSIndexPath *indexPath))handler;
 
 
 @end

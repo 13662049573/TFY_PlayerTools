@@ -66,6 +66,8 @@ static const CGFloat kAnimate = 0.3;
 
 - (void)layoutSubviews {
     [super layoutSubviews];
+    if (isnan(self.value) || isnan(self.bufferValue)) return;
+
     CGFloat min_x = 0;
     CGFloat min_y = 0;
     CGFloat min_w = 0;
@@ -216,6 +218,17 @@ static const CGFloat kAnimate = 0.3;
     self.bgProgressView.player_height     = sliderHeight;
     self.bufferProgressView.player_height = sliderHeight;
     self.sliderProgressView.player_height = sliderHeight;
+}
+
+- (void)setSliderRadius:(CGFloat)sliderRadius {
+    if (isnan(sliderRadius)) return;
+    _sliderRadius = sliderRadius;
+    self.bgProgressView.layer.cornerRadius      = sliderRadius;
+    self.bufferProgressView.layer.cornerRadius  = sliderRadius;
+    self.sliderProgressView.layer.cornerRadius  = sliderRadius;
+    self.bgProgressView.layer.masksToBounds     = YES;
+    self.bufferProgressView.layer.masksToBounds = YES;
+    self.sliderProgressView.layer.masksToBounds = YES;
 }
 
 - (void)setIsHideSliderBlock:(BOOL)isHideSliderBlock {

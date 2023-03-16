@@ -4,7 +4,7 @@
 //
 //  Created by 田风有 on 2020/9/9.
 //  Copyright © 2020 田风有. All rights reserved.
-//  最新版本号：2.1.8
+//  最新版本号：2.2.0
 
 #import <Foundation/Foundation.h>
 
@@ -17,11 +17,13 @@ FOUNDATION_EXPORT const unsigned char TFY_PlayerToolsKitVersionString[];
 #if TFY_PlayerToolsKitRelease
 
 #import <TFY_PlayerTool/TFY_PlayerToolsHeader.h>
-#import <TFY_PlayerView/TFY_PlayerView.h>
+#import <TFY_PlayerView/TFY_PlayerControlView.h>
+#import <TFY_PlayerView/TFY_LandscapeRotationManager.h>
 
 #else
 
 #import "TFY_PlayerToolsHeader.h"
-#import "TFY_PlayerView.h"
+#import "TFY_PlayerControlView.h"
+#import "TFY_LandscapeRotationManager.h"
 
 #endif

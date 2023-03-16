@@ -7,10 +7,23 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "TFY_PlayerToolsHeader.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface TFY_PlayerBaseView : UIView
+
+/// 玩家内容视图。
+@property (nonatomic, strong) UIView *playerView;
+
+/// 决定内容如何缩放以适应视图。
+@property (nonatomic, assign) PlayerScalingMode scalingMode;
+
+/// 视频大小。
+@property (nonatomic, assign) CGSize presentationSize;
+
+/// playerView的封面。
+@property (nonatomic, strong, readonly) UIImageView *coverImageView;
 
 @end
 

@@ -68,7 +68,7 @@ static ReachabilityStatus ReachabilityStatusForFlags(SCNetworkReachabilityFlags 
          NSArray *typeStrings4G = @[CTRadioAccessTechnologyLTE];
         
         NSArray *typeStrings5G;
-        if (@available(iOS 14.0, *)) {
+        if (@available(iOS 14.1, *)) {
             typeStrings5G = @[CTRadioAccessTechnologyNRNSA,
                               CTRadioAccessTechnologyNR];
         }

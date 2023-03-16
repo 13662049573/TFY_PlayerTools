@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  当播放准备播放视频时。
  */
-- (void)videoPlayer:(TFY_PlayerController *)videoPlayer prepareToPlay:(NSString *)assetURL;
+- (void)videoPlayer:(TFY_PlayerController *)videoPlayer prepareToPlay:(NSURL *)assetURL;
 /**
  *  当播放器播放状态改变时。
  */
@@ -141,6 +141,11 @@ NS_ASSUME_NONNULL_BEGIN
  * 当pinchGesture发生变化时
  */
 - (void)gesturePinched:(TFY_PlayerGestureControl *)gestureControl scale:(float)scale;
+
+/**
+ 当手势longPress改变
+ */
+- (void)longPressed:(TFY_PlayerGestureControl *)gestureControl state:(LongPressGestureRecognizerState)state;
 
 #pragma mark - scrollview
 

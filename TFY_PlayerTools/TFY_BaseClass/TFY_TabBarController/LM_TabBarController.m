@@ -7,11 +7,8 @@
 //
 
 #import "LM_TabBarController.h"
-#import "LX_HomeController.h"
-#import "LX_CurveController.h"
-#import "LX_MineController.h"
-#import "LX_CalendarController.h"
-
+#import "HomeViewController.h"
+#import "MineViewController.h"
 @interface LM_TabBarController ()<TfySY_TabBarDelegate>
 
 @end
@@ -29,18 +26,12 @@
 }
 
 - (void)addChildViewControllers{
-    TFY_NavigationController *vc1 = [self navcontroller:[LX_HomeController new]];
-    TFY_NavigationController *vc2 = [self navcontroller:[LX_CalendarController new]];
-    TFY_NavigationController *vc3 = [self navcontroller:[LX_CurveController new]];
-    TFY_NavigationController *vc5 = [self navcontroller:[LX_MineController new]];
    
     NSArray<NSDictionary *>*VCArray = @[
-    [self controller:vc1 normalImg:@"default_measure" selectImg:@"sel_measure" itemTitle:@"样式1"],
-    [self controller:vc2 normalImg:@"calendar" selectImg:@"calendar1" itemTitle:@"样式2"],
-    [self controller:vc3 normalImg:@"default_report" selectImg:@"sel_report" itemTitle:@"样式3"],
-    [self controller:vc5 normalImg:@"default_user" selectImg:@"sel_user" itemTitle:@"样式4"]
+    [self controller:HomeViewController.new normalImg:@"default_measure" selectImg:@"sel_measure" itemTitle:@"样式1"],
+    [self controller:MineViewController.new normalImg:@"calendar" selectImg:@"calendar1" itemTitle:@"样式2"],
     ];
-    
+
     NSMutableArray *tabBarConfs = @[].mutableCopy;
     NSMutableArray *tabBarVCs = @[].mutableCopy;
     [VCArray enumerateObjectsUsingBlock:^(NSDictionary * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -51,7 +42,8 @@
         model.normalColor = [UIColor tfy_colorWithHex:LCColor_A4];
         model.selectColor = [UIColor tfy_colorWithHex:LCColor_A5];
         UIViewController *vc = [obj objectForKey:@"vc"];
-        [tabBarVCs addObject:vc];
+        UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
+        [tabBarVCs addObject:nav];
         [tabBarConfs addObject:model];
     }];
     self.ControllerArray = tabBarVCs;

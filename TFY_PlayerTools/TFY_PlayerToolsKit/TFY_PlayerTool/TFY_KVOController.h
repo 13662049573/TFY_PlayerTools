@@ -14,8 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype _Nonnull)initWithTarget:(NSObject * _Nonnull)target;
 
-- (void)safelyAddObserver:(NSObject * _Nonnull)observer forKeyPath:(NSString * _Nonnull)keyPath options:(NSKeyValueObservingOptions)options context:(void *)context;
-
+- (void)safelyAddObserver:(NSObject * _Nonnull)observer forKeyPath:(NSString * _Nonnull)keyPath options:(NSKeyValueObservingOptions)options context:(void *_Nullable)context;
 
 - (void)safelyRemoveObserver:(NSObject * _Nonnull)observer forKeyPath:(NSString * _Nonnull)keyPath;
 

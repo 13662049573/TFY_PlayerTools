@@ -15,7 +15,6 @@ typedef NS_ENUM(NSInteger, VolumeBrightnessType) {
     VolumeBrightnessTypeumeBrightness // brightness
 };
 
-
 @interface TFY_VolumeBrightnessView : UIView
 
 @property (nonatomic, assign, readonly) VolumeBrightnessType volumeBrightnessType;

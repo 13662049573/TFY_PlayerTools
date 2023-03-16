@@ -12,31 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSUInteger, PlayerPlaybackState) {
-    PlayerPlayStateUnknown,
-    PlayerPlayStatePlaying,
-    PlayerPlayStatePaused,
-    PlayerPlayStatePlayFailed,
-    PlayerPlayStatePlayStopped
-};
-
-typedef NS_OPTIONS(NSUInteger, PlayerLoadState) {
-    PlayerLoadStateUnknown        = 0,
-    PlayerLoadStatePrepare        = 1 << 0,
-    PlayerLoadStatePlayable       = 1 << 1,
-    PlayerLoadStatePlaythroughOK  = 1 << 2, // 播放将自动开始。
-    PlayerLoadStateStalled        = 1 << 3, // 如果启动，播放将在此状态下自动暂停。
-};
-
-typedef NS_ENUM(NSInteger, PlayerScalingMode) {
-    PlayerScalingModeNone,       // 没有缩放。
-    PlayerScalingModeAspectFit,  // 均匀刻度，直到一个尺寸适合。
-    PlayerScalingModeAspectFill, // 均匀缩放直到电影填满可见边界。一个维度可能包含剪辑内容。
-    PlayerScalingModeFill        // 规模不均匀。两个渲染维度都将与可见边界完全匹配。
-};
-
 @protocol TFY_PlayerMediaPlayback <NSObject>
-
 @required
 /**
  * 该视图必须继承`TFY_PlayerBaseView`，此视图处理一些手势冲突。
@@ -97,11 +73,11 @@ typedef NS_ENUM(NSInteger, PlayerScalingMode) {
 /**
  *  播放资产网址。
  */
-@property (nonatomic, copy) NSString *assetURL;
+@property (nonatomic, nullable) NSURL *assetURL;
 /**
  *  视频大小。
  */
-@property (nonatomic, readonly) CGSize presentationSize;
+@property (nonatomic) CGSize presentationSize;
 /**
  *  播放状态。
  */
@@ -118,11 +94,11 @@ typedef NS_ENUM(NSInteger, PlayerScalingMode) {
 /**
  *  当播放准备玩时调用该块。
  */
-@property (nonatomic, copy, nullable) void(^playerPrepareToPlay)(id<TFY_PlayerMediaPlayback> asset, NSString *assetURL);
+@property (nonatomic, copy, nullable) void(^playerPrepareToPlay)(id<TFY_PlayerMediaPlayback> asset, NSURL *assetURL);
 /**
  *  当播放准备好玩时，会调用该块。
  */
-@property (nonatomic, copy, nullable) void(^playerReadyToPlay)(id<TFY_PlayerMediaPlayback> asset, NSString *assetURL);
+@property (nonatomic, copy, nullable) void(^playerReadyToPlay)(id<TFY_PlayerMediaPlayback> asset, NSURL *assetURL);
 /**
  *  当播放进行改变时调用的块。
  */
@@ -181,17 +157,19 @@ typedef NS_ENUM(NSInteger, PlayerScalingMode) {
  */
 - (void)stop;
 /**
- *  视频分解
- */
-- (void)splitVideofps:(float)fps progressImageBlock:(void (NS_NOESCAPE ^)(CGFloat progress))progressImageBlock splitCompleteBlock:(void (NS_NOESCAPE ^)(BOOL success, NSMutableArray *splitimgs))splitCompleteBlock;
-/**
  *  使用此方法可以搜索当前播放器的指定时间，并在搜索操作完成时收到通知。
  */
 - (void)seekToTime:(NSTimeInterval)time completionHandler:(void (^ __nullable)(BOOL finished))completionHandler;
+
+@optional
 /**
  *  当前时间的视频UIImage。
  */
 - (UIImage *)thumbnailImageAtCurrentTime;
+
+/// 视频UIImage在当前时间。
+- (void)thumbnailImageAtCurrentTime:(void(^)(UIImage *))handler;
+
 @end
 
 NS_ASSUME_NONNULL_END

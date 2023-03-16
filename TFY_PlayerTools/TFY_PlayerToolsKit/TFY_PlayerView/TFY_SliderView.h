@@ -71,6 +71,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** 设置滑杆的高度 */
 @property (nonatomic, assign) CGFloat sliderHeight;
 
+/** 设置滑杆的圆角 */
+@property (nonatomic, assign) CGFloat sliderRadius;
+
 /** 是否隐藏滑块（默认为NO） */
 @property (nonatomic, assign) BOOL isHideSliderBlock;
 

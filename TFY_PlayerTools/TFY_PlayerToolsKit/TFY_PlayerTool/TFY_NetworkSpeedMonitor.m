@@ -126,14 +126,22 @@ NSString *const NetworkSpeedNotificationKey         = @"NetworkSpeedNotification
     freeifaddrs(ifa_list);
     if (_iBytes != 0) {
         _downloadNetworkSpeed = [[self stringWithbytes:iBytes - _iBytes] stringByAppendingString:@"/s"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:DownloadNetworkSpeedNotificationKey object:nil userInfo:@{NetworkSpeedNotificationKey:_downloadNetworkSpeed}];
+        NSMutableDictionary *userInfo = @{}.mutableCopy;
+        userInfo[NetworkSpeedNotificationKey] = _downloadNetworkSpeed;
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:DownloadNetworkSpeedNotificationKey object:nil userInfo:userInfo];
+        NSLog(@"downloadNetworkSpeed : %@",_downloadNetworkSpeed);
     }
     
     _iBytes = iBytes;
     
     if (_oBytes != 0) {
         _uploadNetworkSpeed = [[self stringWithbytes:oBytes - _oBytes] stringByAppendingString:@"/s"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:UploadNetworkSpeedNotificationKey object:nil userInfo:@{NetworkSpeedNotificationKey:_uploadNetworkSpeed}];
+        NSMutableDictionary *userInfo = @{}.mutableCopy;
+        userInfo[NetworkSpeedNotificationKey] = _uploadNetworkSpeed;
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:UploadNetworkSpeedNotificationKey object:nil userInfo:userInfo];
+        NSLog(@"uploadNetworkSpeed :%@",_uploadNetworkSpeed);
     }
     _oBytes = oBytes;
 }

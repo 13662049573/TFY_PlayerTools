@@ -13,6 +13,8 @@
 @property (nonatomic, strong) UITapGestureRecognizer *doubleTap;
 @property (nonatomic, strong) UIPanGestureRecognizer *panGR;
 @property (nonatomic, strong) UIPinchGestureRecognizer *pinchGR;
+@property (nonatomic, strong) UILongPressGestureRecognizer *longPressGR;
+
 @property (nonatomic) PanDirection panDirection;
 @property (nonatomic) PanLocation panLocation;
 @property (nonatomic) PanMovingDirection panMovingDirection;
@@ -30,6 +32,7 @@
     [self.targetView addGestureRecognizer:self.doubleTap];
     [self.targetView addGestureRecognizer:self.panGR];
     [self.targetView addGestureRecognizer:self.pinchGR];
+    [self.targetView addGestureRecognizer:self.longPressGR];
 }
 
 - (void)removeGestureToView:(UIView *)view {
@@ -37,6 +40,7 @@
     [view removeGestureRecognizer:self.doubleTap];
     [view removeGestureRecognizer:self.panGR];
     [view removeGestureRecognizer:self.pinchGR];
+    [view removeGestureRecognizer:self.longPressGR];
 }
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
@@ -88,6 +92,12 @@
             break;
         case PlayerGestureTypeSingleTap: {
             if (self.disableTypes & PlayerDisableGestureTypesSingleTap) {
+                return NO;
+            }
+        }
+            break;
+        case PlayerDisableGestureTypesLongPress: {
+            if (self.disableTypes & PlayerDisableGestureTypesLongPress) {
                 return NO;
             }
         }
@@ -166,6 +176,15 @@
     return _pinchGR;
 }
 
+- (UILongPressGestureRecognizer *)longPressGR {
+    if (!_longPressGR) {
+        _longPressGR = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+        _longPressGR.delegate = self;
+        _longPressGR.delaysTouchesBegan = YES;
+    }
+    return _longPressGR;
+}
+
 - (void)handleSingleTap:(UITapGestureRecognizer *)tap {
     if (self.singleTapped) self.singleTapped(self);
 }
@@ -237,6 +256,26 @@
             break;
         default:
             break;
+    }
+}
+
+- (void)handleLongPress:(UILongPressGestureRecognizer *)longPress {
+    switch (longPress.state) {
+        case UIGestureRecognizerStateBegan: {
+            if (self.longPressed) self.longPressed(self, LongPressGestureRecognizerStateBegan);
+        }
+            break;
+        case UIGestureRecognizerStateChanged: {
+            if (self.longPressed) self.longPressed(self, LongPressGestureRecognizerStateChanged);
+        }
+            break;
+        case UIGestureRecognizerStateEnded:
+        case UIGestureRecognizerStateCancelled:
+        case UIGestureRecognizerStateFailed: {
+            if (self.longPressed) self.longPressed(self, LongPressGestureRecognizerStateEnded);
+        }
+            break;
+        default: break;
     }
 }
 

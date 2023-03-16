@@ -14,7 +14,6 @@
 #import "TFY_PlayerBaseView.h"
 #import "TFY_KVOController.h"
 
-#define Player_WS(weakSelf)  __weak __typeof(&*self)weakSelf = self;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored"-Wdeprecated-declarations"
 
@@ -27,7 +26,7 @@ static NSString *const kPlaybackBufferEmpty      = @"playbackBufferEmpty";
 static NSString *const kPlaybackLikelyToKeepUp   = @"playbackLikelyToKeepUp";
 static NSString *const kPresentationSize         = @"presentationSize";
 
-@interface TFY_PlayerPresentView : TFY_PlayerBaseView
+@interface TFY_PlayerPresentView : UIView
 
 @property (nonatomic, strong) AVPlayer *player;
 /// 默认为AVLayerVideoGravityResizeAspect。
@@ -43,14 +42,6 @@ static NSString *const kPresentationSize         = @"presentationSize";
 
 - (AVPlayerLayer *)avLayer {
     return (AVPlayerLayer *)self.layer;
-}
-
-- (instancetype)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
-    if (self) {
-        self.backgroundColor = [UIColor blackColor];
-    }
-    return self;
 }
 
 - (void)setPlayer:(AVPlayer *)player {
@@ -77,11 +68,10 @@ static NSString *const kPresentationSize         = @"presentationSize";
     TFY_KVOController *_playerItemKVO;
 }
 @property (nonatomic, strong) AVPlayerLayer *playerLayer;
-@property (nonatomic, strong) AVPlayerItemVideoOutput * playerOutput;
 @property (nonatomic, assign) BOOL isBuffering;
 @property (nonatomic, assign) BOOL isReadyToPlay;
-//视频截图
-@property(nonatomic , strong)NSMutableArray *thumbImages;
+@property (nonatomic, strong) AVAssetImageGenerator *imageGenerator;
+
 @end
 
 @implementation TFY_AVPlayerManager
@@ -159,147 +149,79 @@ static NSString *const kPresentationSize         = @"presentationSize";
 - (void)stop {
     [_playerItemKVO safelyRemoveAllObservers];
     self.loadState = PlayerLoadStateUnknown;
+    self.playState = PlayerPlayStatePlayStopped;
     if (self.player.rate != 0) [self.player pause];
+    [_playerItem cancelPendingSeeks];
+    [_asset cancelLoading];
     [self.player removeTimeObserver:_timeObserver];
     [self.player replaceCurrentItemWithPlayerItem:nil];
+    self.presentationSize = CGSizeZero;
     _timeObserver = nil;
     [[NSNotificationCenter defaultCenter] removeObserver:_itemEndObserver name:AVPlayerItemDidPlayToEndTimeNotification object:self.playerItem];
     _itemEndObserver = nil;
     _isPlaying = NO;
+    _player = nil;
+    _assetURL = nil;
+    _playerItem = nil;
     _isPreparedToPlay = NO;
     self->_currentTime = 0;
     self->_totalTime = 0;
     self->_bufferTime = 0;
     self.isReadyToPlay = NO;
-    self.playState = PlayerPlayStatePlayStopped;
 }
 
 - (void)replay {
-    Player_WS(myself);
+    @player_weakify(self)
     [self seekToTime:0 completionHandler:^(BOOL finished) {
-        [myself play];
+        @player_strongify(self)
+        if (finished) {
+            [self play];
+        }
     }];
 }
 
 - (void)seekToTime:(NSTimeInterval)time completionHandler:(void (^ __nullable)(BOOL finished))completionHandler {
     if (self.totalTime > 0) {
-        CMTime seekTime = CMTimeMake(time, 1);
+        [_player.currentItem cancelPendingSeeks];
+        int32_t timeScale = _player.currentItem.asset.duration.timescale;
+        CMTime seekTime = CMTimeMakeWithSeconds(time, timeScale);
         [_player seekToTime:seekTime toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero completionHandler:completionHandler];
     } else {
         self.seekTime = time;
     }
 }
 
-// 视频分解
-- (void)splitVideofps:(float)fps progressImageBlock:(void (NS_NOESCAPE ^)(CGFloat progress))progressImageBlock splitCompleteBlock:(void (NS_NOESCAPE ^)(BOOL success, NSMutableArray *splitimgs))splitCompleteBlock {
-    if (!self.assetURL) {
-        return;
-    }
-    NSMutableArray *splitImages = [NSMutableArray array];
-    CMTime cmtime = self.asset.duration; //视频时间信息结构体
-    Float64 durationSeconds = CMTimeGetSeconds(cmtime); //视频总秒数
+- (UIImage *)thumbnailImageAtCurrentTime {
+    CMTime expectedTime = self.playerItem.currentTime;
+    CGImageRef cgImage = NULL;
     
-    NSMutableArray *times = [NSMutableArray array];
-    Float64 totalFrames = durationSeconds / fps; //获得视频总帧数
-    CMTime timeFrame;
-    for (int i = 1; i <= totalFrames; i++) {
-        timeFrame = CMTimeMake(totalFrames, fps); //第i帧  帧率
-        if ([self.assetURL hasSuffix:@"m3u8"]) {
-            NSValue *timeValue = [NSValue valueWithCMTime:timeFrame];
-            [times addObject:timeValue];
-            UIImage *frameImg = [self screenshotsm3u8WithCurrentTime:timeFrame playerItemVideoOutput:_playerOutput];
-            
-            if ([frameImg isKindOfClass:[UIImage class]]) {
-                [splitImages addObject:frameImg];
-            }
-        }
-        else{
-            NSValue *timeValue = [NSValue valueWithCMTime:timeFrame];
-            [times addObject:timeValue];
-        }
+    self.imageGenerator.requestedTimeToleranceBefore = kCMTimeZero;
+    self.imageGenerator.requestedTimeToleranceAfter = kCMTimeZero;
+    cgImage = [self.imageGenerator copyCGImageAtTime:expectedTime actualTime:NULL error:NULL];
+
+    if (!cgImage) {
+        self.imageGenerator.requestedTimeToleranceBefore = kCMTimePositiveInfinity;
+        self.imageGenerator.requestedTimeToleranceAfter = kCMTimePositiveInfinity;
+        cgImage = [self.imageGenerator copyCGImageAtTime:expectedTime actualTime:NULL error:NULL];
     }
     
-    AVAssetImageGenerator *imgGenerator = [[AVAssetImageGenerator alloc] initWithAsset:_asset];
-    //防止时间出现偏差
-    imgGenerator.requestedTimeToleranceBefore = kCMTimeZero;
-    imgGenerator.requestedTimeToleranceAfter = kCMTimeZero;
-    
-    NSInteger timesCount = [times count];
-    [imgGenerator generateCGImagesAsynchronouslyForTimes:times completionHandler:^(CMTime requestedTime, CGImageRef  _Nullable image, CMTime actualTime, AVAssetImageGeneratorResult result, NSError * _Nullable error) {
-       
-        if (progressImageBlock) {
-            CGFloat progress = requestedTime.value * 1.0 / timesCount;
-            progressImageBlock(progress);
-        }
-        
-        BOOL isSuccess = NO;
-        switch (result) {
-            case AVAssetImageGeneratorCancelled:
-                NSLog(@"Cancelled");
-                break;
-            case AVAssetImageGeneratorFailed:
-                NSLog(@"Failed");
-                break;
-            case AVAssetImageGeneratorSucceeded: {
-                UIImage *frameImg = [UIImage imageWithCGImage:image];
-                [splitImages addObject:frameImg];
-                
-                if (requestedTime.value == timesCount) {
-                    isSuccess = YES;
-                }
-            }
-                break;
-        }
-        if (splitCompleteBlock) {
-            splitCompleteBlock(isSuccess,splitImages);
+    UIImage *image = [UIImage imageWithCGImage:cgImage];
+    return image;
+}
+
+- (void)thumbnailImageAtCurrentTime:(void(^)(UIImage *))handler {
+    CMTime expectedTime = self.playerItem.currentTime;
+    [self.imageGenerator generateCGImagesAsynchronouslyForTimes:@[[NSValue valueWithCMTime:expectedTime]] completionHandler:^(CMTime requestedTime, CGImageRef  _Nullable image, CMTime actualTime, AVAssetImageGeneratorResult result, NSError * _Nullable error) {
+        if (handler) {
+            UIImage *finalImage = [UIImage imageWithCGImage:image];
+            handler(finalImage);
         }
     }];
 }
 
-- (UIImage *)thumbnailImageAtCurrentTime {
-    UIImage *image;
-    if ([self.assetURL hasSuffix:@"m3u8"]) {
-        image = [self screenshotsm3u8WithCurrentTime:_playerItem.currentTime playerItemVideoOutput:_playerOutput];
-    }
-    else{
-       image = [self screenshotsMP4WithCurrentTime:_playerItem.currentTime videoUrl:self.assetURL];
-    }
-    return image;
-}
-
--(UIImage *)screenshotsMP4WithCurrentTime:(CMTime)currentTime videoUrl:(NSString *)url{
-    
-    AVURLAsset * asset = [[AVURLAsset alloc] initWithURL:[NSURL URLWithString:url] options:nil];
-    AVAssetImageGenerator * gen = [[AVAssetImageGenerator alloc] initWithAsset:asset];
-    gen.appliesPreferredTrackTransform = YES;
-    gen.requestedTimeToleranceAfter = kCMTimeZero;
-    gen.requestedTimeToleranceBefore = kCMTimeZero;
-    CMTime time = CMTimeMakeWithSeconds(CMTimeGetSeconds(currentTime), 600);
-    NSError * error = nil;
-    CMTime actualTime;
-    CGImageRef imageRef = [gen copyCGImageAtTime:time actualTime:&actualTime error:&error];
-    UIImage * image = [[UIImage alloc] initWithCGImage:imageRef];
-    return image;
-}
-
--(UIImage *)screenshotsm3u8WithCurrentTime:(CMTime)currentTime playerItemVideoOutput:(AVPlayerItemVideoOutput *)output{
-    
-    CVPixelBufferRef pixelBuffer = [output copyPixelBufferForItemTime:currentTime itemTimeForDisplay:nil];
-    CIImage *ciImage = [CIImage imageWithCVPixelBuffer:pixelBuffer];
-    CIContext *temporaryContext = [CIContext contextWithOptions:nil];
-    CGImageRef videoImage = [temporaryContext createCGImage:ciImage
-                                                   fromRect:CGRectMake(0, 0,
-                                                                       CVPixelBufferGetWidth(pixelBuffer),
-                                                                       CVPixelBufferGetHeight(pixelBuffer))];
-    UIImage *frameImg = [UIImage imageWithCGImage:videoImage];
-    CGImageRelease(videoImage);
-    CVBufferRelease(pixelBuffer);
-    return frameImg;
-}
-
 #pragma mark - private method
 
-///计算缓冲区进度
+/// Calculate buffer progress
 - (NSTimeInterval)availableDuration {
     NSArray *timeRangeArray = _playerItem.loadedTimeRanges;
     CMTime currentTime = [_player currentTime];
@@ -323,27 +245,30 @@ static NSString *const kPresentationSize         = @"presentationSize";
 }
 
 - (void)initializePlayer {
-    _asset = [AVURLAsset URLAssetWithURL:[NSURL URLWithString:self.assetURL] options:self.requestHeader];
+    _asset = [AVURLAsset URLAssetWithURL:self.assetURL options:self.requestHeader];
     _playerItem = [AVPlayerItem playerItemWithAsset:_asset];
     _player = [AVPlayer playerWithPlayerItem:_playerItem];
-    self.playerOutput = [[AVPlayerItemVideoOutput alloc] init];
-    [self.playerItem addOutput:self.playerOutput];
+    _imageGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:_asset];
+
     [self enableAudioTracks:YES inPlayerItem:_playerItem];
     
-    TFY_PlayerPresentView *presentView = (TFY_PlayerPresentView *)self.view;
+    TFY_PlayerPresentView *presentView = [[TFY_PlayerPresentView alloc] init];
     presentView.player = _player;
+    self.view.playerView = presentView;
+
     self.scalingMode = _scalingMode;
     if (@available(iOS 9.0, *)) {
         _playerItem.canUseNetworkResourcesForLiveStreamingWhilePaused = NO;
     }
     if (@available(iOS 10.0, *)) {
         _playerItem.preferredForwardBufferDuration = 5;
+        /// 关闭AVPlayer默认的缓冲延迟播放策略，提高首屏播放速度
         _player.automaticallyWaitsToMinimizeStalling = NO;
     }
     [self itemObserving];
 }
 
-/// 播放速度切换方法
+/// Playback speed switching method
 - (void)enableAudioTracks:(BOOL)enable inPlayerItem:(AVPlayerItem*)playerItem {
     for (AVPlayerItemTrack *track in playerItem.tracks){
         if ([track.assetTrack.mediaType isEqual:AVMediaTypeVideo]) {
@@ -363,10 +288,10 @@ static NSString *const kPresentationSize         = @"presentationSize";
     self.isBuffering = YES;
     
     // 需要先暂停一小会之后再播放，否则网络状况不好的时候时间在走，声音播放不出来
-    [self.player pause];
+    [self pause];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         // 如果此时用户已经暂停了，则不再需要开启播放了
-        if (!self.isPlaying) {
+        if (!self.isPlaying && self.loadState == PlayerLoadStateStalled) {
             self.isBuffering = NO;
             return;
         }
@@ -380,38 +305,44 @@ static NSString *const kPresentationSize         = @"presentationSize";
 - (void)itemObserving {
     [_playerItemKVO safelyRemoveAllObservers];
     _playerItemKVO = [[TFY_KVOController alloc] initWithTarget:_playerItem];
-    
-    [_playerItemKVO safelyAddObserver:self forKeyPath:kStatus options:NSKeyValueObservingOptionNew context:@""];
-    
-    [_playerItemKVO safelyAddObserver:self forKeyPath:kPlaybackBufferEmpty options:NSKeyValueObservingOptionNew context:@""];
-    
-    [_playerItemKVO safelyAddObserver:self forKeyPath:kPlaybackLikelyToKeepUp options:NSKeyValueObservingOptionNew context:@""];
-    
-    [_playerItemKVO safelyAddObserver:self forKeyPath:kLoadedTimeRanges options:NSKeyValueObservingOptionNew context:@""];
-    
-    [_playerItemKVO safelyAddObserver:self forKeyPath:kPresentationSize options:NSKeyValueObservingOptionNew context:@""];
+    [_playerItemKVO safelyAddObserver:self
+                           forKeyPath:kStatus
+                              options:NSKeyValueObservingOptionNew
+                              context:nil];
+    [_playerItemKVO safelyAddObserver:self
+                           forKeyPath:kPlaybackBufferEmpty
+                              options:NSKeyValueObservingOptionNew
+                              context:nil];
+    [_playerItemKVO safelyAddObserver:self
+                           forKeyPath:kPlaybackLikelyToKeepUp
+                              options:NSKeyValueObservingOptionNew
+                              context:nil];
+    [_playerItemKVO safelyAddObserver:self
+                           forKeyPath:kLoadedTimeRanges
+                              options:NSKeyValueObservingOptionNew
+                              context:nil];
+    [_playerItemKVO safelyAddObserver:self
+                           forKeyPath:kPresentationSize
+                              options:NSKeyValueObservingOptionNew
+                              context:nil];
     
     CMTime interval = CMTimeMakeWithSeconds(self.timeRefreshInterval > 0 ? self.timeRefreshInterval : 0.1, NSEC_PER_SEC);
-    Player_WS(myself);
+    @player_weakify(self)
     _timeObserver = [self.player addPeriodicTimeObserverForInterval:interval queue:dispatch_get_main_queue() usingBlock:^(CMTime time) {
-        
-        if (!myself) return;
-        NSArray *loadedRanges = myself.playerItem.seekableTimeRanges;
-        /// 大于0才把状态改为可以播放，解决黑屏问题
-        if (CMTimeGetSeconds(time) > 0 && !myself.isReadyToPlay) {
-            myself.isReadyToPlay = YES;
-            myself.loadState = PlayerLoadStatePlaythroughOK;
-        }
+        @player_strongify(self)
+        if (!self) return;
+        NSArray *loadedRanges = self.playerItem.seekableTimeRanges;
+        if (self.isPlaying && self.loadState == PlayerLoadStateStalled) self.player.rate = self.rate;
         if (loadedRanges.count > 0) {
-            if (myself.playerPlayTimeChanged) myself.playerPlayTimeChanged(myself, myself.currentTime, myself.totalTime);
+            if (self.playerPlayTimeChanged) self.playerPlayTimeChanged(self, self.currentTime, self.totalTime);
         }
     }];
     
     _itemEndObserver = [[NSNotificationCenter defaultCenter] addObserverForName:AVPlayerItemDidPlayToEndTimeNotification object:self.playerItem queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification * _Nonnull note) {
-        
-        if (!myself) return;
-        myself.playState = PlayerPlayStatePlayStopped;
-        if (myself.playerDidToEnd) myself.playerDidToEnd(myself);
+        @player_strongify(self)
+        if (!self) return;
+        self.playState = PlayerPlayStatePlayStopped;
+        if (self.playerDidToEnd) self.playerDidToEnd(self);
     }];
 }
 
@@ -419,34 +350,43 @@ static NSString *const kPresentationSize         = @"presentationSize";
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([keyPath isEqualToString:kStatus]) {
             if (self.player.currentItem.status == AVPlayerItemStatusReadyToPlay) {
-                /// 第一次初始化
-                if (self.loadState == PlayerLoadStatePrepare) {
+                if (!self.isReadyToPlay) {
+                    self.isReadyToPlay = YES;
+                    self.loadState = PlayerLoadStatePlaythroughOK;
                     if (self.playerReadyToPlay) self.playerReadyToPlay(self, self.assetURL);
                 }
                 if (self.seekTime) {
-                    [self seekToTime:self.seekTime completionHandler:nil];
+                    if (self.shouldAutoPlay) [self pause];
+                    @player_weakify(self)
+                    [self seekToTime:self.seekTime completionHandler:^(BOOL finished) {
+                        @player_strongify(self)
+                        if (finished) {
+                            if (self.shouldAutoPlay) [self play];
+                        }
+                    }];
                     self.seekTime = 0;
+                } else {
+                    if (self.shouldAutoPlay && self.isPlaying) [self play];
                 }
-                if (self.isPlaying) [self play];
                 self.player.muted = self.muted;
                 NSArray *loadedRanges = self.playerItem.seekableTimeRanges;
                 if (loadedRanges.count > 0) {
-                    
                     if (self.playerPlayTimeChanged) self.playerPlayTimeChanged(self, self.currentTime, self.totalTime);
                 }
             } else if (self.player.currentItem.status == AVPlayerItemStatusFailed) {
                 self.playState = PlayerPlayStatePlayFailed;
+                self->_isPlaying = NO;
                 NSError *error = self.player.currentItem.error;
                 if (self.playerPlayFailed) self.playerPlayFailed(self, error);
             }
         } else if ([keyPath isEqualToString:kPlaybackBufferEmpty]) {
-            //当缓冲区为空时
+            // When the buffer is empty
             if (self.playerItem.playbackBufferEmpty) {
                 self.loadState = PlayerLoadStateStalled;
                 [self bufferingSomeSecond];
             }
         } else if ([keyPath isEqualToString:kPlaybackLikelyToKeepUp]) {
-            // 当缓冲区好的时候
+            // When the buffer is good
             if (self.playerItem.playbackLikelyToKeepUp) {
                 self.loadState = PlayerLoadStatePlayable;
                 if (self.isPlaying) [self.player play];
@@ -456,12 +396,8 @@ static NSString *const kPresentationSize         = @"presentationSize";
             self->_bufferTime = bufferTime;
             if (self.playerBufferTimeChanged) self.playerBufferTimeChanged(self, bufferTime);
         } else if ([keyPath isEqualToString:kPresentationSize]) {
-            self->_presentationSize = self.playerItem.presentationSize;
-            if (self.presentationSizeChanged) {
-                self.presentationSizeChanged(self, self->_presentationSize);
-            }
-        }
-        else {
+            self.presentationSize = self.playerItem.presentationSize;
+        } else {
             [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
         }
     });
@@ -469,11 +405,17 @@ static NSString *const kPresentationSize         = @"presentationSize";
 
 #pragma mark - getter
 
-- (UIView *)view {
+- (TFY_PlayerBaseView *)view {
     if (!_view) {
-        _view = [[TFY_PlayerPresentView alloc] init];
+        TFY_PlayerBaseView *view = [[TFY_PlayerBaseView alloc] init];
+        _view = view;
     }
     return _view;
+}
+
+- (AVPlayerLayer *)avPlayerLayer {
+    TFY_PlayerPresentView *view = (TFY_PlayerPresentView *)self.view.playerView;
+    return [view avLayer];
 }
 
 - (float)rate {
@@ -495,13 +437,6 @@ static NSString *const kPresentationSize         = @"presentationSize";
     }
     return sec;
 }
-- (NSMutableArray *)thumbImages{
-    
-    if (_thumbImages == nil) {
-        _thumbImages = [NSMutableArray array];
-    }
-    return _thumbImages;
-}
 
 #pragma mark - setter
 
@@ -515,7 +450,7 @@ static NSString *const kPresentationSize         = @"presentationSize";
     if (self.playerLoadStateChanged) self.playerLoadStateChanged(self, loadState);
 }
 
-- (void)setAssetURL:(NSString *)assetURL {
+- (void)setAssetURL:(NSURL *)assetURL {
     if (self.player) [self stop];
     _assetURL = assetURL;
     [self prepareToPlay];
@@ -535,7 +470,8 @@ static NSString *const kPresentationSize         = @"presentationSize";
 
 - (void)setScalingMode:(PlayerScalingMode)scalingMode {
     _scalingMode = scalingMode;
-    TFY_PlayerPresentView *presentView = (TFY_PlayerPresentView *)self.view;
+    TFY_PlayerPresentView *presentView = (TFY_PlayerPresentView *)self.view.playerView;
+    self.view.scalingMode = scalingMode;
     switch (scalingMode) {
         case PlayerScalingModeNone:
             presentView.videoGravity = AVLayerVideoGravityResizeAspect;
@@ -556,8 +492,17 @@ static NSString *const kPresentationSize         = @"presentationSize";
 
 - (void)setVolume:(float)volume {
     _volume = MIN(MAX(0, volume), 1);
-    self.player.volume = volume;
+    self.player.volume = _volume;
 }
+
+- (void)setPresentationSize:(CGSize)presentationSize {
+    _presentationSize = presentationSize;
+    self.view.presentationSize = presentationSize;
+    if (self.presentationSizeChanged) {
+        self.presentationSizeChanged(self, self.presentationSize);
+    }
+}
+
 
 @end
 

@@ -44,7 +44,8 @@ typedef NS_OPTIONS(NSUInteger, PlayerDisableGestureTypes) {
     PlayerDisableGestureTypesDoubleTap    = 1 << 1,
     PlayerDisableGestureTypesPan          = 1 << 2,
     PlayerDisableGestureTypesPinch        = 1 << 3,
-    PlayerDisableGestureTypesAll          = (PlayerDisableGestureTypesSingleTap | PlayerDisableGestureTypesDoubleTap | PlayerDisableGestureTypesPan | PlayerDisableGestureTypesPinch)
+    PlayerDisableGestureTypesLongPress    = 1 << 4,
+    PlayerDisableGestureTypesAll          = (PlayerDisableGestureTypesSingleTap | PlayerDisableGestureTypesDoubleTap | PlayerDisableGestureTypesPan | PlayerDisableGestureTypesPinch | PlayerDisableGestureTypesLongPress)
 };
 
 /// 该枚举列出了播放不支持的一些平移手势移动方向。
@@ -54,6 +55,14 @@ typedef NS_OPTIONS(NSUInteger, PlayerDisablePanMovingDirection) {
     PlayerDisablePanMovingDirectionHorizontal   = 1 << 1,  /// 禁用平移移动水平方向。
     PlayerDisablePanMovingDirectionAll          = (PlayerDisablePanMovingDirectionVertical | PlayerDisablePanMovingDirectionHorizontal)  /// 禁用平移所有方向。
 };
+
+/// 长按手势状态
+typedef NS_ENUM(NSUInteger, LongPressGestureRecognizerState) {
+    LongPressGestureRecognizerStateBegan,
+    LongPressGestureRecognizerStateChanged,
+    LongPressGestureRecognizerStateEnded
+};
+
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -92,6 +101,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable) void(^pinched)(TFY_PlayerGestureControl *control, float scale);
 
+/// 长按轻敲手势回调。
+@property (nonatomic, copy, nullable) void(^longPressed)(TFY_PlayerGestureControl *control, LongPressGestureRecognizerState state);
+
 /**
  *  单击手势。
  */
@@ -111,6 +123,10 @@ NS_ASSUME_NONNULL_BEGIN
  *  捏水龙头手势。
  */
 @property (nonatomic, strong, readonly) UIPinchGestureRecognizer *pinchGR;
+
+/// 长按手势。
+@property (nonatomic, strong, readonly) UILongPressGestureRecognizer *longPressGR;
+
 /**
  * 平移手势方向。
  */

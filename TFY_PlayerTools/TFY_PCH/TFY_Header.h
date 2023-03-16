@@ -33,4 +33,6 @@
 
 #define AtAppDelegate ((AppDelegate *)[UIApplication sharedApplication].delegate)
 
+#define kPlayerViewTag 100
+
 #endif /* TFY_Header_h */

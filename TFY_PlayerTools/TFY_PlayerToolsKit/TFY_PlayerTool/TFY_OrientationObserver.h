@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import "TFY_PlayerBaseView.h"
 
 /// 全屏模式
 typedef NS_ENUM(NSUInteger, FullScreenMode) {
@@ -16,26 +17,49 @@ typedef NS_ENUM(NSUInteger, FullScreenMode) {
     FullScreenModePortrait    // 人像全屏模特
 };
 
-/// 视图上的全屏模式
+/// Portrait full screen mode.
+typedef NS_ENUM(NSUInteger, PortraitFullScreenMode) {
+    PortraitFullScreenModeScaleToFill,    // Full fill
+    PortraitFullScreenModeScaleAspectFit  // contents scaled to fit with fixed aspect. remainder is transparent
+};
+
+/// Player view mode
 typedef NS_ENUM(NSUInteger, RotateType) {
-    RotateTypeNormal,         // 正常
-    RotateTypeCell,           // Cell
-    RotateTypeCellOther       //单元格模式添加到其他视图
+    RotateTypeNormal,         // Normal
+    RotateTypeCell            // Cell
 };
 
 /**
- 旋转支撑方向
+ Rotation of support direction
  */
 typedef NS_OPTIONS(NSUInteger, InterfaceOrientationMask) {
+    InterfaceOrientationMaskUnknow = 0,
     InterfaceOrientationMaskPortrait = (1 << 0),
     InterfaceOrientationMaskLandscapeLeft = (1 << 1),
     InterfaceOrientationMaskLandscapeRight = (1 << 2),
     InterfaceOrientationMaskPortraitUpsideDown = (1 << 3),
     InterfaceOrientationMaskLandscape = (InterfaceOrientationMaskLandscapeLeft | InterfaceOrientationMaskLandscapeRight),
-    InterfaceOrientationMaskAll = (InterfaceOrientationMaskPortrait | InterfaceOrientationMaskLandscapeLeft | InterfaceOrientationMaskLandscapeRight | InterfaceOrientationMaskPortraitUpsideDown),
-    InterfaceOrientationMaskAllButUpsideDown = (InterfaceOrientationMaskPortrait | InterfaceOrientationMaskLandscapeLeft | InterfaceOrientationMaskLandscapeRight),
+    InterfaceOrientationMaskAll = (InterfaceOrientationMaskPortrait | InterfaceOrientationMaskLandscape | InterfaceOrientationMaskPortraitUpsideDown),
+    InterfaceOrientationMaskAllButUpsideDown = (InterfaceOrientationMaskPortrait | InterfaceOrientationMaskLandscape),
 };
 
+/// This enumeration lists some of the gesture types that the player has by default.
+typedef NS_OPTIONS(NSUInteger, DisablePortraitGestureTypes) {
+    DisablePortraitGestureTypesNone         = 0,
+    DisablePortraitGestureTypesTap          = 1 << 0,
+    DisablePortraitGestureTypesPan          = 1 << 1,
+    DisablePortraitGestureTypesAll          = (DisablePortraitGestureTypesTap | DisablePortraitGestureTypesPan)
+};
+
+@protocol PortraitOrientationDelegate <NSObject>
+
+- (void)tfy_orientationWillChange:(BOOL)isFullScreen;
+
+- (void)tfy_orientationDidChanged:(BOOL)isFullScreen;
+
+- (void)tfy_interationState:(BOOL)isDragging;
+
+@end
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -43,89 +67,82 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  添加对应的容器
  */
-- (void)updateRotateView:(UIView *)rotateView containerView:(UIView *)containerView;
-/**
- *  列表播放
- */
-- (void)cellModelRotateView:(UIView *)rotateView rotateViewAtCell:(UIView *)cell playerViewTag:(NSInteger)playerViewTag;
-/**
- * 单元格其他视图旋转
- */
-- (void)cellOtherModelRotateView:(UIView *)rotateView containerView:(UIView *)containerView;
-/**
- * 容器视图的全屏状态播放器。
- */
-@property (nonatomic, strong) UIView *fullScreenContainerView;
-/**
- * 一个小屏幕状态球员的容器视图。
- */
+- (void)updateRotateView:(TFY_PlayerBaseView *)rotateView containerView:(UIView *)containerView;
+/// Container view of a full screen state player.
+@property (nonatomic, strong, readonly, nullable) UIView *fullScreenContainerView;
+
+/// Container view of a small screen state player.
 @property (nonatomic, weak) UIView *containerView;
-/**
- * 如果全屏。
- */
-@property (nonatomic, readonly, getter=isFullScreen) BOOL fullScreen;
-/**
- * 使用设备方向，默认值为NO。
- */
-@property (nonatomic, assign) BOOL forceDeviceOrientation;
-/**
- *  屏幕锁定但需要开启视频转动 默认NO
- */
-@property (nonatomic, assign) BOOL systemrotationbool;
-/**
- * 锁定屏幕方向
- */
-@property (nonatomic, getter=isLockedScreen) BOOL lockedScreen;
-/**
- * 调用的块当播放器旋转时。
- */
+
+/// The block invoked When player will rotate.
 @property (nonatomic, copy, nullable) void(^orientationWillChange)(TFY_OrientationObserver *observer, BOOL isFullScreen);
-/**
- * 播放器旋转时调用的块。
- */
+
+/// The block invoked when player rotated.
 @property (nonatomic, copy, nullable) void(^orientationDidChanged)(TFY_OrientationObserver *observer, BOOL isFullScreen);
-/**
- * 全屏模式，默认横向进入全屏
- */
+
+/// Full screen mode, the default landscape into full screen
 @property (nonatomic) FullScreenMode fullScreenMode;
-/**
- * 旋转持续时间，默认为0.30
- */
-@property (nonatomic) float duration;
-/**
- * 状态栏已隐藏。
- */
-@property (nonatomic, getter=isStatusBarHidden) BOOL statusBarHidden;
-/**
- * 播放器的当前方向。 默认为UIInterfaceOrientationPortrait。
- */
+
+@property (nonatomic, assign) PortraitFullScreenMode portraitFullScreenMode;
+
+/// rotate duration, default is 0.30
+@property (nonatomic) NSTimeInterval duration;
+
+/// If the full screen.
+@property (nonatomic, readonly, getter=isFullScreen) BOOL fullScreen;
+
+/// Lock screen orientation
+@property (nonatomic, getter=isLockedScreen) BOOL lockedScreen;
+
+/// The fullscreen statusbar hidden.
+@property (nonatomic, assign) BOOL fullScreenStatusBarHidden;
+
+/// default is  UIStatusBarStyleLightContent.
+@property (nonatomic, assign) UIStatusBarStyle fullScreenStatusBarStyle;
+
+/// defalut is UIStatusBarAnimationSlide.
+@property (nonatomic, assign) UIStatusBarAnimation fullScreenStatusBarAnimation;
+
+@property (nonatomic, assign) CGSize presentationSize;
+
+/// default is ZFDisablePortraitGestureTypesAll.
+@property (nonatomic, assign) DisablePortraitGestureTypes disablePortraitGestureTypes;
+
+/// The current orientation of the player.
+/// Default is UIInterfaceOrientationPortrait.
 @property (nonatomic, readonly) UIInterfaceOrientation currentOrientation;
-/**
- * 是否允许视频方向旋转。 默认为YES。
- */
-@property (nonatomic) BOOL allowOrentitaionRotation;
-/**
- *  支持Interface Orientation，默认为InterfaceOrientationMaskAllButUpsideDown
- */
+
+/// Whether allow the video orientation rotate.
+/// default is YES.
+@property (nonatomic, assign) BOOL allowOrientationRotation;
+
+/// The support Interface Orientation,default is ZFInterfaceOrientationMaskAllButUpsideDown
 @property (nonatomic, assign) InterfaceOrientationMask supportInterfaceOrientation;
-/**
- * 添加设备方向观察器。
- */
+
+/// Add the device orientation observer.
 - (void)addDeviceOrientationObserver;
-/**
- * 删除设备方向观察器。
- */
+
+/// Remove the device orientation observer.
 - (void)removeDeviceOrientationObserver;
-/**
- * 输入fullScreen，而FullScreenMode是FullScreenModeLandscape。
- */
-- (void)enterLandscapeFullScreen:(UIInterfaceOrientation)orientation animated:(BOOL)animated;
-/**
- *  在FullScreenMode为FullScreenModePortrait时输入fullScreen。
- */
+
+/// Enter the fullScreen while the ZFFullScreenMode is ZFFullScreenModeLandscape.
+- (void)rotateToOrientation:(UIInterfaceOrientation)orientation animated:(BOOL)animated;
+
+/// Enter the fullScreen while the ZFFullScreenMode is ZFFullScreenModeLandscape.
+- (void)rotateToOrientation:(UIInterfaceOrientation)orientation animated:(BOOL)animated completion:(void(^ __nullable)(void))completion;
+
+/// Enter the fullScreen while the ZFFullScreenMode is ZFFullScreenModePortrait.
 - (void)enterPortraitFullScreen:(BOOL)fullScreen animated:(BOOL)animated;
 
-- (void)exitFullScreenWithAnimated:(BOOL)animated;
+/// Enter the fullScreen while the ZFFullScreenMode is ZFFullScreenModePortrait.
+- (void)enterPortraitFullScreen:(BOOL)fullScreen animated:(BOOL)animated completion:(void(^ __nullable)(void))completion;
+
+/// FullScreen mode is determined by ZFFullScreenMode.
+- (void)enterFullScreen:(BOOL)fullScreen animated:(BOOL)animated;
+
+/// FullScreen mode is determined by ZFFullScreenMode.
+- (void)enterFullScreen:(BOOL)fullScreen animated:(BOOL)animated completion:(void (^ _Nullable)(void))completion;
+
 @end
 
 NS_ASSUME_NONNULL_END

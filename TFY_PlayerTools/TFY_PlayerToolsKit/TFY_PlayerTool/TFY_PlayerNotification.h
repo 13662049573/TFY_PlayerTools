@@ -6,9 +6,7 @@
 //  Copyright © 2019 田风有. All rights reserved.
 //
 #import <UIKit/UIKit.h>
-#import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
-#import <MediaPlayer/MPMusicPlayerController.h>
 
 typedef NS_ENUM(NSUInteger, PlayerBackgroundState) {
     PlayerBackgroundStateForeground,  // 从背景输入前景。

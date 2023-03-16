@@ -26,14 +26,154 @@
 
 @implementation UIScrollView (TFY_Player)
 
-- (void)tfy_scrollViewDidStopScroll {
+#pragma mark - public method
+
+- (UIView *)tfy_getCellForIndexPath:(NSIndexPath *)indexPath {
+    if ([self _isTableView]) {
+        UITableView *tableView = (UITableView *)self;
+        UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+        return cell;
+    } else if ([self _isCollectionView]) {
+        UICollectionView *collectionView = (UICollectionView *)self;
+        UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
+        return cell;
+    }
+    return nil;
+}
+
+- (NSIndexPath *)tfy_getIndexPathForCell:(UIView *)cell {
+    if ([self _isTableView]) {
+        UITableView *tableView = (UITableView *)self;
+        NSIndexPath *indexPath = [tableView indexPathForCell:(UITableViewCell *)cell];
+        return indexPath;
+    } else if ([self _isCollectionView]) {
+        UICollectionView *collectionView = (UICollectionView *)self;
+        NSIndexPath *indexPath = [collectionView indexPathForCell:(UICollectionViewCell *)cell];
+        return indexPath;
+    }
+    return nil;
+}
+
+/**
+Scroll to indexPath with position.
+ 
+@param indexPath scroll the  indexPath.
+@param scrollPosition  scrollView scroll position.
+@param animated animate.
+@param completionHandler  Scroll completion callback.
+*/
+- (void)tfy_scrollToRowAtIndexPath:(NSIndexPath *)indexPath
+                 atScrollPosition:(PlayerScrollViewScrollPosition)scrollPosition
+                         animated:(BOOL)animated
+                completionHandler:(void (^ __nullable)(void))completionHandler {
+    [self tfy_scrollToRowAtIndexPath:indexPath atScrollPosition:scrollPosition animateDuration:animated ? 0.4 : 0.0 completionHandler:completionHandler];
+}
+
+- (void)tfy_scrollToRowAtIndexPath:(NSIndexPath *)indexPath
+                 atScrollPosition:(PlayerScrollViewScrollPosition)scrollPosition
+                  animateDuration:(NSTimeInterval)duration
+                completionHandler:(void (^ __nullable)(void))completionHandler {
+    BOOL animated = duration > 0.0;
+    if ([self _isTableView]) {
+        UITableView *tableView = (UITableView *)self;
+        UITableViewScrollPosition tableScrollPosition = UITableViewScrollPositionNone;
+        if (scrollPosition <= PlayerScrollViewScrollPositionBottom) {
+            tableScrollPosition = (UITableViewScrollPosition)scrollPosition;
+        }
+        [tableView scrollToRowAtIndexPath:indexPath atScrollPosition:tableScrollPosition animated:animated];
+    } else if ([self _isCollectionView]) {
+        UICollectionView *collectionView = (UICollectionView *)self;
+        if (self.tfy_scrollViewDirection == PlayerScrollViewDirectionVertical) {
+            UICollectionViewScrollPosition collectionScrollPosition = UICollectionViewScrollPositionNone;
+            switch (scrollPosition) {
+                case PlayerScrollViewScrollPositionNone:
+                    collectionScrollPosition = UICollectionViewScrollPositionNone;
+                    break;
+                case PlayerScrollViewScrollPositionTop:
+                    collectionScrollPosition = UICollectionViewScrollPositionTop;
+                    break;
+                case PlayerScrollViewScrollPositionCenteredVertically:
+                    collectionScrollPosition = UICollectionViewScrollPositionCenteredVertically;
+                    break;
+                case PlayerScrollViewScrollPositionBottom:
+                    collectionScrollPosition = UICollectionViewScrollPositionBottom;
+                    break;
+                default:
+                    break;
+            }
+            [collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:collectionScrollPosition animated:animated];
+        } else if (self.tfy_scrollViewDirection == PlayerScrollViewDirectionHorizontal) {
+            UICollectionViewScrollPosition collectionScrollPosition = UICollectionViewScrollPositionNone;
+            switch (scrollPosition) {
+                case PlayerScrollViewScrollPositionNone:
+                    collectionScrollPosition = UICollectionViewScrollPositionNone;
+                    break;
+                case PlayerScrollViewScrollPositionLeft:
+                    collectionScrollPosition = UICollectionViewScrollPositionLeft;
+                    break;
+                case PlayerScrollViewScrollPositionCenteredHorizontally:
+                    collectionScrollPosition = UICollectionViewScrollPositionCenteredHorizontally;
+                    break;
+                case PlayerScrollViewScrollPositionRight:
+                    collectionScrollPosition = UICollectionViewScrollPositionRight;
+                    break;
+                default:
+                    break;
+            }
+            [collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:collectionScrollPosition animated:animated];
+        }
+    }
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(duration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (completionHandler) completionHandler();
+    });
+}
+
+- (void)tfy_scrollViewDidEndDecelerating {
+    BOOL scrollToScrollStop = !self.tracking && !self.dragging && !self.decelerating;
+    if (scrollToScrollStop) {
+        [self _scrollViewDidStopScroll];
+    }
+}
+
+- (void)tfy_scrollViewDidEndDraggingWillDecelerate:(BOOL)decelerate {
+    if (!decelerate) {
+        BOOL dragToDragStop = self.tracking && !self.dragging && !self.decelerating;
+        if (dragToDragStop) {
+            [self _scrollViewDidStopScroll];
+        }
+    }
+}
+
+- (void)tfy_scrollViewDidScrollToTop {
+    [self _scrollViewDidStopScroll];
+}
+
+- (void)tfy_scrollViewDidScroll {
+    if (self.tfy_scrollViewDirection == PlayerScrollViewDirectionVertical) {
+        [self _findCorrectCellWhenScrollViewDirectionVertical:nil];
+        [self _scrollViewScrollingDirectionVertical];
+    } else {
+        [self _findCorrectCellWhenScrollViewDirectionHorizontal:nil];
+        [self _scrollViewScrollingDirectionHorizontal];
+    }
+}
+
+- (void)tfy_scrollViewWillBeginDragging {
+    [self _scrollViewBeginDragging];
+}
+
+#pragma mark - private method
+
+- (void)_scrollViewDidStopScroll {
+    self.tfy_scrollDirection = PlayerScrollDirectionNone;
+    @player_weakify(self)
     [self tfy_filterShouldPlayCellWhileScrolled:^(NSIndexPath * _Nonnull indexPath) {
-        
-        if (self.tfy_scrollViewDidStopScrollCallback) self.tfy_scrollViewDidStopScrollCallback(indexPath);
+        @player_strongify(self)
+        if (self.tfy_scrollViewDidEndScrollingCallback) self.tfy_scrollViewDidEndScrollingCallback(indexPath);
     }];
 }
 
-- (void)tfy_scrollViewBeginDragging {
+- (void)_scrollViewBeginDragging {
     if (self.tfy_scrollViewDirection == PlayerScrollViewDirectionVertical) {
         self.tfy_lastOffsetY = self.contentOffset.y;
     } else {
@@ -42,9 +182,9 @@
 }
 
 /**
- 垂直滚动中处理的滚动百分比。
+  The percentage of scrolling processed in vertical scrolling.
  */
-- (void)tfy_scrollViewScrollingDirectionVertical {
+- (void)_scrollViewScrollingDirectionVertical {
     CGFloat offsetY = self.contentOffset.y;
     self.tfy_scrollDirection = (offsetY - self.tfy_lastOffsetY > 0) ? PlayerScrollDirectionUp : PlayerScrollDirectionDown;
     self.tfy_lastOffsetY = offsetY;
@@ -69,76 +209,76 @@
     
     CGRect rect1 = [playerView convertRect:playerView.frame toView:self];
     CGRect rect = [self convertRect:rect1 toView:self.superview];
-    /// playerView top to scrollView顶部空间。
+    /// playerView top to scrollView top space.
     CGFloat topSpacing = CGRectGetMinY(rect) - CGRectGetMinY(self.frame) - CGRectGetMinY(playerView.frame);
-    /// playerView底部滚动查看底部空间。
+    /// playerView bottom to scrollView bottom space.
     CGFloat bottomSpacing = CGRectGetMaxY(self.frame) - CGRectGetMaxY(rect) + CGRectGetMinY(playerView.frame);
-    /// 内容区域的高度。
+    /// The height of the content area.
     CGFloat contentInsetHeight = CGRectGetMaxY(self.frame) - CGRectGetMinY(self.frame);
     
     CGFloat playerDisapperaPercent = 0;
     CGFloat playerApperaPercent = 0;
     
-    if (self.tfy_scrollDirection == PlayerScrollDirectionUp) { /// 向上滑动
-        /// 播放正在消失。
+    if (self.tfy_scrollDirection == PlayerScrollDirectionUp) { /// Scroll up
+        /// Player is disappearing.
         if (topSpacing <= 0 && CGRectGetHeight(rect) != 0) {
             playerDisapperaPercent = -topSpacing/CGRectGetHeight(rect);
             if (playerDisapperaPercent > 1.0) playerDisapperaPercent = 1.0;
             if (self.tfy_playerDisappearingInScrollView) self.tfy_playerDisappearingInScrollView(self.tfy_playingIndexPath, playerDisapperaPercent);
         }
         
-        /// 顶部区域
+        /// Top area
         if (topSpacing <= 0 && topSpacing > -CGRectGetHeight(rect)/2) {
-            /// 当播放消失时。
+            /// When the player will disappear.
             if (self.tfy_playerWillDisappearInScrollView) self.tfy_playerWillDisappearInScrollView(self.tfy_playingIndexPath);
         } else if (topSpacing <= -CGRectGetHeight(rect)) {
-            /// 当播放确实消失了。
+            /// When the player did disappeared.
             if (self.tfy_playerDidDisappearInScrollView) self.tfy_playerDidDisappearInScrollView(self.tfy_playingIndexPath);
         } else if (topSpacing > 0 && topSpacing <= contentInsetHeight) {
-            ///播放正在出现。
+            /// Player is appearing.
             if (CGRectGetHeight(rect) != 0) {
                 playerApperaPercent = -(topSpacing-contentInsetHeight)/CGRectGetHeight(rect);
                 if (playerApperaPercent > 1.0) playerApperaPercent = 1.0;
                 if (self.tfy_playerAppearingInScrollView) self.tfy_playerAppearingInScrollView(self.tfy_playingIndexPath, playerApperaPercent);
             }
-            /// 在可见区域
+            /// In visable area
             if (topSpacing <= contentInsetHeight && topSpacing > contentInsetHeight-CGRectGetHeight(rect)/2) {
-                /// 当播放出现时。
+                /// When the player will appear.
                 if (self.tfy_playerWillAppearInScrollView) self.tfy_playerWillAppearInScrollView(self.tfy_playingIndexPath);
             } else {
-                /// 当播放出现时。
+                /// When the player did appeared.
                 if (self.tfy_playerDidAppearInScrollView) self.tfy_playerDidAppearInScrollView(self.tfy_playingIndexPath);
             }
         }
         
-    } else if (self.tfy_scrollDirection == PlayerScrollDirectionDown) { /// 向下滚动
-        /// 播放正在消失。
+    } else if (self.tfy_scrollDirection == PlayerScrollDirectionDown) { /// Scroll Down
+        /// Player is disappearing.
         if (bottomSpacing <= 0 && CGRectGetHeight(rect) != 0) {
             playerDisapperaPercent = -bottomSpacing/CGRectGetHeight(rect);
             if (playerDisapperaPercent > 1.0) playerDisapperaPercent = 1.0;
             if (self.tfy_playerDisappearingInScrollView) self.tfy_playerDisappearingInScrollView(self.tfy_playingIndexPath, playerDisapperaPercent);
         }
         
-        ///底部区域
+        /// Bottom area
         if (bottomSpacing <= 0 && bottomSpacing > -CGRectGetHeight(rect)/2) {
-            /// 当播放消失时。
+            /// When the player will disappear.
             if (self.tfy_playerWillDisappearInScrollView) self.tfy_playerWillDisappearInScrollView(self.tfy_playingIndexPath);
         } else if (bottomSpacing <= -CGRectGetHeight(rect)) {
-            /// 当播放确实消失了。
+            /// When the player did disappeared.
             if (self.tfy_playerDidDisappearInScrollView) self.tfy_playerDidDisappearInScrollView(self.tfy_playingIndexPath);
         } else if (bottomSpacing > 0 && bottomSpacing <= contentInsetHeight) {
-            /// 播放正在出现。
+            /// Player is appearing.
             if (CGRectGetHeight(rect) != 0) {
                 playerApperaPercent = -(bottomSpacing-contentInsetHeight)/CGRectGetHeight(rect);
                 if (playerApperaPercent > 1.0) playerApperaPercent = 1.0;
                 if (self.tfy_playerAppearingInScrollView) self.tfy_playerAppearingInScrollView(self.tfy_playingIndexPath, playerApperaPercent);
             }
-            /// 在可见区域
+            /// In visable area
             if (bottomSpacing <= contentInsetHeight && bottomSpacing > contentInsetHeight-CGRectGetHeight(rect)/2) {
-                /// 当播放出现时。
+                /// When the player will appear.
                 if (self.tfy_playerWillAppearInScrollView) self.tfy_playerWillAppearInScrollView(self.tfy_playingIndexPath);
             } else {
-                /// 当播放出现时。
+                /// When the player did appeared.
                 if (self.tfy_playerDidAppearInScrollView) self.tfy_playerDidAppearInScrollView(self.tfy_playingIndexPath);
             }
         }
@@ -146,9 +286,9 @@
 }
 
 /**
- 在水平滚动中处理的滚动百分比。
+ The percentage of scrolling processed in horizontal scrolling.
  */
-- (void)tfy_scrollViewScrollingDirectionHorizontal {
+- (void)_scrollViewScrollingDirectionHorizontal {
     CGFloat offsetX = self.contentOffset.x;
     self.tfy_scrollDirection = (offsetX - self.tfy_lastOffsetX > 0) ? PlayerScrollDirectionLeft : PlayerScrollDirectionRight;
     self.tfy_lastOffsetX = offsetX;
@@ -156,7 +296,7 @@
     
     UIView *playerView;
     if (self.tfy_containerType == PlayerContainerTypeCell) {
-        // 第一次玩它时避免被暂停。
+        // Avoid being paused the first time you play it.
         if (self.contentOffset.x < 0) return;
         if (!self.tfy_playingIndexPath) return;
         
@@ -165,7 +305,7 @@
             if (self.tfy_playerDidDisappearInScrollView) self.tfy_playerDidDisappearInScrollView(self.tfy_playingIndexPath);
             return;
         }
-        playerView = [cell viewWithTag:self.tfy_containerViewTag];
+       playerView = [cell viewWithTag:self.tfy_containerViewTag];
     } else if (self.tfy_containerType == PlayerContainerTypeView) {
         if (!self.tfy_containerView) return;
         playerView = self.tfy_containerView;
@@ -173,76 +313,76 @@
     
     CGRect rect1 = [playerView convertRect:playerView.frame toView:self];
     CGRect rect = [self convertRect:rect1 toView:self.superview];
-    /// playerView左侧滚动查看左侧空间。
+    /// playerView left to scrollView left space.
     CGFloat leftSpacing = CGRectGetMinX(rect) - CGRectGetMinX(self.frame) - CGRectGetMinX(playerView.frame);
-    /// playerView底部滚动查看右侧空间。
+    /// playerView bottom to scrollView right space.
     CGFloat rightSpacing = CGRectGetMaxX(self.frame) - CGRectGetMaxX(rect) + CGRectGetMinX(playerView.frame);
-    /// 内容区域的高度。
+    /// The height of the content area.
     CGFloat contentInsetWidth = CGRectGetMaxX(self.frame) - CGRectGetMinX(self.frame);
     
     CGFloat playerDisapperaPercent = 0;
     CGFloat playerApperaPercent = 0;
     
-    if (self.tfy_scrollDirection == PlayerScrollDirectionLeft) { /// 向左滚动
-        /// 播放正在消失。
+    if (self.tfy_scrollDirection == PlayerScrollDirectionLeft) { /// Scroll left
+        /// Player is disappearing.
         if (leftSpacing <= 0 && CGRectGetWidth(rect) != 0) {
             playerDisapperaPercent = -leftSpacing/CGRectGetWidth(rect);
             if (playerDisapperaPercent > 1.0) playerDisapperaPercent = 1.0;
             if (self.tfy_playerDisappearingInScrollView) self.tfy_playerDisappearingInScrollView(self.tfy_playingIndexPath, playerDisapperaPercent);
         }
         
-        ///顶部区域
+        /// Top area
         if (leftSpacing <= 0 && leftSpacing > -CGRectGetWidth(rect)/2) {
-            /// 当播放消失时。
+            /// When the player will disappear.
             if (self.tfy_playerWillDisappearInScrollView) self.tfy_playerWillDisappearInScrollView(self.tfy_playingIndexPath);
         } else if (leftSpacing <= -CGRectGetWidth(rect)) {
-            /// 当播放确实消失了。
+            /// When the player did disappeared.
             if (self.tfy_playerDidDisappearInScrollView) self.tfy_playerDidDisappearInScrollView(self.tfy_playingIndexPath);
         } else if (leftSpacing > 0 && leftSpacing <= contentInsetWidth) {
-            ///播放正在出现。
+            /// Player is appearing.
             if (CGRectGetWidth(rect) != 0) {
                 playerApperaPercent = -(leftSpacing-contentInsetWidth)/CGRectGetWidth(rect);
                 if (playerApperaPercent > 1.0) playerApperaPercent = 1.0;
                 if (self.tfy_playerAppearingInScrollView) self.tfy_playerAppearingInScrollView(self.tfy_playingIndexPath, playerApperaPercent);
             }
-            /// 在可见区域
+            /// In visable area
             if (leftSpacing <= contentInsetWidth && leftSpacing > contentInsetWidth-CGRectGetWidth(rect)/2) {
-                /// 当播放出现时。
+                /// When the player will appear.
                 if (self.tfy_playerWillAppearInScrollView) self.tfy_playerWillAppearInScrollView(self.tfy_playingIndexPath);
             } else {
-                /// 当播放出现时。
+                /// When the player did appeared.
                 if (self.tfy_playerDidAppearInScrollView) self.tfy_playerDidAppearInScrollView(self.tfy_playingIndexPath);
             }
         }
         
-    } else if (self.tfy_scrollDirection == PlayerScrollDirectionRight) { /// 向右滚动
-        /// 播放正在消失。
+    } else if (self.tfy_scrollDirection == PlayerScrollDirectionRight) { /// Scroll right
+        /// Player is disappearing.
         if (rightSpacing <= 0 && CGRectGetWidth(rect) != 0) {
             playerDisapperaPercent = -rightSpacing/CGRectGetWidth(rect);
             if (playerDisapperaPercent > 1.0) playerDisapperaPercent = 1.0;
             if (self.tfy_playerDisappearingInScrollView) self.tfy_playerDisappearingInScrollView(self.tfy_playingIndexPath, playerDisapperaPercent);
         }
         
-        /// 底部区域
+        /// Bottom area
         if (rightSpacing <= 0 && rightSpacing > -CGRectGetWidth(rect)/2) {
-            /// 当播放消失时。
+            /// When the player will disappear.
             if (self.tfy_playerWillDisappearInScrollView) self.tfy_playerWillDisappearInScrollView(self.tfy_playingIndexPath);
         } else if (rightSpacing <= -CGRectGetWidth(rect)) {
-            ///当播放确实消失了。
+            /// When the player did disappeared.
             if (self.tfy_playerDidDisappearInScrollView) self.tfy_playerDidDisappearInScrollView(self.tfy_playingIndexPath);
         } else if (rightSpacing > 0 && rightSpacing <= contentInsetWidth) {
-            /// 播放正在出现。
+            /// Player is appearing.
             if (CGRectGetWidth(rect) != 0) {
                 playerApperaPercent = -(rightSpacing-contentInsetWidth)/CGRectGetWidth(rect);
                 if (playerApperaPercent > 1.0) playerApperaPercent = 1.0;
                 if (self.tfy_playerAppearingInScrollView) self.tfy_playerAppearingInScrollView(self.tfy_playingIndexPath, playerApperaPercent);
             }
-            /// 在可见区域
+            /// In visable area
             if (rightSpacing <= contentInsetWidth && rightSpacing > contentInsetWidth-CGRectGetWidth(rect)/2) {
-                /// 当播放出现时。
+                /// When the player will appear.
                 if (self.tfy_playerWillAppearInScrollView) self.tfy_playerWillAppearInScrollView(self.tfy_playingIndexPath);
             } else {
-                /// 当播放出现时。
+                /// When the player did appeared.
                 if (self.tfy_playerDidAppearInScrollView) self.tfy_playerDidAppearInScrollView(self.tfy_playingIndexPath);
             }
         }
@@ -250,41 +390,41 @@
 }
 
 /**
- 在scrollDirection为垂直时找到播放单元格。
+ Find the playing cell while the scrollDirection is vertical.
  */
-- (void)tfy_findCorrectCellWhenScrollViewDirectionVertical:(void (^ __nullable)(NSIndexPath *indexPath))handler {
+- (void)_findCorrectCellWhenScrollViewDirectionVertical:(void (^ __nullable)(NSIndexPath *indexPath))handler {
     if (!self.tfy_shouldAutoPlay) return;
     if (self.tfy_containerType == PlayerContainerTypeView) return;
-    
+
+    if (!self.tfy_stopWhileNotVisible) {
+        /// If you have a cell that is playing, stop the traversal.
+        if (self.tfy_playingIndexPath) {
+            NSIndexPath *finalIndexPath = self.tfy_playingIndexPath;
+            if (self.tfy_scrollViewDidScrollCallback) self.tfy_scrollViewDidScrollCallback(finalIndexPath);
+            if (handler) handler(finalIndexPath);
+            self.tfy_shouldPlayIndexPath = finalIndexPath;
+            return;
+        }
+    }
     NSArray *visiableCells = nil;
     NSIndexPath *indexPath = nil;
-    if ([self isTableView]) {
+    BOOL isLast = self.contentOffset.y + self.frame.size.height >= self.contentSize.height;
+    if ([self _isTableView]) {
         UITableView *tableView = (UITableView *)self;
         visiableCells = [tableView visibleCells];
-        // 第一个可见单元索引路径
+        // First visible cell indexPath
         indexPath = tableView.indexPathsForVisibleRows.firstObject;
-        if (self.contentOffset.y <= 0 && (!self.tfy_playingIndexPath || [indexPath compare:self.tfy_playingIndexPath] == NSOrderedSame)) {
+        if ((self.contentOffset.y <= 0 || isLast) && (!self.tfy_playingIndexPath || [indexPath compare:self.tfy_playingIndexPath] == NSOrderedSame)) {
             UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
             UIView *playerView = [cell viewWithTag:self.tfy_containerViewTag];
-            if (playerView) {
+            if (playerView && !playerView.hidden && playerView.alpha > 0.01) {
+                if (self.tfy_scrollViewDidScrollCallback) self.tfy_scrollViewDidScrollCallback(indexPath);
                 if (handler) handler(indexPath);
                 self.tfy_shouldPlayIndexPath = indexPath;
                 return;
             }
         }
-        
-        // 最后一个可见单元格indexPath
-        indexPath = tableView.indexPathsForVisibleRows.lastObject;
-        if (self.contentOffset.y + self.frame.size.height >= self.contentSize.height && (!self.tfy_playingIndexPath || [indexPath compare:self.tfy_playingIndexPath] == NSOrderedSame)) {
-            UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-            UIView *playerView = [cell viewWithTag:self.tfy_containerViewTag];
-            if (playerView) {
-                if (handler) handler(indexPath);
-                self.tfy_shouldPlayIndexPath = indexPath;
-                return;
-            }
-        }
-    } else if ([self isCollectionView]) {
+    } else if ([self _isCollectionView]) {
         UICollectionView *collectionView = (UICollectionView *)self;
         visiableCells = [collectionView visibleCells];
         NSArray *sortedIndexPaths = [collectionView.indexPathsForVisibleItems sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
@@ -297,24 +437,13 @@
             return [path1 compare:path2];
         }];
         
-        // 第一个可见单元索引路径
-        indexPath = sortedIndexPaths.firstObject;
-        if (self.contentOffset.y <= 0 && (!self.tfy_playingIndexPath || [indexPath compare:self.tfy_playingIndexPath] == NSOrderedSame)) {
+        // First visible cell indexPath
+        indexPath = isLast ? sortedIndexPaths.lastObject : sortedIndexPaths.firstObject;
+        if ((self.contentOffset.y <= 0 || isLast) && (!self.tfy_playingIndexPath || [indexPath compare:self.tfy_playingIndexPath] == NSOrderedSame)) {
             UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
             UIView *playerView = [cell viewWithTag:self.tfy_containerViewTag];
-            if (playerView) {
-                if (handler) handler(indexPath);
-                self.tfy_shouldPlayIndexPath = indexPath;
-                return;
-            }
-        }
-        
-        // 最后一个可见单元格indexPath
-        indexPath = sortedIndexPaths.lastObject;
-        if (self.contentOffset.y + self.frame.size.height >= self.contentSize.height && (!self.tfy_playingIndexPath || [indexPath compare:self.tfy_playingIndexPath] == NSOrderedSame)) {
-            UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
-            UIView *playerView = [cell viewWithTag:self.tfy_containerViewTag];
-            if (playerView) {
+            if (playerView && !playerView.hidden && playerView.alpha > 0.01) {
+                if (self.tfy_scrollViewDidScrollCallback) self.tfy_scrollViewDidScrollCallback(indexPath);
                 if (handler) handler(indexPath);
                 self.tfy_shouldPlayIndexPath = indexPath;
                 return;
@@ -329,84 +458,78 @@
         cells = [visiableCells reverseObjectEnumerator].allObjects;
     }
     
-    /// 中线。
+    /// Mid line.
     CGFloat scrollViewMidY = CGRectGetHeight(self.frame)/2;
-    /// T他最后玩indexPath。
+    /// The final playing indexPath.
     __block NSIndexPath *finalIndexPath = nil;
-    /// 距离中心线的最终距离。
+    /// The final distance from the center line.
     __block CGFloat finalSpace = 0;
-    Player_WS(myself);
+    @player_weakify(self)
     [cells enumerateObjectsUsingBlock:^(UIView *cell, NSUInteger idx, BOOL * _Nonnull stop) {
-        
-        UIView *playerView = [cell viewWithTag:myself.tfy_containerViewTag];
-        if (!playerView) return;
-        CGRect rect1 = [playerView convertRect:playerView.frame toView:myself];
-        CGRect rect = [myself convertRect:rect1 toView:myself.superview];
-        /// playerView top to scrollView顶部空间。
-        CGFloat topSpacing = CGRectGetMinY(rect) - CGRectGetMinY(myself.frame) - CGRectGetMinY(playerView.frame);
-        /// playerView底部滚动查看底部空间。
-        CGFloat bottomSpacing = CGRectGetMaxY(myself.frame) - CGRectGetMaxY(rect) + CGRectGetMinY(playerView.frame);
+        @player_strongify(self)
+        UIView *playerView = [cell viewWithTag:self.tfy_containerViewTag];
+        if (!playerView || playerView.hidden || playerView.alpha <= 0.01) return;
+        CGRect rect1 = [playerView convertRect:playerView.frame toView:self];
+        CGRect rect = [self convertRect:rect1 toView:self.superview];
+        /// playerView top to scrollView top space.
+        CGFloat topSpacing = CGRectGetMinY(rect) - CGRectGetMinY(self.frame) - CGRectGetMinY(playerView.frame);
+        /// playerView bottom to scrollView bottom space.
+        CGFloat bottomSpacing = CGRectGetMaxY(self.frame) - CGRectGetMaxY(rect) + CGRectGetMinY(playerView.frame);
         CGFloat centerSpacing = ABS(scrollViewMidY - CGRectGetMidY(rect));
-        NSIndexPath *indexPath = [myself tfy_getIndexPathForCell:cell];
+        NSIndexPath *indexPath = [self tfy_getIndexPathForCell:cell];
         
-        /// 视频播放部分可见时播放。
-        if ((topSpacing >= -(1 - myself.tfy_playerApperaPercent) * CGRectGetHeight(rect)) && (bottomSpacing >= -(1 - myself.tfy_playerApperaPercent) * CGRectGetHeight(rect))) {
-            /// 如果您正在播放正在播放的小区，请停止遍历。
-            if (myself.tfy_playingIndexPath) {
-                indexPath = myself.tfy_playingIndexPath;
-                finalIndexPath = indexPath;
-                *stop = YES;
-                return;
-            }
+        /// Play when the video playback section is visible.
+        if ((topSpacing >= -(1 - self.tfy_playerApperaPercent) * CGRectGetHeight(rect)) && (bottomSpacing >= -(1 - self.tfy_playerApperaPercent) * CGRectGetHeight(rect))) {
             if (!finalIndexPath || centerSpacing < finalSpace) {
                 finalIndexPath = indexPath;
                 finalSpace = centerSpacing;
             }
         }
     }];
-    /// 如果找到播放indexPath。
+    /// if find the playing indexPath.
     if (finalIndexPath) {
+        if (self.tfy_scrollViewDidScrollCallback) self.tfy_scrollViewDidScrollCallback(indexPath);
         if (handler) handler(finalIndexPath);
-        self.tfy_shouldPlayIndexPath = finalIndexPath;
     }
+    self.tfy_shouldPlayIndexPath = finalIndexPath;
 }
 
 /**
- 在scrollDirection为水平时找到播放单元格。
+ Find the playing cell while the scrollDirection is horizontal.
  */
-- (void)tfy_findCorrectCellWhenScrollViewDirectionHorizontal:(void (^ __nullable)(NSIndexPath *indexPath))handler {
+- (void)_findCorrectCellWhenScrollViewDirectionHorizontal:(void (^ __nullable)(NSIndexPath *indexPath))handler {
     if (!self.tfy_shouldAutoPlay) return;
     if (self.tfy_containerType == PlayerContainerTypeView) return;
+    if (!self.tfy_stopWhileNotVisible) {
+        /// If you have a cell that is playing, stop the traversal.
+        if (self.tfy_playingIndexPath) {
+            NSIndexPath *finalIndexPath = self.tfy_playingIndexPath;
+            if (self.tfy_scrollViewDidScrollCallback) self.tfy_scrollViewDidScrollCallback(finalIndexPath);
+            if (handler) handler(finalIndexPath);
+            self.tfy_shouldPlayIndexPath = finalIndexPath;
+            return;
+        }
+    }
     
     NSArray *visiableCells = nil;
     NSIndexPath *indexPath = nil;
-    if ([self isTableView]) {
+    BOOL isLast = self.contentOffset.x + self.frame.size.width >= self.contentSize.width;
+    if ([self _isTableView]) {
         UITableView *tableView = (UITableView *)self;
         visiableCells = [tableView visibleCells];
-        // 第一个可见单元索引路径
+        // First visible cell indexPath
         indexPath = tableView.indexPathsForVisibleRows.firstObject;
-        if (self.contentOffset.x <= 0 && (!self.tfy_playingIndexPath || [indexPath compare:self.tfy_playingIndexPath] == NSOrderedSame)) {
+        if ((self.contentOffset.x <= 0 || isLast) && (!self.tfy_playingIndexPath || [indexPath compare:self.tfy_playingIndexPath] == NSOrderedSame)) {
             UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
             UIView *playerView = [cell viewWithTag:self.tfy_containerViewTag];
-            if (playerView) {
+            if (playerView && !playerView.hidden && playerView.alpha > 0.01) {
+                if (self.tfy_scrollViewDidScrollCallback) self.tfy_scrollViewDidScrollCallback(indexPath);
                 if (handler) handler(indexPath);
                 self.tfy_shouldPlayIndexPath = indexPath;
                 return;
             }
         }
-        
-        //最后一个可见单元格indexPath
-        indexPath = tableView.indexPathsForVisibleRows.lastObject;
-        if (self.contentOffset.x + self.frame.size.width >= self.contentSize.width && (!self.tfy_playingIndexPath || [indexPath compare:self.tfy_playingIndexPath] == NSOrderedSame)) {
-            UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-            UIView *playerView = [cell viewWithTag:self.tfy_containerViewTag];
-            if (playerView) {
-                if (handler) handler(indexPath);
-                self.tfy_shouldPlayIndexPath = indexPath;
-                return;
-            }
-        }
-    } else if ([self isCollectionView]) {
+    } else if ([self _isCollectionView]) {
         UICollectionView *collectionView = (UICollectionView *)self;
         visiableCells = [collectionView visibleCells];
         NSArray *sortedIndexPaths = [collectionView.indexPathsForVisibleItems sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
@@ -419,24 +542,13 @@
             return [path1 compare:path2];
         }];
         
-        // 第一个可见单元索引路径
-        indexPath = sortedIndexPaths.firstObject;
-        if (self.contentOffset.x <= 0 && (!self.tfy_playingIndexPath || [indexPath compare:self.tfy_playingIndexPath] == NSOrderedSame)) {
+        // First visible cell indexPath
+        indexPath = isLast ? sortedIndexPaths.lastObject : sortedIndexPaths.firstObject;
+        if ((self.contentOffset.x <= 0 || isLast) && (!self.tfy_playingIndexPath || [indexPath compare:self.tfy_playingIndexPath] == NSOrderedSame)) {
             UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
             UIView *playerView = [cell viewWithTag:self.tfy_containerViewTag];
-            if (playerView) {
-                if (handler) handler(indexPath);
-                self.tfy_shouldPlayIndexPath = indexPath;
-                return;
-            }
-        }
-        
-        // 最后一个可见单元格indexPath
-        indexPath = sortedIndexPaths.lastObject;
-        if (self.contentOffset.x + self.frame.size.width >= self.contentSize.width && (!self.tfy_playingIndexPath || [indexPath compare:self.tfy_playingIndexPath] == NSOrderedSame)) {
-            UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
-            UIView *playerView = [cell viewWithTag:self.tfy_containerViewTag];
-            if (playerView) {
+            if (playerView && !playerView.hidden && playerView.alpha > 0.01) {
+                if (self.tfy_scrollViewDidScrollCallback) self.tfy_scrollViewDidScrollCallback(indexPath);
                 if (handler) handler(indexPath);
                 self.tfy_shouldPlayIndexPath = indexPath;
                 return;
@@ -451,210 +563,58 @@
         cells = [visiableCells reverseObjectEnumerator].allObjects;
     }
     
-    /// 中线。
+    /// Mid line.
     CGFloat scrollViewMidX = CGRectGetWidth(self.frame)/2;
-    /// 最后播放indexPath。
+    /// The final playing indexPath.
     __block NSIndexPath *finalIndexPath = nil;
-    /// 距离中心线的最终距离。
+    /// The final distance from the center line.
     __block CGFloat finalSpace = 0;
-    Player_WS(myself);
+    @player_weakify(self)
     [cells enumerateObjectsUsingBlock:^(UIView *cell, NSUInteger idx, BOOL * _Nonnull stop) {
-        
-        UIView *playerView = [cell viewWithTag:myself.tfy_containerViewTag];
-        if (!playerView) return;
-        CGRect rect1 = [playerView convertRect:playerView.frame toView:myself];
-        CGRect rect = [myself convertRect:rect1 toView:myself.superview];
-        /// playerView左侧滚动查看顶部空间。
-        CGFloat leftSpacing = CGRectGetMinX(rect) - CGRectGetMinX(myself.frame) - CGRectGetMinX(playerView.frame);
-        /// playerView右侧滚动查看顶部空间。
-        CGFloat rightSpacing = CGRectGetMaxX(myself.frame) - CGRectGetMaxX(rect) + CGRectGetMinX(playerView.frame);
+        @player_strongify(self)
+        UIView *playerView = [cell viewWithTag:self.tfy_containerViewTag];
+        if (!playerView || playerView.hidden || playerView.alpha <= 0.01) return;
+        CGRect rect1 = [playerView convertRect:playerView.frame toView:self];
+        CGRect rect = [self convertRect:rect1 toView:self.superview];
+        /// playerView left to scrollView top space.
+        CGFloat leftSpacing = CGRectGetMinX(rect) - CGRectGetMinX(self.frame) - CGRectGetMinX(playerView.frame);
+        /// playerView right to scrollView top space.
+        CGFloat rightSpacing = CGRectGetMaxX(self.frame) - CGRectGetMaxX(rect) + CGRectGetMinX(playerView.frame);
         CGFloat centerSpacing = ABS(scrollViewMidX - CGRectGetMidX(rect));
-        NSIndexPath *indexPath = [myself tfy_getIndexPathForCell:cell];
+        NSIndexPath *indexPath = [self tfy_getIndexPathForCell:cell];
         
-        /// 视频播放部分可见时播放。
-        if ((leftSpacing >= -(1 - myself.tfy_playerApperaPercent) * CGRectGetWidth(rect)) && (rightSpacing >= -(1 - myself.tfy_playerApperaPercent) * CGRectGetWidth(rect))) {
-            /// 如果您正在播放正在播放的小区，请停止遍历。
-            if (myself.tfy_playingIndexPath) {
-                indexPath = myself.tfy_playingIndexPath;
-                finalIndexPath = indexPath;
-                *stop = YES;
-                return;
-            }
+        /// Play when the video playback section is visible.
+        if ((leftSpacing >= -(1 - self.tfy_playerApperaPercent) * CGRectGetWidth(rect)) && (rightSpacing >= -(1 - self.tfy_playerApperaPercent) * CGRectGetWidth(rect))) {
             if (!finalIndexPath || centerSpacing < finalSpace) {
                 finalIndexPath = indexPath;
                 finalSpace = centerSpacing;
             }
         }
     }];
-    /// 如果找到播放indexPath。
+    /// if find the playing indexPath.
     if (finalIndexPath) {
+        if (self.tfy_scrollViewDidScrollCallback) self.tfy_scrollViewDidScrollCallback(indexPath);
         if (handler) handler(finalIndexPath);
         self.tfy_shouldPlayIndexPath = finalIndexPath;
     }
 }
 
-- (BOOL)isTableView {
+- (BOOL)_isTableView {
     return [self isKindOfClass:[UITableView class]];
 }
 
-- (BOOL)isCollectionView {
+- (BOOL)_isCollectionView {
     return [self isKindOfClass:[UICollectionView class]];
 }
 
-- (NSIndexPath *)tfy_getIndexPathForCell:(UIView *)cell {
-    if ([self isTableView]) {
-        UITableView *tableView = (UITableView *)self;
-        NSIndexPath *indexPath = [tableView indexPathForCell:(UITableViewCell *)cell];
-        return indexPath;
-    } else if ([self isCollectionView]) {
-        UICollectionView *collectionView = (UICollectionView *)self;
-        NSIndexPath *indexPath = [collectionView indexPathForCell:(UICollectionViewCell *)cell];
-        return indexPath;
-    }
-    return nil;
-}
-
-#pragma mark - public method
-
-- (void)tfy_filterShouldPlayCellWhileScrolling:(void (^ __nullable)(NSIndexPath *indexPath))handler {
-    if (self.tfy_scrollViewDirection == PlayerScrollViewDirectionVertical) {
-        [self tfy_findCorrectCellWhenScrollViewDirectionVertical:handler];
-    } else {
-        [self tfy_findCorrectCellWhenScrollViewDirectionHorizontal:handler];
-    }
-}
-
-- (void)tfy_filterShouldPlayCellWhileScrolled:(void (^ __nullable)(NSIndexPath *indexPath))handler {
-    if (!self.tfy_shouldAutoPlay) return;
-    Player_WS(myself);
-    [self tfy_filterShouldPlayCellWhileScrolling:^(NSIndexPath *indexPath) {
-        
-        /// 如果当前控制器已经消失，直接return
-        if (myself.tfy_viewControllerDisappear) return;
-        if ([TFY_ReachabilityManager sharedManager].isReachableViaWWAN && !myself.tfy_WWANAutoPlay) {
-            /// 移动网络
-            self.tfy_shouldPlayIndexPath = indexPath;
-            return;
-        }
-        if (handler) handler(indexPath);
-        self.tfy_playingIndexPath = indexPath;
-    }];
-}
-
-- (UIView *)tfy_getCellForIndexPath:(NSIndexPath *)indexPath {
-    if ([self isTableView]) {
-        UITableView *tableView = (UITableView *)self;
-        UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-        return cell;
-    } else if ([self isCollectionView]) {
-        UICollectionView *collectionView = (UICollectionView *)self;
-        UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
-        return cell;
-    }
-    return [UIView new];
-}
-
-- (void)tfy_scrollToRowAtIndexPath:(NSIndexPath *)indexPath completionHandler:(void (^ __nullable)(void))completionHandler {
-    [self tfy_scrollToRowAtIndexPath:indexPath animated:YES completionHandler:completionHandler];
-}
-
-- (void)tfy_scrollToRowAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated completionHandler:(void (^ __nullable)(void))completionHandler {
-    [self tfy_scrollToRowAtIndexPath:indexPath animateWithDuration:animated ? 0.4 : 0.0 completionHandler:completionHandler];
-}
-
-/// 使用动画持续时间滚动到indexPath
-- (void)tfy_scrollToRowAtIndexPath:(NSIndexPath *)indexPath animateWithDuration:(NSTimeInterval)duration completionHandler:(void (^ __nullable)(void))completionHandler {
-    BOOL animated = duration > 0.0;
-    if ([self isTableView]) {
-        UITableView *tableView = (UITableView *)self;
-        [tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:animated];
-    } else if ([self isCollectionView]) {
-        UICollectionView *collectionView = (UICollectionView *)self;
-        [collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionTop animated:animated];
-    }
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(duration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        if (completionHandler) completionHandler();
-    });
-}
-
-- (void)tfy_scrollViewDidEndDecelerating {
-    BOOL scrollToScrollStop = !self.tracking && !self.dragging && !self.decelerating;
-    if (scrollToScrollStop) {
-        [self tfy_scrollViewDidStopScroll];
-    }
-}
-
-- (void)tfy_scrollViewDidEndDraggingWillDecelerate:(BOOL)decelerate {
-    if (!decelerate) {
-        BOOL dragToDragStop = self.tracking && !self.dragging && !self.decelerating;
-        if (dragToDragStop) {
-            [self tfy_scrollViewDidStopScroll];
-        }
-    }
-}
-
-- (void)tfy_scrollViewDidScrollToTop {
-    [self tfy_scrollViewDidStopScroll];
-}
-
-- (void)tfy_scrollViewDidScroll {
-    if (self.tfy_scrollViewDirection == PlayerScrollViewDirectionVertical) {
-        [self tfy_scrollViewScrollingDirectionVertical];
-    } else {
-        [self tfy_scrollViewScrollingDirectionHorizontal];
-    }
-}
-
-- (void)tfy_scrollViewWillBeginDragging {
-    [self tfy_scrollViewBeginDragging];
-}
-
 #pragma mark - getter
-
--(NSIndexPath *)tfy_playingIndexPath{
-    return objc_getAssociatedObject(self, _cmd);
-}
-- (NSIndexPath *)tfy_shouldPlayIndexPath {
-    return objc_getAssociatedObject(self, _cmd);
-}
-
-- (NSInteger)tfy_containerViewTag {
-    return [objc_getAssociatedObject(self, _cmd) integerValue];
-}
 
 - (PlayerScrollDirection)tfy_scrollDirection {
     return [objc_getAssociatedObject(self, _cmd) integerValue];
 }
 
-- (BOOL)tfy_stopWhileNotVisible {
-    return [objc_getAssociatedObject(self, _cmd) boolValue];
-}
-
-- (BOOL)tfy_isWWANAutoPlay {
-    return [objc_getAssociatedObject(self, _cmd) boolValue];
-}
-
-- (BOOL)tfy_shouldAutoPlay {
-    NSNumber *number = objc_getAssociatedObject(self, _cmd);
-    if (number) return number.boolValue;
-    self.tfy_shouldAutoPlay = YES;
-    return YES;
-}
-
 - (PlayerScrollViewDirection)tfy_scrollViewDirection {
     return [objc_getAssociatedObject(self, _cmd) integerValue];
-}
-
-- (BOOL)tfy_stopPlay {
-    return [objc_getAssociatedObject(self, _cmd) boolValue];
-}
-
-- (PlayerContainerType)tfy_containerType {
-    return [objc_getAssociatedObject(self, _cmd) integerValue];
-}
-
-- (UIView *)tfy_containerView {
-    return objc_getAssociatedObject(self, _cmd);
 }
 
 - (CGFloat)tfy_lastOffsetY {
@@ -665,60 +625,14 @@
     return [objc_getAssociatedObject(self, _cmd) floatValue];
 }
 
-- (void (^)(NSIndexPath * _Nonnull))tfy_scrollViewDidStopScrollCallback {
-    return objc_getAssociatedObject(self, _cmd);
-}
-
-- (void (^)(NSIndexPath * _Nonnull))tfy_shouldPlayIndexPathCallback {
-    return objc_getAssociatedObject(self, _cmd);
-}
-
 #pragma mark - setter
-
-- (void)setTfy_playingIndexPath:(NSIndexPath *)tfy_playingIndexPath {
-    objc_setAssociatedObject(self, @selector(tfy_playingIndexPath), tfy_playingIndexPath, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    if (tfy_playingIndexPath) self.tfy_shouldPlayIndexPath = tfy_playingIndexPath;
-}
-
-- (void)setTfy_shouldPlayIndexPath:(NSIndexPath *)tfy_shouldPlayIndexPath {
-    if (self.tfy_shouldPlayIndexPathCallback) self.tfy_shouldPlayIndexPathCallback(tfy_shouldPlayIndexPath);
-    objc_setAssociatedObject(self, @selector(tfy_shouldPlayIndexPath), tfy_shouldPlayIndexPath, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (void)setTfy_containerViewTag:(NSInteger)tfy_containerViewTag {
-    objc_setAssociatedObject(self, @selector(tfy_containerViewTag), @(tfy_containerViewTag), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
 
 - (void)setTfy_scrollDirection:(PlayerScrollDirection)tfy_scrollDirection {
     objc_setAssociatedObject(self, @selector(tfy_scrollDirection), @(tfy_scrollDirection), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-- (void)setTfy_stopWhileNotVisible:(BOOL)tfy_stopWhileNotVisible {
-    objc_setAssociatedObject(self, @selector(tfy_stopWhileNotVisible), @(tfy_stopWhileNotVisible), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (void)setTfy_WWANAutoPlay:(BOOL)tfy_WWANAutoPlay {
-    objc_setAssociatedObject(self, @selector(tfy_isWWANAutoPlay), @(tfy_WWANAutoPlay), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
 - (void)setTfy_scrollViewDirection:(PlayerScrollViewDirection)tfy_scrollViewDirection {
     objc_setAssociatedObject(self, @selector(tfy_scrollViewDirection), @(tfy_scrollViewDirection), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (void)setTfy_stopPlay:(BOOL)tfy_stopPlay {
-    objc_setAssociatedObject(self, @selector(tfy_stopPlay), @(tfy_stopPlay), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (void)setTfy_containerType:(PlayerContainerType)tfy_containerType {
-    objc_setAssociatedObject(self, @selector(tfy_containerType), @(tfy_containerType), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (void)setTfy_containerView:(UIView *)tfy_containerView {
-    objc_setAssociatedObject(self, @selector(tfy_containerView), tfy_containerView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (void)setTfy_shouldAutoPlay:(BOOL)tfy_shouldAutoPlay {
-    objc_setAssociatedObject(self, @selector(tfy_shouldAutoPlay), @(tfy_shouldAutoPlay), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (void)setTfy_lastOffsetY:(CGFloat)tfy_lastOffsetY {
@@ -729,17 +643,34 @@
     objc_setAssociatedObject(self, @selector(tfy_lastOffsetX), @(tfy_lastOffsetX), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-- (void)setTfy_scrollViewDidStopScrollCallback:(void (^)(NSIndexPath * _Nonnull))tfy_scrollViewDidStopScrollCallback {
-    objc_setAssociatedObject(self, @selector(tfy_scrollViewDidStopScrollCallback), tfy_scrollViewDidStopScrollCallback, OBJC_ASSOCIATION_COPY_NONATOMIC);
-}
-
-- (void)setTfy_shouldPlayIndexPathCallback:(void (^)(NSIndexPath * _Nonnull))tfy_shouldPlayIndexPathCallback {
-    objc_setAssociatedObject(self, @selector(tfy_shouldPlayIndexPathCallback), tfy_shouldPlayIndexPathCallback, OBJC_ASSOCIATION_COPY_NONATOMIC);
-}
-
 @end
 
 @implementation UIScrollView (PlayerCannotCalled)
+
+- (void)tfy_filterShouldPlayCellWhileScrolling:(void (^ __nullable)(NSIndexPath *indexPath))handler {
+    if (self.tfy_scrollViewDirection == PlayerScrollViewDirectionVertical) {
+        [self _findCorrectCellWhenScrollViewDirectionVertical:handler];
+    } else {
+        [self _findCorrectCellWhenScrollViewDirectionHorizontal:handler];
+    }
+}
+
+- (void)tfy_filterShouldPlayCellWhileScrolled:(void (^ __nullable)(NSIndexPath *indexPath))handler {
+    if (!self.tfy_shouldAutoPlay) return;
+    @player_weakify(self)
+    [self tfy_filterShouldPlayCellWhileScrolling:^(NSIndexPath *indexPath) {
+        @player_strongify(self)
+        /// 如果当前控制器已经消失，直接return
+        if (self.tfy_viewControllerDisappear) return;
+        if ([TFY_ReachabilityManager sharedManager].isReachableViaWWAN && !self.tfy_WWANAutoPlay) {
+            /// 移动网络
+            self.tfy_shouldPlayIndexPath = indexPath;
+            return;
+        }
+        if (handler) handler(indexPath);
+        self.tfy_playingIndexPath = indexPath;
+    }];
+}
 
 #pragma mark - getter
 
@@ -767,6 +698,18 @@
     return objc_getAssociatedObject(self, _cmd);
 }
 
+- (void (^)(NSIndexPath * _Nonnull))tfy_scrollViewDidEndScrollingCallback {
+    return objc_getAssociatedObject(self, _cmd);
+}
+
+- (void (^)(NSIndexPath * _Nonnull))tfy_scrollViewDidScrollCallback {
+    return objc_getAssociatedObject(self, _cmd);
+}
+
+- (void (^)(NSIndexPath * _Nonnull))tfy_playerShouldPlayInScrollView {
+    return objc_getAssociatedObject(self, _cmd);
+}
+
 - (CGFloat)tfy_playerApperaPercent {
     return [objc_getAssociatedObject(self, _cmd) floatValue];
 }
@@ -777,6 +720,48 @@
 
 - (BOOL)tfy_viewControllerDisappear {
     return [objc_getAssociatedObject(self, _cmd) boolValue];
+}
+
+- (BOOL)tfy_stopPlay {
+    NSNumber *number = objc_getAssociatedObject(self, _cmd);
+    if (number) return number.boolValue;
+    self.tfy_stopPlay = YES;
+    return YES;
+}
+
+- (BOOL)tfy_stopWhileNotVisible {
+    return [objc_getAssociatedObject(self, _cmd) boolValue];
+}
+
+- (NSIndexPath *)tfy_playingIndexPath {
+    return objc_getAssociatedObject(self, _cmd);
+}
+
+- (NSIndexPath *)tfy_shouldPlayIndexPath {
+    return objc_getAssociatedObject(self, _cmd);
+}
+
+- (NSInteger)tfy_containerViewTag {
+    return [objc_getAssociatedObject(self, _cmd) integerValue];
+}
+
+- (BOOL)tfy_isWWANAutoPlay {
+    return [objc_getAssociatedObject(self, _cmd) boolValue];
+}
+
+- (BOOL)tfy_shouldAutoPlay {
+    NSNumber *number = objc_getAssociatedObject(self, _cmd);
+    if (number) return number.boolValue;
+    self.tfy_shouldAutoPlay = YES;
+    return YES;
+}
+
+- (PlayerContainerType)tfy_containerType {
+    return [objc_getAssociatedObject(self, _cmd) integerValue];
+}
+
+- (UIView *)tfy_containerView {
+    return objc_getAssociatedObject(self, _cmd);
 }
 
 #pragma mark - setter
@@ -805,6 +790,18 @@
     objc_setAssociatedObject(self, @selector(tfy_playerDidDisappearInScrollView), tfy_playerDidDisappearInScrollView, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
 
+- (void)setTfy_scrollViewDidEndScrollingCallback:(void (^)(NSIndexPath * _Nonnull))tfy_scrollViewDidEndScrollingCallback {
+    objc_setAssociatedObject(self, @selector(tfy_scrollViewDidEndScrollingCallback), tfy_scrollViewDidEndScrollingCallback, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+- (void)setTfy_scrollViewDidScrollCallback:(void (^)(NSIndexPath * _Nonnull))tfy_scrollViewDidScrollCallback {
+    objc_setAssociatedObject(self, @selector(tfy_scrollViewDidScrollCallback), tfy_scrollViewDidScrollCallback, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+- (void)setTfy_playerShouldPlayInScrollView:(void (^)(NSIndexPath * _Nonnull))tfy_playerShouldPlayInScrollView {
+    objc_setAssociatedObject(self, @selector(tfy_playerShouldPlayInScrollView), tfy_playerShouldPlayInScrollView, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
 - (void)setTfy_playerApperaPercent:(CGFloat)tfy_playerApperaPercent {
     objc_setAssociatedObject(self, @selector(tfy_playerApperaPercent), @(tfy_playerApperaPercent), OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
@@ -817,6 +814,45 @@
     objc_setAssociatedObject(self, @selector(tfy_viewControllerDisappear), @(tfy_viewControllerDisappear), OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
 
+- (void)setTfy_stopPlay:(BOOL)tfy_stopPlay {
+    objc_setAssociatedObject(self, @selector(tfy_stopPlay), @(tfy_stopPlay), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (void)setTfy_stopWhileNotVisible:(BOOL)tfy_stopWhileNotVisible {
+    objc_setAssociatedObject(self, @selector(tfy_stopWhileNotVisible), @(tfy_stopWhileNotVisible), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (void)setTfy_playingIndexPath:(NSIndexPath *)tfy_playingIndexPath {
+    objc_setAssociatedObject(self, @selector(tfy_playingIndexPath), tfy_playingIndexPath, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    if (tfy_playingIndexPath && [tfy_playingIndexPath compare:self.tfy_shouldPlayIndexPath] != NSOrderedSame) {
+        self.tfy_shouldPlayIndexPath = tfy_playingIndexPath;
+    }
+}
+
+- (void)setTfy_shouldPlayIndexPath:(NSIndexPath *)tfy_shouldPlayIndexPath {
+    if (self.tfy_playerShouldPlayInScrollView) self.tfy_playerShouldPlayInScrollView(tfy_shouldPlayIndexPath);
+    objc_setAssociatedObject(self, @selector(tfy_shouldPlayIndexPath), tfy_shouldPlayIndexPath, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (void)setTfy_containerViewTag:(NSInteger)tfy_containerViewTag {
+    objc_setAssociatedObject(self, @selector(tfy_containerViewTag), @(tfy_containerViewTag), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (void)setTfy_containerType:(PlayerContainerType)tfy_containerType {
+    objc_setAssociatedObject(self, @selector(tfy_containerType), @(tfy_containerType), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (void)setTfy_containerView:(UIView *)tfy_containerView {
+    objc_setAssociatedObject(self, @selector(tfy_containerView), tfy_containerView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (void)setTfy_shouldAutoPlay:(BOOL)tfy_shouldAutoPlay {
+    objc_setAssociatedObject(self, @selector(tfy_shouldAutoPlay), @(tfy_shouldAutoPlay), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (void)setTfy_WWANAutoPlay:(BOOL)tfy_WWANAutoPlay {
+    objc_setAssociatedObject(self, @selector(tfy_isWWANAutoPlay), @(tfy_WWANAutoPlay), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
 
 @end
 #pragma clang diagnostic pop

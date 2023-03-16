@@ -20,6 +20,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSTimeInterval timeRefreshInterval;
 /// 视频请求头
 @property (nonatomic, strong) NSDictionary *requestHeader;
+
+@property (nonatomic, strong, readonly) AVPlayerLayer *avPlayerLayer;
+
 @end
 
 NS_ASSUME_NONNULL_END
