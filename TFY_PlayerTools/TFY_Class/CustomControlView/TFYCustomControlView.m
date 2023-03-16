@@ -85,7 +85,7 @@
     [self.fullScreenBtn addTarget:self action:@selector(fullScreenButtonClickAction:) forControlEvents:UIControlEventTouchUpInside];
 }
 
-#pragma mark - ZFSliderViewDelegate
+#pragma mark - TFYSliderViewDelegate
 
 - (void)sliderTouchBegan:(float)value {
     self.slider.isdragging = YES;
@@ -361,7 +361,7 @@
     }];
 }
 
-#pragma mark - ZFPlayerControlViewDelegate
+#pragma mark - TFYPlayerControlViewDelegate
 
 /// 手势筛选，返回NO不响应该手势
 - (BOOL)gestureTriggerCondition:(TFY_PlayerGestureControl *)gestureControl gestureType:(PlayerGestureType)gestureType gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer touch:(nonnull UITouch *)touch {

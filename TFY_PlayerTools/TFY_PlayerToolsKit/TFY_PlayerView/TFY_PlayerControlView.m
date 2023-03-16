@@ -295,7 +295,7 @@
     }
 }
 
-#pragma mark - ZFPlayerControlViewDelegate
+#pragma mark - TFYPlayerControlViewDelegate
 
 /// 手势筛选，返回NO不响应该手势
 - (BOOL)gestureTriggerCondition:(TFY_PlayerGestureControl *)gestureControl gestureType:(PlayerGestureType)gestureType gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer touch:(nonnull UITouch *)touch {

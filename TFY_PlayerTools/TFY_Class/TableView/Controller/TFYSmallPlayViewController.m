@@ -214,7 +214,7 @@ static NSString *kIdentifier = @"kIdentifier";
     return layout.height;
 }
 
-#pragma mark - ZFTableViewCellDelegate
+#pragma mark - TFYTableViewCellDelegate
 
 - (void)tfy_playTheVideoAtIndexPath:(NSIndexPath *)indexPath {
     [self playTheVideoAtIndexPath:indexPath];

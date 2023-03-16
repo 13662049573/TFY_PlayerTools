@@ -41,7 +41,7 @@ API_AVAILABLE(ios(13.0)) @implementation UIViewController (PlayerRotation)
         
         for (NSUInteger index = 0; index < sizeof(selectors) / sizeof(SEL); ++index) {
             SEL originalSelector = selectors[index];
-            SEL swizzledSelector = NSSelectorFromString([@"zf_" stringByAppendingString:NSStringFromSelector(originalSelector)]);
+            SEL swizzledSelector = NSSelectorFromString([@"tfy_" stringByAppendingString:NSStringFromSelector(originalSelector)]);
             [self hookClass:self.class originalSelector:originalSelector swizzledSelector:swizzledSelector];
         }
         
@@ -71,8 +71,8 @@ API_AVAILABLE(ios(13.0)) @implementation UIViewController (PlayerRotation)
     }
 }
 
-- (NSInteger)zf_selectedIndex {
-    NSInteger index = [self zf_selectedIndex];
+- (NSInteger)tfy_selectedIndex {
+    NSInteger index = [self tfy_selectedIndex];
     if (index > self.viewControllers.count) return 0;
     return index;
 }

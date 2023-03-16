@@ -155,7 +155,7 @@
     self.playOrPauseBtn.selected = selected;
 }
 
-#pragma mark - ZFSliderViewDelegate
+#pragma mark - TFYSliderViewDelegate
 
 - (void)sliderTouchBegan:(float)value {
     self.slider.isdragging = YES;

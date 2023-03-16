@@ -54,7 +54,7 @@
             entry.keyPath  = keyPath;
             [_observerArray addObject:entry];
         } @catch (NSException *e) {
-            NSLog(@"ZFKVO: failed to add observer for %@\n", keyPath);
+            NSLog(@"TFYKVO: failed to add observer for %@\n", keyPath);
         }
     }
 }
@@ -73,7 +73,7 @@
             [_target removeObserver:observer
                             forKeyPath:keyPath];
         } @catch (NSException *e) {
-            NSLog(@"ZFKVO: failed to remove observer for %@\n", keyPath);
+            NSLog(@"TFYKVO: failed to remove observer for %@\n", keyPath);
         }
     }
 }
@@ -88,7 +88,7 @@
             [_target removeObserver:observer
                         forKeyPath:entry.keyPath];
         } @catch (NSException *e) {
-            NSLog(@"ZFKVO: failed to remove observer for %@\n", entry.keyPath);
+            NSLog(@"TFYKVO: failed to remove observer for %@\n", entry.keyPath);
         }
     }];
     

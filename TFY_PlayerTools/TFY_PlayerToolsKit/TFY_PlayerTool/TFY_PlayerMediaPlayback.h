@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 @optional
 ///播放器音量。
 ///仅影响播放器实例的音量而不影响设备。
-///您可以根据需要更改设备音量或播放器音量，更改播放器音量，您可以使用`ZFPlayerMediaPlayback`协议。
+///您可以根据需要更改设备音量或播放器音量，更改播放器音量，您可以使用`TFYPlayerMediaPlayback`协议。
 @property (nonatomic) float volume;
 
 ///播放静音

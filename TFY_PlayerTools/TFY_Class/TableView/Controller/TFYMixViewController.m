@@ -190,7 +190,7 @@ static NSString *kDouYinIdentifier = @"douYinIdentifier";
     return 250;
 }
 
-#pragma mark - ZFTableViewCellDelegate
+#pragma mark - TFYTableViewCellDelegate
 
 - (void)tfy_playTheVideoAtIndexPath:(NSIndexPath *)indexPath {
     [self playTheVideoAtIndexPath:indexPath scrollAnimated:NO];

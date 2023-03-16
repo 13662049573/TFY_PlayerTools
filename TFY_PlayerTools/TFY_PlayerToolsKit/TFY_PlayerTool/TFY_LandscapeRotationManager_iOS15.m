@@ -81,7 +81,7 @@
     return NO;
 }
 
-#pragma mark - ZFLandscapeViewControllerDelegate
+#pragma mark - TFYLandscapeViewControllerDelegate
 
 - (BOOL)ls_shouldAutorotate {
     if ([self allowsRotation]) {

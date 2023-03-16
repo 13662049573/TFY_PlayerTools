@@ -105,7 +105,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign) CGSize presentationSize;
 
-/// default is ZFDisablePortraitGestureTypesAll.
+/// default is TFYDisablePortraitGestureTypesAll.
 @property (nonatomic, assign) DisablePortraitGestureTypes disablePortraitGestureTypes;
 
 /// The current orientation of the player.
@@ -116,7 +116,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// default is YES.
 @property (nonatomic, assign) BOOL allowOrientationRotation;
 
-/// The support Interface Orientation,default is ZFInterfaceOrientationMaskAllButUpsideDown
+/// The support Interface Orientation,default is InterfaceOrientationMaskAllButUpsideDown
 @property (nonatomic, assign) InterfaceOrientationMask supportInterfaceOrientation;
 
 /// Add the device orientation observer.
@@ -125,22 +125,22 @@ NS_ASSUME_NONNULL_BEGIN
 /// Remove the device orientation observer.
 - (void)removeDeviceOrientationObserver;
 
-/// Enter the fullScreen while the ZFFullScreenMode is ZFFullScreenModeLandscape.
+/// Enter the fullScreen while the TFYFullScreenMode is TFYFullScreenModeLandscape.
 - (void)rotateToOrientation:(UIInterfaceOrientation)orientation animated:(BOOL)animated;
 
-/// Enter the fullScreen while the ZFFullScreenMode is ZFFullScreenModeLandscape.
+/// Enter the fullScreen while the TFYFullScreenMode is TFYFullScreenModeLandscape.
 - (void)rotateToOrientation:(UIInterfaceOrientation)orientation animated:(BOOL)animated completion:(void(^ __nullable)(void))completion;
 
-/// Enter the fullScreen while the ZFFullScreenMode is ZFFullScreenModePortrait.
+/// Enter the fullScreen while the TFYFullScreenMode is TFYFullScreenModePortrait.
 - (void)enterPortraitFullScreen:(BOOL)fullScreen animated:(BOOL)animated;
 
-/// Enter the fullScreen while the ZFFullScreenMode is ZFFullScreenModePortrait.
+/// Enter the fullScreen while the TFYFullScreenMode is TFYFullScreenModePortrait.
 - (void)enterPortraitFullScreen:(BOOL)fullScreen animated:(BOOL)animated completion:(void(^ __nullable)(void))completion;
 
-/// FullScreen mode is determined by ZFFullScreenMode.
+/// FullScreen mode is determined by TFYFullScreenMode.
 - (void)enterFullScreen:(BOOL)fullScreen animated:(BOOL)animated;
 
-/// FullScreen mode is determined by ZFFullScreenMode.
+/// FullScreen mode is determined by TFYFullScreenMode.
 - (void)enterFullScreen:(BOOL)fullScreen animated:(BOOL)animated completion:(void (^ _Nullable)(void))completion;
 
 @end
