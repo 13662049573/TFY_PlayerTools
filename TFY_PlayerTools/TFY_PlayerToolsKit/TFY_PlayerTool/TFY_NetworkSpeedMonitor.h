@@ -15,6 +15,7 @@ extern NSString * _Nonnull const NetworkSpeedNotificationKey;
 NS_ASSUME_NONNULL_BEGIN
 
 @interface TFY_NetworkSpeedMonitor : NSObject
+
 @property (nonatomic, copy, readonly) NSString *downloadNetworkSpeed;
 @property (nonatomic, copy, readonly) NSString *uploadNetworkSpeed;
 

@@ -12,7 +12,7 @@
 #import "TFYDouYinCell.h"
 #import "TFYDouYinControlView.h"
 #import "TFYCustomControlView.h"
-
+#import "TFY_PlayerTool.h"
 static NSString *kIdentifier = @"kIdentifier";
 
 @interface TFYDouYinViewController ()<UITableViewDelegate,UITableViewDataSource,TFYDouYinCellDelegate>

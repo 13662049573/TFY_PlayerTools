@@ -13,7 +13,7 @@
 #import "TFYTableData.h"
 #import "TFYTableViewCell.h"
 #import "UIView+PlayerFrame.h"
-
+#import "TFY_PlayerTool.h"
 static NSString *kIdentifier = @"kIdentifier";
 
 @interface TFYSmallPlayViewController ()<UITableViewDelegate,UITableViewDataSource,TFYTableViewCellDelegate>

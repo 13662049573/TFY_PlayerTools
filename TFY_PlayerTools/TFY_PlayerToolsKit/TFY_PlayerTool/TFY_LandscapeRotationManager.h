@@ -9,7 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "TFY_OrientationObserver.h"
 #import "TFY_LandscapeWindow.h"
-#import "TFY_PlayerBaseView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -36,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign) BOOL disableAnimations;
 
-/// The support Interface Orientation,default is ZFInterfaceOrientationMaskAllButUpsideDown
+/// The support Interface Orientation,default is InterfaceOrientationMaskAllButUpsideDown
 @property (nonatomic, assign) InterfaceOrientationMask supportInterfaceOrientation;
 
 /// The current orientation of the player.

@@ -12,7 +12,7 @@
 #import "TFYTableData.h"
 #import "TFYOtherCell.h"
 #import "TFY_ITools.h"
-
+#import "TFY_PlayerTool.h"
 static NSString *kIdentifier = @"kIdentifier";
 
 @interface TFYTableHeaderViewController ()<UITableViewDelegate,UITableViewDataSource>

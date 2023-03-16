@@ -10,7 +10,7 @@
 #import "TFYCollectionViewCell.h"
 #import "TFYTableData.h"
 #import "UIView+PlayerFrame.h"
-
+#import "TFY_PlayerTool.h"
 static NSString * const reuseIdentifier = @"collectionViewCell";
 
 @interface TFYHorizontalCollectionViewController ()<UICollectionViewDelegate,UICollectionViewDataSource>

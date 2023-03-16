@@ -11,7 +11,7 @@
 #import "TFYTableViewCell.h"
 #import "TFYTableData.h"
 #import <AVFoundation/AVFoundation.h>
-
+#import "TFY_PlayerTool.h"
 static NSString *kIdentifier = @"kIdentifier";
 
 @interface TFYAutoPlayerViewController ()<UITableViewDelegate,UITableViewDataSource,TFYTableViewCellDelegate>

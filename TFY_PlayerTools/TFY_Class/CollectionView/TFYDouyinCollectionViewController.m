@@ -13,7 +13,7 @@
 #import "TFYDouYinControlView.h"
 #import "TFYDouYinCellDelegate.h"
 #import "TFYCustomControlView.h"
-
+#import "TFY_PlayerTool.h"
 static NSString * const reuseIdentifier = @"collectionViewCell";
 
 @interface TFYDouyinCollectionViewController ()<UICollectionViewDelegate,UICollectionViewDataSource,TFYDouYinCellDelegate>

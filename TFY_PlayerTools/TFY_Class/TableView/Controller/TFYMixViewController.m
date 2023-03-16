@@ -11,7 +11,7 @@
 #import "TFYTableViewCell.h"
 #import "TFYTableData.h"
 #import "TFYOtherCell.h"
-
+#import "TFY_PlayerTool.h"
 static NSString *kIdentifier = @"kIdentifier";
 static NSString *kDouYinIdentifier = @"douYinIdentifier";
 

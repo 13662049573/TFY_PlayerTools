@@ -11,7 +11,7 @@
 #import "TFYTableData.h"
 #import <AVFoundation/AVFoundation.h>
 #import "TFYWeChatControlView.h"
-
+#import "TFY_PlayerTool.h"
 static NSString *kIdentifier = @"kIdentifier";
 
 @interface TFYWChatViewController ()<UITableViewDelegate,UITableViewDataSource,TFYTableViewCellDelegate>

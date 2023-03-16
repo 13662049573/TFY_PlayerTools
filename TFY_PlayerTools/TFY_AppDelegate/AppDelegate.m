@@ -8,7 +8,7 @@
 
 #import "AppDelegate.h"
 #import "LM_TabBarController.h"
-
+#import "TFY_PlayerTool.h"
 @interface AppDelegate ()
 
 @end

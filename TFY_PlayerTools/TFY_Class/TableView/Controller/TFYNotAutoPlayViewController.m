@@ -10,7 +10,7 @@
 #import "TFYTableViewCell.h"
 #import "TFYTableData.h"
 #import "TFYPlayerDetailViewController.h"
-
+#import "TFY_PlayerTool.h"
 static NSString *kIdentifier = @"kIdentifier";
 
 @interface TFYNotAutoPlayViewController ()<UITableViewDelegate,UITableViewDataSource,TFYTableViewCellDelegate>

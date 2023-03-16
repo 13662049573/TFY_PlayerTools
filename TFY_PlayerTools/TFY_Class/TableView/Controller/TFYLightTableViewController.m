@@ -11,7 +11,7 @@
 #import "TFYTableViewCellLayout.h"
 #import "TFYTableViewCell.h"
 #import "TFYTableData.h"
-
+#import "TFY_PlayerTool.h"
 static NSString *kIdentifier = @"kIdentifier";
 
 @interface TFYLightTableViewController ()<UITableViewDelegate,UITableViewDataSource,TFYTableViewCellDelegate>

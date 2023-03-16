@@ -85,7 +85,6 @@
 		3671A2FE24C1AFB80010728D /* TFY_ITools.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A2FD24C1AFB80010728D /* TFY_ITools.m */; };
 		3671A30124C1B12A0010728D /* TFY_VolumeBrightnessView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A30024C1B12A0010728D /* TFY_VolumeBrightnessView.m */; };
 		3671A30424C1B3E60010728D /* TFY_SpeedLoadingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A30324C1B3E60010728D /* TFY_SpeedLoadingView.m */; };
-		3671A30D24C1B5A80010728D /* TFY_LandScapeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A30C24C1B5A80010728D /* TFY_LandScapeView.m */; };
 		3671A31324C1DEE90010728D /* Playerdata.json in Resources */ = {isa = PBXBuildFile; fileRef = 3671A31224C1DEE90010728D /* Playerdata.json */; };
 		3688F51C24CE5D3800379F66 /* TFY_AppDotNetAPIClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 3688F50E24CE5D3800379F66 /* TFY_AppDotNetAPIClient.m */; };
 		3688F51D24CE5D3800379F66 /* TFY_RefreshGifHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 3688F50F24CE5D3800379F66 /* TFY_RefreshGifHeader.m */; };
@@ -217,6 +216,8 @@
 		3608431629C2DBEB00D04A39 /* TFYKeyboardViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFYKeyboardViewController.m; sourceTree = "<group>"; };
 		3608431829C2DC6700D04A39 /* TFYScrollViewViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFYScrollViewViewController.h; sourceTree = "<group>"; };
 		3608431929C2DC6700D04A39 /* TFYScrollViewViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFYScrollViewViewController.m; sourceTree = "<group>"; };
+		3608431B29C2EFFD00D04A39 /* TFY_PlayerTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_PlayerTool.h; sourceTree = "<group>"; };
+		3608431C29C2F49B00D04A39 /* TFY_PlayerView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_PlayerView.h; sourceTree = "<group>"; };
 		3638B05D250883B000F71DC7 /* TFY_PlayerToolsKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_PlayerToolsKit.h; sourceTree = "<group>"; };
 		3644635F24BFF3CD001D0DC4 /* TFY_PlayerTools.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TFY_PlayerTools.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3644636E24BFF3CF001D0DC4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -279,8 +280,6 @@
 		3671A30024C1B12A0010728D /* TFY_VolumeBrightnessView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_VolumeBrightnessView.m; sourceTree = "<group>"; };
 		3671A30224C1B3E60010728D /* TFY_SpeedLoadingView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_SpeedLoadingView.h; sourceTree = "<group>"; };
 		3671A30324C1B3E60010728D /* TFY_SpeedLoadingView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_SpeedLoadingView.m; sourceTree = "<group>"; };
-		3671A30B24C1B5A80010728D /* TFY_LandScapeView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_LandScapeView.h; sourceTree = "<group>"; };
-		3671A30C24C1B5A80010728D /* TFY_LandScapeView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_LandScapeView.m; sourceTree = "<group>"; };
 		3671A31224C1DEE90010728D /* Playerdata.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Playerdata.json; sourceTree = "<group>"; };
 		3688F50E24CE5D3800379F66 /* TFY_AppDotNetAPIClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TFY_AppDotNetAPIClient.m; sourceTree = "<group>"; };
 		3688F50F24CE5D3800379F66 /* TFY_RefreshGifHeader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TFY_RefreshGifHeader.m; sourceTree = "<group>"; };
@@ -591,7 +590,9 @@
 		364463A324BFF4A5001D0DC4 /* TFY_PlayerTool */ = {
 			isa = PBXGroup;
 			children = (
+				3608431B29C2EFFD00D04A39 /* TFY_PlayerTool.h */,
 				364463BD24BFF4A5001D0DC4 /* TFY_PlayerToolsHeader.h */,
+				364463A624BFF4A5001D0DC4 /* TFY_PlayerMediaPlayback.h */,
 				364463B424BFF4A5001D0DC4 /* UIScrollView+TFY_Player.h */,
 				364463A924BFF4A5001D0DC4 /* UIScrollView+TFY_Player.m */,
 				364463B024BFF4A5001D0DC4 /* TFY_PlayerGestureControl.h */,
@@ -603,8 +604,6 @@
 				364463AB24BFF4A5001D0DC4 /* TFY_AVPlayerManager.m */,
 				364463BF24BFF4A5001D0DC4 /* TFY_FloatView.h */,
 				364463B124BFF4A5001D0DC4 /* TFY_FloatView.m */,
-				364463B324BFF4A5001D0DC4 /* TFY_LoadingView.h */,
-				364463AA24BFF4A5001D0DC4 /* TFY_LoadingView.m */,
 				364463AE24BFF4A5001D0DC4 /* TFY_KVOController.h */,
 				364463B924BFF4A5001D0DC4 /* TFY_KVOController.m */,
 				364463A724BFF4A5001D0DC4 /* TFY_PlayerNotification.h */,
@@ -613,7 +612,6 @@
 				364463A424BFF4A5001D0DC4 /* TFY_NetworkSpeedMonitor.m */,
 				364463A824BFF4A5001D0DC4 /* TFY_ReachabilityManager.h */,
 				364463B524BFF4A5001D0DC4 /* TFY_ReachabilityManager.m */,
-				364463A624BFF4A5001D0DC4 /* TFY_PlayerMediaPlayback.h */,
 				364463BC24BFF4A5001D0DC4 /* TFY_PlayerController.h */,
 				364463AD24BFF4A5001D0DC4 /* TFY_PlayerController.m */,
 				364463BB24BFF4A5001D0DC4 /* TFY_OrientationObserver.h */,
@@ -672,6 +670,7 @@
 		3671A2ED24C1A2DF0010728D /* TFY_PlayerView */ = {
 			isa = PBXGroup;
 			children = (
+				3608431C29C2F49B00D04A39 /* TFY_PlayerView.h */,
 				3671A2EE24C1A3410010728D /* UIView+PlayerFrame.h */,
 				3671A2EF24C1A3410010728D /* UIView+PlayerFrame.m */,
 				3671A2F124C1A8D10010728D /* UIImageView+PlayerImageView.h */,
@@ -694,8 +693,8 @@
 				3608429D29C2AE1B00D04A39 /* TFY_PlayerControlView.m */,
 				3608429F29C2AE9A00D04A39 /* TFY_PortraitControlView.h */,
 				360842A029C2AE9A00D04A39 /* TFY_PortraitControlView.m */,
-				3671A30B24C1B5A80010728D /* TFY_LandScapeView.h */,
-				3671A30C24C1B5A80010728D /* TFY_LandScapeView.m */,
+				364463B324BFF4A5001D0DC4 /* TFY_LoadingView.h */,
+				364463AA24BFF4A5001D0DC4 /* TFY_LoadingView.m */,
 			);
 			path = TFY_PlayerView;
 			sourceTree = "<group>";
@@ -1070,7 +1069,6 @@
 				3608428B29C29F4700D04A39 /* TFY_PersentInteractiveTransition.m in Sources */,
 				3608428829C29F0700D04A39 /* TFY_PortraitViewController.m in Sources */,
 				3671A30424C1B3E60010728D /* TFY_SpeedLoadingView.m in Sources */,
-				3671A30D24C1B5A80010728D /* TFY_LandScapeView.m in Sources */,
 				3688F52224CE5D3800379F66 /* TFY_ServerConfig.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

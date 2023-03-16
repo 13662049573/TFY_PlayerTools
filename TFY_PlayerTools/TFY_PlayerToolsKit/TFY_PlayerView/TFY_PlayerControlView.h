@@ -101,28 +101,28 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  设置标题、封面、全屏模式
 
- @param title 视频的标题
- @param coverUrl 视频的封面，占位图默认是灰色的
- @param fullScreenMode 全屏模式
+  title 视频的标题
+  coverUrl 视频的封面，占位图默认是灰色的
+  fullScreenMode 全屏模式
  */
 - (void)showTitle:(NSString *)title coverURLString:(NSString *)coverUrl fullScreenMode:(FullScreenMode)fullScreenMode;
 
 /**
  设置标题、封面、默认占位图、全屏模式
 
- @param title 视频的标题
- @param coverUrl 视频的封面
- @param placeholder 指定封面的placeholder
- @param fullScreenMode 全屏模式
+  title 视频的标题
+  coverUrl 视频的封面
+  placeholder 指定封面的placeholder
+  fullScreenMode 全屏模式
  */
 - (void)showTitle:(NSString *)title coverURLString:(NSString *)coverUrl placeholderImage:(UIImage *)placeholder fullScreenMode:(FullScreenMode)fullScreenMode;
 
 /**
  设置标题、UIImage封面、全屏模式
 
- @param title 视频的标题
- @param image 视频的封面UIImage
- @param fullScreenMode 全屏模式
+  title 视频的标题
+  image 视频的封面UIImage
+  fullScreenMode 全屏模式
  */
 - (void)showTitle:(NSString *)title coverImage:(UIImage *)image fullScreenMode:(FullScreenMode)fullScreenMode;
 

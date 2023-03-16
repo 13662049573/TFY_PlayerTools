@@ -8,7 +8,7 @@
 
 #import "TFYKeyboardViewController.h"
 #import "UIView+PlayerFrame.h"
-
+#import "TFY_PlayerTool.h"
 @interface TFYKeyboardViewController ()
 @property (nonatomic, strong) TFY_PlayerController *player;
 @property (nonatomic, strong) UIView *containerView;

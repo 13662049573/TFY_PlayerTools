@@ -76,25 +76,4 @@ typedef NS_ENUM(NSInteger, PlayerScalingMode) {
     PlayerScalingModeFill        // 不均匀的规模。两个渲染维度都将完全匹配可见边界。
 };
 
-
-#import <UIKit/UIKit.h>
-#import <Foundation/Foundation.h>
-
-#import "TFY_PlayerController.h"
-#import "TFY_AVPlayerManager.h"
-#import "TFY_PlayerGestureControl.h"
-#import "TFY_PlayerNotification.h"
-#import "TFY_PlayerMediaControl.h"
-#import "TFY_PlayerMediaPlayback.h"
-#import "TFY_PlayerBaseView.h"
-#import "TFY_FloatView.h"
-#import "TFY_KVOController.h"
-#import "TFY_ReachabilityManager.h"
-#import "UIScrollView+TFY_Player.h"
-#import "TFY_OrientationObserver.h"
-#import "TFY_NetworkSpeedMonitor.h"
-#import "TFY_LoadingView.h"
-#import "TFY_LandscapeWindow.h"
-#import "TFY_LandscapeRotationManager.h"
-
 #endif /* TFY_PlayerToolsHeader_h */

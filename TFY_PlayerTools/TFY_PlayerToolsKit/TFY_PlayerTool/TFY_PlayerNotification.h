@@ -16,6 +16,7 @@ typedef NS_ENUM(NSUInteger, PlayerBackgroundState) {
 NS_ASSUME_NONNULL_BEGIN
 
 @interface TFY_PlayerNotification : NSObject
+
 @property (nonatomic, readonly) PlayerBackgroundState backgroundState;
 
 @property (nonatomic, copy, nullable) void(^willResignActive)(TFY_PlayerNotification *registrar);
@@ -35,6 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)addNotification;
 
 - (void)removeNotification;
+
 @end
 
 NS_ASSUME_NONNULL_END
