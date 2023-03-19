@@ -85,7 +85,6 @@
 		3671A2FE24C1AFB80010728D /* TFY_ITools.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A2FD24C1AFB80010728D /* TFY_ITools.m */; };
 		3671A30124C1B12A0010728D /* TFY_VolumeBrightnessView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A30024C1B12A0010728D /* TFY_VolumeBrightnessView.m */; };
 		3671A30424C1B3E60010728D /* TFY_SpeedLoadingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3671A30324C1B3E60010728D /* TFY_SpeedLoadingView.m */; };
-		3671A31324C1DEE90010728D /* Playerdata.json in Resources */ = {isa = PBXBuildFile; fileRef = 3671A31224C1DEE90010728D /* Playerdata.json */; };
 		3688F51C24CE5D3800379F66 /* TFY_AppDotNetAPIClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 3688F50E24CE5D3800379F66 /* TFY_AppDotNetAPIClient.m */; };
 		3688F51D24CE5D3800379F66 /* TFY_RefreshGifHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 3688F50F24CE5D3800379F66 /* TFY_RefreshGifHeader.m */; };
 		3688F51E24CE5D3800379F66 /* TFY_NetWorking.m in Sources */ = {isa = PBXBuildFile; fileRef = 3688F51024CE5D3800379F66 /* TFY_NetWorking.m */; };
@@ -280,7 +279,6 @@
 		3671A30024C1B12A0010728D /* TFY_VolumeBrightnessView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_VolumeBrightnessView.m; sourceTree = "<group>"; };
 		3671A30224C1B3E60010728D /* TFY_SpeedLoadingView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TFY_SpeedLoadingView.h; sourceTree = "<group>"; };
 		3671A30324C1B3E60010728D /* TFY_SpeedLoadingView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TFY_SpeedLoadingView.m; sourceTree = "<group>"; };
-		3671A31224C1DEE90010728D /* Playerdata.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Playerdata.json; sourceTree = "<group>"; };
 		3688F50E24CE5D3800379F66 /* TFY_AppDotNetAPIClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TFY_AppDotNetAPIClient.m; sourceTree = "<group>"; };
 		3688F50F24CE5D3800379F66 /* TFY_RefreshGifHeader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TFY_RefreshGifHeader.m; sourceTree = "<group>"; };
 		3688F51024CE5D3800379F66 /* TFY_NetWorking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TFY_NetWorking.m; sourceTree = "<group>"; };
@@ -642,7 +640,6 @@
 		3671A2BD24C1992A0010728D /* TFY_PCH */ = {
 			isa = PBXGroup;
 			children = (
-				3671A31224C1DEE90010728D /* Playerdata.json */,
 				3671A2BE24C1993C0010728D /* TFY_PrefixHeader.pch */,
 				3671A2BF24C1994A0010728D /* TFY_Header.h */,
 			);
@@ -861,7 +858,6 @@
 			files = (
 				3644637224BFF3CF001D0DC4 /* LaunchScreen.storyboard in Resources */,
 				3671A2FB24C1AF640010728D /* videoImages.bundle in Resources */,
-				3671A31324C1DEE90010728D /* Playerdata.json in Resources */,
 				360842C529C2BE4100D04A39 /* data.json in Resources */,
 				3644636F24BFF3CF001D0DC4 /* Assets.xcassets in Resources */,
 			);

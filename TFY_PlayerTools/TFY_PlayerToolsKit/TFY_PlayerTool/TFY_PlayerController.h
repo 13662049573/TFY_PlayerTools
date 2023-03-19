@@ -58,58 +58,54 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak, nullable) UIScrollView *scrollView;
 
 /*!
- @method            playerWithPlayerManager:containerView:
- @abstract          Create an tfyPlayerController that plays a single audiovisual item.
- @param             playerManager must conform `tfyPlayerMediaPlayback` protocol.
- @param             containerView to see the video frames must set the contrainerView.
- @result            An instance of tfyPlayerController.
+ playerWithPlayerManager: containerView:
+ 创建一个TFY_PlayerController来播放一个单独的视听项目。
+ playerManager必须符合“TFY_PlayerMediaPlayback”协议。
+ containerView查看视频帧必须设置containerView。
+ tfyPlayerController的实例。
  */
 + (instancetype)playerWithPlayerManager:(id<TFY_PlayerMediaPlayback>)playerManager containerView:(UIView *)containerView;
 
 /*!
- @method            initWithPlayerManager:containerView:
- @abstract          Create an tfyPlayerController that plays a single audiovisual item.
- @param             playerManager must conform `tfyPlayerMediaPlayback` protocol.
- @param             containerView to see the video frames must set the contrainerView.
- @result            An instance of tfyPlayerController.
+ initWithPlayerManager: containerView:
+ 创建一个TFY_PlayerController来播放一个单独的视听项目。
+ playerManager必须符合“tfyPlayerMediaPlayback”协议。
+ containerView查看视频帧必须设置containerView。
+ tfyPlayerController的实例。
  */
 - (instancetype)initWithPlayerManager:(id<TFY_PlayerMediaPlayback>)playerManager containerView:(UIView *)containerView;
 
 /*!
- @method            playerWithScrollView:playerManager:containerViewTag:
- @abstract          Create an tfyPlayerController that plays a single audiovisual item. Use in `UITableView` or `UICollectionView`.
- @param             scrollView is `tableView` or `collectionView`.
- @param             playerManager must conform `tfyPlayerMediaPlayback` protocol.
- @param             containerViewTag to see the video at scrollView must set the contrainerViewTag.
- @result            An instance of tfyPlayerController.
+ playerWithScrollView: playerManager: containerViewTag:
+ 创建一个TFY_PlayerController来播放一个单独的视听项目。在' UITableView '或' UICollectionView '中使用。
+ scrollView是tableView或collectionView。
+ playerManager必须符合“TFY_PlayerMediaPlayback”协议。
+ 要在scrollView查看视频，必须设置containerViewTag。
+ tfyPlayerController的实例。
  */
 + (instancetype)playerWithScrollView:(UIScrollView *)scrollView playerManager:(id<TFY_PlayerMediaPlayback>)playerManager containerViewTag:(NSInteger)containerViewTag;
 
 /*!
- @method            initWithScrollView:playerManager:containerViewTag:
- @abstract          Create an tfyPlayerController that plays a single audiovisual item. Use in `UITableView` or `UICollectionView`.
- @param             scrollView is `tableView` or `collectionView`.
- @param             playerManager must conform `tfyPlayerMediaPlayback` protocol.
- @param             containerViewTag to see the video at scrollView must set the contrainerViewTag.
- @result            An instance of tfyPlayerController.
+  initWithScrollView: playerManager: containerViewTag:
+ 创建一个TFY_PlayerController来播放一个单独的视听项目。在' UITableView '或' UICollectionView '中使用。
+ scrollView是tableView或collectionView。
+ playerManager必须符合“TFY_PlayerMediaPlayback”协议。
+ 要在scrollView查看视频，必须设置containerViewTag。
+ tfyPlayerController的实例。
  */
 - (instancetype)initWithScrollView:(UIScrollView *)scrollView playerManager:(id<TFY_PlayerMediaPlayback>)playerManager containerViewTag:(NSInteger)containerViewTag;
 
 /*!
- @method            playerWithScrollView:playerManager:containerView:
- @abstract          Create an tfyPlayerController that plays a single audiovisual item. Use in `UIScrollView`.
- @param             playerManager must conform `tfyPlayerMediaPlayback` protocol.
- @param             containerView to see the video at the scrollView.
- @result            An instance of tfyPlayerController.
+ playerWithScrollView: playerManager: containerView:
+ 创建一个TFY_PlayerController来播放一个单独的视听项目。在' UIScrollView '中使用。playerManager必须符合“TFY_PlayerMediaPlayback”协议。在scrollView中查看视频。
+ tfyPlayerController的实例。
  */
 + (instancetype)playerWithScrollView:(UIScrollView *)scrollView playerManager:(id<TFY_PlayerMediaPlayback>)playerManager containerView:(UIView *)containerView;
 
 /*!
- @method            initWithScrollView:playerManager:containerView:
- @abstract          Create an tfyPlayerController that plays a single audiovisual item. Use in `UIScrollView`.
- @param             playerManager must conform `tfyPlayerMediaPlayback` protocol.
- @param             containerView to see the video at the scrollView.
- @result            An instance of tfyPlayerController.
+ initWithScrollView: playerManager: containerView:
+ 创建一个TFY_PlayerController来播放一个单独的视听项目。在' UIScrollView '中使用。playerManager必须符合“TFY_PlayerMediaPlayback”协议。在scrollView中查看视频。
+ tfyPlayerController的实例。
  */
 - (instancetype)initWithScrollView:(UIScrollView *)scrollView playerManager:(id<TFY_PlayerMediaPlayback>)playerManager containerView:(UIView *)containerView;
 
@@ -117,26 +113,26 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface TFY_PlayerController (PlayerTimeControl)
 
-/// The player current play time.
+/// 玩家当前的游戏时间。
 @property (nonatomic, readonly) NSTimeInterval currentTime;
 
-/// The player total time.
+/// 玩家总时间。
 @property (nonatomic, readonly) NSTimeInterval totalTime;
 
-/// The player buffer time.
+/// 玩家缓冲时间。
 @property (nonatomic, readonly) NSTimeInterval bufferTime;
 
-/// The player progress, 0...1
+/// 玩家进程，0…1
 @property (nonatomic, readonly) float progress;
 
-/// The player bufferProgress, 0...1
+/// 玩家bufferProgress, 0…1
 @property (nonatomic, readonly) float bufferProgress;
 
 /**
- Use this method to seek to a specified time for the current player and to be notified when the seek operation is complete.
+ 使用此方法查找当前播放器的指定时间，并在查找操作完成时收到通知。
 
- @param time seek time.
- @param completionHandler completion handler.
+ 时过境迁。
+ completionHandler完成处理程序。
  */
 - (void)seekToTime:(NSTimeInterval)time completionHandler:(void (^ __nullable)(BOOL finished))completionHandler;
 
@@ -144,134 +140,132 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface TFY_PlayerController (PlayerPlaybackControl)
 
-/// Resume playback record.default is NO.
-/// Memory storage playback records.
+///恢复播放记录。
+///内存存储回放记录。
 @property (nonatomic, assign) BOOL resumePlayRecord;
 
-/// 0...1.0
-/// Only affects audio volume for the device instance and not for the player.
-/// You can change device volume or player volume as needed,change the player volume you can conform the `tfyPlayerMediaPlayback` protocol.
+/// 0 --1.0
+///只影响设备实例的音频音量，不影响播放器。
+///您可以根据需要更改设备音量或播放器音量，更改播放器音量您可以遵循' tfyPlayerMediaPlayback '协议。
 @property (nonatomic) float volume;
 
-/// The device muted.
-/// Only affects audio muting for the device instance and not for the player.
-/// You can change device mute or player mute as needed,change the player mute you can conform the `tfyPlayerMediaPlayback` protocol.
+///设备静音。
+///只影响设备实例的音频静音，不影响播放器。
+///您可以根据需要更改设备静音或播放器静音，更改播放器静音可以遵循' tfyPlayerMediaPlayback '协议。
 @property (nonatomic, getter=isMuted) BOOL muted;
 
-// 0...1.0, where 1.0 is maximum brightness. Only supported by main screen.
+//0…1.0，其中1.0是最大亮度。仅主界面支持。
 @property (nonatomic) float brightness;
 
-/// The play asset URL.
+/// 播放资产URL。
 @property (nonatomic, nullable) NSURL *assetURL;
 
-/// If tableView or collectionView has only one section , use `assetURLs`.
-/// If tableView or collectionView has more sections , use `sectionAssetURLs`.
-/// Set this you can use `playTheNext` `playThePrevious` `playTheIndex:` method.
+///如果tableView或collectionView只有一个section，使用' assetURLs '。
+///如果tableView或collectionView有更多的section，使用' sectionAssetURLs '。
+///设置这个你可以使用' playthennext ' ' playThePrevious ' ' playTheIndex: '方法。
 @property (nonatomic, copy, nullable) NSArray <NSURL *>*assetURLs;
 
-/// The currently playing index,limited to one-dimensional arrays.
+/// 当前播放的索引，仅限于一维数组。
 @property (nonatomic) NSInteger currentPlayIndex;
 
-/// is the last asset URL in `assetURLs`.
+/// is the first asset URL in `assetURLs`.
 @property (nonatomic, readonly) BOOL isLastAssetURL;
 
 /// is the first asset URL in `assetURLs`.
 @property (nonatomic, readonly) BOOL isFirstAssetURL;
 
-/// If Yes, player will be called pause method When Received `UIApplicationWillResignActiveNotification` notification.
-/// default is YES.
+///如果是，播放器将被调用pause方法当收到' UIApplicationWillResignActiveNotification '通知。
+/// default为YES。
 @property (nonatomic) BOOL pauseWhenAppResignActive;
 
-/// When the player is playing, it is paused by some event,not by user click to pause.
-/// For example, when the player is playing, application goes into the background or pushed to another viewController
+///当播放器播放时，它被一些事件暂停，而不是由用户点击暂停。
+///例如，当播放器播放时，应用程序进入后台或推到另一个viewController
 @property (nonatomic, getter=isPauseByEvent) BOOL pauseByEvent;
 
-/// The current player controller is disappear, not dealloc
+///当前的播放器控制器是消失，而不是dealloc
 @property (nonatomic, getter=isViewControllerDisappear) BOOL viewControllerDisappear;
 
-/// You can custom the AVAudioSession,
-/// default is NO.
+/// 你可以自定义AVAudioSession，
+/// default为NO。
 @property (nonatomic, assign) BOOL customAudioSession;
 
-/// The block invoked when the player is Prepare to play.
+/// 当玩家在准备游戏时调用的块。
 @property (nonatomic, copy, nullable) void(^playerPrepareToPlay)(id<TFY_PlayerMediaPlayback> asset, NSURL *assetURL);
 
-/// The block invoked when the player is Ready to play.
+/// 当玩家准备好游戏时调用的块。
 @property (nonatomic, copy, nullable) void(^playerReadyToPlay)(id<TFY_PlayerMediaPlayback> asset, NSURL *assetURL);
 
-/// The block invoked when the player play progress changed.
+/// 当玩家游戏进程改变时调用的块。
 @property (nonatomic, copy, nullable) void(^playerPlayTimeChanged)(id<TFY_PlayerMediaPlayback> asset, NSTimeInterval currentTime, NSTimeInterval duration);
 
-/// The block invoked when the player play buffer changed.
+/// 当播放器播放缓冲区改变时调用的块。
 @property (nonatomic, copy, nullable) void(^playerBufferTimeChanged)(id<TFY_PlayerMediaPlayback> asset, NSTimeInterval bufferTime);
 
-/// The block invoked when the player playback state changed.
+/// 当播放器回放状态改变时调用的块。
 @property (nonatomic, copy, nullable) void(^playerPlayStateChanged)(id<TFY_PlayerMediaPlayback> asset, PlayerPlaybackState playState);
 
-/// The block invoked when the player load state changed.
+/// 当播放器加载状态改变时调用的块。
 @property (nonatomic, copy, nullable) void(^playerLoadStateChanged)(id<TFY_PlayerMediaPlayback> asset, PlayerLoadState loadState);
 
-/// The block invoked when the player play failed.
+/// 当播放器播放失败时调用的块。
 @property (nonatomic, copy, nullable) void(^playerPlayFailed)(id<TFY_PlayerMediaPlayback> asset, id error);
 
-/// The block invoked when the player play end.
+/// 当播放器播放结束时调用的块。
 @property (nonatomic, copy, nullable) void(^playerDidToEnd)(id<TFY_PlayerMediaPlayback> asset);
 
-// The block invoked when video size changed.
+// 当视频大小改变时调用的块。
 @property (nonatomic, copy, nullable) void(^presentationSizeChanged)(id<TFY_PlayerMediaPlayback> asset, CGSize size);
 
 /**
- Play the next url ,while the `assetURLs` is not NULL.
+ 播放下一个url，而' assetURLs '不是NULL。
  */
 - (void)playTheNext;
 
 /**
-  Play the previous url ,while the `assetURLs` is not NULL.
+ 播放之前的url，而' assetURLs '不是NULL。
  */
 - (void)playThePrevious;
 
 /**
- Play the index of url ,while the `assetURLs` is not NULL.
-
- @param index play the index.
+ 播放url的索引，而' assetURLs '不是NULL。
+ 指数玩指数。
  */
 - (void)playTheIndex:(NSInteger)index;
 
 /**
- Player stop and playerView remove from super view,remove other notification.
+ 播放器停止和playerView从超级视图删除，删除其他通知。
  */
 - (void)stop;
 
 /*!
- @method           replaceCurrentPlayerManager:
- @abstract         Replaces the player's current playeranager with the specified player item.
- @param            manager must conform `tfyPlayerMediaPlayback` protocol
- @discussion       The playerManager that will become the player's current playeranager.
+ replaceCurrentPlayerManager:
+ 将玩家当前的玩家管理器替换为指定的玩家项目。管理器必须符合' tfyPlayerMediaPlayback '协议
+ 将成为玩家当前玩家管理器的playerManager。
  */
 - (void)replaceCurrentPlayerManager:(id<TFY_PlayerMediaPlayback>)manager;
 
 /**
- Add video to cell.
+ 添加视频到单元格。
  */
 - (void)addPlayerViewToCell;
 
 /**
- Add video to container view.
+ 向容器视图添加视频。
  */
 - (void)addPlayerViewToContainerView:(UIView *)containerView;
 
 /**
- Add to small float view.
+ 添加到小浮动视图。
  */
 - (void)addPlayerViewToSmallFloatView;
 
 /**
- Stop the current playing video and remove the playerView.
+ 停止当前播放的视频并删除playerView。
  */
 - (void)stopCurrentPlayingView;
 
 /**
- stop the current playing video on cell.
+ 停止当前在单元格上播放的视频。
  */
 - (void)stopCurrentPlayingCell;
 
@@ -281,98 +275,98 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) TFY_OrientationObserver *orientationObserver;
 
-/// Whether automatic screen rotation is supported.
-/// The value is NO.
-/// This property is used for the return value of UIViewController `shouldAutorotate` method.
+///是否支持屏幕自动旋转
+///取值为NO。
+///该属性用于UIViewController的shouldautoroate方法的返回值。
 @property (nonatomic, readonly) BOOL shouldAutorotate;
 
-/// Whether allow the video orientation rotate.
-/// default is YES.
+///是否允许视频方向旋转。
+///默认是YES..
 @property (nonatomic) BOOL allowOrentitaionRotation;
 
-/// When tfyFullScreenMode is tfyFullScreenModeLandscape the orientation is LandscapeLeft or LandscapeRight, this value is YES.
-/// When tfyFullScreenMode is tfyFullScreenModePortrait, while the player fullSceen this value is YES.
+///当tfyFullScreenMode为tfyFullScreenModeLandscape时，朝向为庭园左或庭园右，此值为YES。
+///当tfyFullScreenMode为tfyFullScreenModePortrait时，当玩家fullscene时，此值为YES。
 @property (nonatomic, readonly) BOOL isFullScreen;
 
-/// when call the `stop` method, exit the fullScreen model, default is YES.
+/// 当调用' stop '方法时，退出fullScreen模型，默认为YES。
 @property (nonatomic, assign) BOOL exitFullScreenWhenStop;
 
-/// Lock the screen orientation.
+/// 锁定屏幕方向。
 @property (nonatomic, getter=isLockedScreen) BOOL lockedScreen;
 
 /// The block invoked When player will rotate.
 @property (nonatomic, copy, nullable) void(^orientationWillChange)(TFY_PlayerController *player, BOOL isFullScreen);
 
-/// The block invoked when player rotated.
+/// 当玩家旋转时，方块被调用。
 @property (nonatomic, copy, nullable) void(^orientationDidChanged)(TFY_PlayerController *player, BOOL isFullScreen);
 
-/// default is  UIStatusBarStyleLightContent.
+/// 默认是UIStatusBarStyleLightContent。
 @property (nonatomic, assign) UIStatusBarStyle fullScreenStatusBarStyle;
 
-/// defalut is UIStatusBarAnimationSlide.
+/// defalut是UIStatusBarAnimationSlide。
 @property (nonatomic, assign) UIStatusBarAnimation fullScreenStatusBarAnimation;
 
-/// The fullscreen statusbar hidden.
+/// 全屏状态栏隐藏。
 @property (nonatomic, getter=isStatusBarHidden) BOOL statusBarHidden;
 
 /**
- Add the device orientation observer.
+ 添加设备方向观测器。
  */
 - (void)addDeviceOrientationObserver;
 
 /**
- Remove the device orientation observer.
+ 移除设备方向观测器。
  */
 - (void)removeDeviceOrientationObserver;
 
 /**
- Enter the fullScreen while the tfyFullScreenMode is tfyFullScreenModeLandscape.
+ 当tfyFullScreenMode为tfyFullScreenModeLandscape时，进入fullScreen。
 
- @param orientation is UIInterfaceOrientation.
- @param animated is animated.
+ orientation是UIInterfaceOrientation。
+ 动画就是动画。
 */
 - (void)rotateToOrientation:(UIInterfaceOrientation)orientation animated:(BOOL)animated;
 
 /**
- Enter the fullScreen while the tfyFullScreenMode is tfyFullScreenModeLandscape.
+ 当tfyFullScreenMode为tfyFullScreenModeLandscape时，进入fullScreen。
 
- @param orientation is UIInterfaceOrientation.
- @param animated is animated.
- @param completion rotating completed callback.
+ orientation是UIInterfaceOrientation。
+ 动画就是动画。
+ 完成旋转已完成的回调。
 */
 - (void)rotateToOrientation:(UIInterfaceOrientation)orientation animated:(BOOL)animated completion:(void(^ __nullable)(void))completion;
 
 /**
- Enter the fullScreen while the tfyFullScreenMode is tfyFullScreenModePortrait.
+ 当tfyFullScreenMode为tfyFullScreenModePortrait时，进入fullScreen。
 
- @param fullScreen is fullscreen.
- @param animated is animated.
- @param completion rotating completed callback.
+ fullScreen是全屏。
+ 动画就是动画。
+ 完成旋转已完成的回调。
  */
 - (void)enterPortraitFullScreen:(BOOL)fullScreen animated:(BOOL)animated completion:(void(^ __nullable)(void))completion;
 
 /**
- Enter the fullScreen while the tfyFullScreenMode is tfyFullScreenModePortrait.
+ 当tfyFullScreenMode为tfyFullScreenModePortrait时，进入fullScreen。
 
- @param fullScreen is fullscreen.
- @param animated is animated.
+ fullScreen是全屏。
+ 动画就是动画。
  */
 - (void)enterPortraitFullScreen:(BOOL)fullScreen animated:(BOOL)animated;
 
 /**
- FullScreen mode is determined by tfyFullScreenMode.
+ 全屏模式由tfyFullScreenMode决定。
 
- @param fullScreen is fullscreen.
- @param animated is animated.
- @param completion rotating completed callback.
+ fullScreen是全屏。
+ 动画就是动画。
+ 完成旋转已完成的回调。
  */
 - (void)enterFullScreen:(BOOL)fullScreen animated:(BOOL)animated completion:(void(^ __nullable)(void))completion;
 
 /**
- FullScreen mode is determined by tfyFullScreenMode.
+ 全屏模式由tfyFullScreenMode决定。
 
- @param fullScreen is fullscreen.
- @param animated is animated.
+ fullScreen是全屏。
+ 动画就是动画。
  */
 - (void)enterFullScreen:(BOOL)fullScreen animated:(BOOL)animated;
 
@@ -393,100 +387,98 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface TFY_PlayerController (PlayerScrollView)
 
-/// The scrollView player should auto player, default is YES.
+/// scrollView播放器应该自动播放，默认是YES。
 @property (nonatomic) BOOL shouldAutoPlay;
 
-/// WWAN network auto play, only support in scrollView mode when the `shouldAutoPlay` is YES, default is NO.
+/// WWAN网络自动播放，只支持在scrollView模式下' shouldAutoPlay '为YES时，默认为NO。
 @property (nonatomic, getter=isWWANAutoPlay) BOOL WWANAutoPlay;
 
-/// The indexPath is playing.
+/// indexPath正在播放。
 @property (nonatomic, readonly, nullable) NSIndexPath *playingIndexPath;
 
-/// The indexPath should be play while scrolling.
+/// 滚动时应该播放indexPath。
 @property (nonatomic, readonly, nullable) NSIndexPath *shouldPlayIndexPath;
 
-/// The view tag that the player display in scrollView.
+/// 播放器在scrollView中显示的视图标签。
 @property (nonatomic, readonly) NSInteger containerViewTag;
 
-/// The current playing cell stop playing when the cell has out off the screen，defalut is YES.
+/// 当前播放的单元格在单元格退出屏幕时停止播放，默认为YES。
 @property (nonatomic) BOOL stopWhileNotVisible;
 
 /**
- The current player scroll slides off the screen percent.
- the property used when the `stopWhileNotVisible` is YES, stop the current playing player.
- the property used when the `stopWhileNotVisible` is NO, the current playing player add to small container view.
- The range is 0.0~1.0, defalut is 0.5.
- 0.0 is the player will disappear.
- 1.0 is the player did disappear.
+ 当前玩家滚动滑出屏幕的百分比。
+ ' stopWhileNotVisible '为YES时使用的属性，停止当前播放的播放器。
+ ' stopWhileNotVisible '为NO时使用的属性，当前播放的播放器添加到小容器视图。
+ 范围为0.0~1.0，默认值为0.5。
+ 0.0表示玩家将消失。
+ 1.0是玩家消失了。
  */
 @property (nonatomic) CGFloat playerDisapperaPercent;
 
 /**
- The current player scroll to the screen percent to play the video.
- The range is 0.0~1.0, defalut is 0.0.
- 0.0 is the player will appear.
- 1.0 is the player did appear.
+ 当前播放器滚动到屏幕百分比来播放视频。
+ 范围为0.0~1.0，默认值为0.0。
+ 0.0表示玩家将会出现。
+ 1.0是玩家确实出现了。
  */
 @property (nonatomic) CGFloat playerApperaPercent;
 
-/// If tableView or collectionView has more sections, use `sectionAssetURLs`.
+/// 如果tableView或collectionView有更多的section，使用' sectionAssetURLs '。
 @property (nonatomic, copy, nullable) NSArray <NSArray <NSURL *>*>*sectionAssetURLs;
 
-/// The block invoked When the player appearing.
+/// 当玩家出现时，方块被调用。
 @property (nonatomic, copy, nullable) void(^tfy_playerAppearingInScrollView)(NSIndexPath *indexPath, CGFloat playerApperaPercent);
 
-/// The block invoked When the player disappearing.
+/// 当玩家消失时，方块被调用。
 @property (nonatomic, copy, nullable) void(^tfy_playerDisappearingInScrollView)(NSIndexPath *indexPath, CGFloat playerDisapperaPercent);
 
-/// The block invoked When the player will appeared.
+/// 当玩家出现时，块被调用。
 @property (nonatomic, copy, nullable) void(^tfy_playerWillAppearInScrollView)(NSIndexPath *indexPath);
 
-/// The block invoked When the player did appeared.
+/// 当玩家出现时，方块被调用。
 @property (nonatomic, copy, nullable) void(^tfy_playerDidAppearInScrollView)(NSIndexPath *indexPath);
 
-/// The block invoked When the player will disappear.
+/// 当玩家消失时调用的块。
 @property (nonatomic, copy, nullable) void(^tfy_playerWillDisappearInScrollView)(NSIndexPath *indexPath);
 
-/// The block invoked When the player did disappeared.
+/// 当玩家消失时，方块被调用。
 @property (nonatomic, copy, nullable) void(^tfy_playerDidDisappearInScrollView)(NSIndexPath *indexPath);
 
-/// The block invoked When the player should play.
+/// 当玩家应该游戏时调用的块。
 @property (nonatomic, copy, nullable) void(^tfy_playerShouldPlayInScrollView)(NSIndexPath *indexPath);
 
-/// The block invoked When the player did stop scroll.
+/// 当玩家停止滚动时，方块被调用。
 @property (nonatomic, copy, nullable) void(^tfy_scrollViewDidEndScrollingCallback)(NSIndexPath *indexPath);
 
-/// Filter the cell that should be played when the scroll is stopped (to play when the scroll is stopped).
+/// 筛选当滚动停止时应该播放的单元格(当滚动停止时播放)。
 - (void)tfy_filterShouldPlayCellWhileScrolled:(void (^ __nullable)(NSIndexPath *indexPath))handler;
 
-/// Filter the cell that should be played while scrolling (you can use this to filter the highlighted cell).
+/// 在滚动时过滤应该播放的单元格(您可以使用此功能来过滤突出显示的单元格)。
 - (void)tfy_filterShouldPlayCellWhileScrolling:(void (^ __nullable)(NSIndexPath *indexPath))handler;
 
 /**
- Play the indexPath of url without scroll postion,  while the `assetURLs` or `sectionAssetURLs` is not NULL.
- 
- @param indexPath Play the indexPath of url.
+ 播放没有滚动位置的url的indexPath，而' assetURLs '或' sectionAssetURLs '不是NULL。
  */
 - (void)playTheIndexPath:(NSIndexPath *)indexPath;
 
 /**
- Play the indexPath of url, while the `assetURLs` or `sectionAssetURLs` is not NULL.
+ 播放url的indexPath，而' assetURLs '或' sectionAssetURLs '不是NULL。
 
- @param indexPath Play the indexPath of url.
- @param scrollPosition scroll position.
- @param animated scroll animation.
+ 播放url的indexPath。
+ scrollPosition滚动位置。
+ 动画滚动动画。
  */
 - (void)playTheIndexPath:(NSIndexPath *)indexPath
           scrollPosition:(PlayerScrollViewScrollPosition)scrollPosition
                 animated:(BOOL)animated;
 
 /**
- Play the indexPath of url with scroll postion, while the `assetURLs` or `sectionAssetURLs` is not NULL.
- 
- @param indexPath Play the indexPath of url.
- @param scrollPosition scroll position.
- @param animated scroll animation.
- @param completionHandler Scroll completion callback.
+ 滚动位置播放url的indexPath，而' assetURLs '或' sectionAssetURLs '不是NULL。
+
+ 播放url的indexPath。
+ scrollPosition滚动位置。
+ 动画滚动动画。
+ 滚动完成回调。
  */
 - (void)playTheIndexPath:(NSIndexPath *)indexPath
           scrollPosition:(PlayerScrollViewScrollPosition)scrollPosition
@@ -495,21 +487,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 /**
- Play the indexPath of url with scroll postion.
- 
- @param indexPath Play the indexPath of url
- @param assetURL The player URL.
+ 滚动位置播放url的indexPath。
+
+ 播放url的indexPath
+ assetURL播放器URL。
  */
 - (void)playTheIndexPath:(NSIndexPath *)indexPath assetURL:(NSURL *)assetURL;
 
 
 /**
- Play the indexPath of url with scroll postion.
- 
- @param indexPath Play the indexPath of url
- @param assetURL The player URL.
- @param scrollPosition  scroll position.
- @param animated scroll animation.
+ 滚动位置播放url的indexPath。
+
+ 播放url的indexPath
+ assetURL播放器URL。
+ scrollPosition滚动位置。
+ 动画滚动动画。
  */
 - (void)playTheIndexPath:(NSIndexPath *)indexPath
                 assetURL:(NSURL *)assetURL
@@ -517,13 +509,13 @@ NS_ASSUME_NONNULL_BEGIN
                 animated:(BOOL)animated;
 
 /**
- Play the indexPath of url with scroll postion.
- 
- @param indexPath Play the indexPath of url
- @param assetURL The player URL.
- @param scrollPosition  scroll position.
- @param animated scroll animation.
- @param completionHandler Scroll completion callback.
+ 滚动位置播放url的indexPath。
+
+ 播放url的indexPath
+ assetURL播放器URL。
+ scrollPosition滚动位置。
+ 动画滚动动画。
+ 滚动完成回调。
  */
 - (void)playTheIndexPath:(NSIndexPath *)indexPath
                 assetURL:(NSURL *)assetURL
