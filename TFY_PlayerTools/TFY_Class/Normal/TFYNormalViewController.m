@@ -128,6 +128,13 @@ static NSString *kVideoCover = @"https://upload-images.jianshu.io/upload_images/
             [self.pipController stopPictureInPicture];
             sender.selected = NO;
         } else {
+            @try {
+                    NSError *error = nil;
+                    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
+                    [[AVAudioSession sharedInstance] setActive:YES error:&error];
+                } @catch (NSException *exception) {
+                    NSLog(@"AVAudioSession错误");
+                }
             TFY_AVPlayerManager *manager = (TFY_AVPlayerManager *)self.player.currentPlayerManager;
             self.pipController = [[AVPictureInPictureController alloc] initWithPlayerLayer:manager.avPlayerLayer];
             if (@available(iOS 14.2, *)) {
