@@ -13,7 +13,7 @@
 
 static NSString *kVideoCover = @"https://upload-images.jianshu.io/upload_images/635942-14593722fe3f0695.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240";
 
-@interface TFYNormalViewController ()
+@interface TFYNormalViewController ()<AVPictureInPictureControllerDelegate>
 @property (nonatomic, strong) TFY_PlayerController *player;
 @property (nonatomic, strong) UIImageView *containerView;
 @property (nonatomic, strong) TFY_PlayerControlView *controlView;
@@ -22,6 +22,7 @@ static NSString *kVideoCover = @"https://upload-images.jianshu.io/upload_images/
 @property (nonatomic, strong) UIButton *nextBtn;
 @property (nonatomic, strong) UIButton *pipBtn;
 @property (nonatomic, strong) NSArray <NSURL *>*assetURLs;
+@property (nonatomic, strong) AVPictureInPictureController *pipController;
 @end
 
 @implementation TFYNormalViewController
@@ -121,20 +122,51 @@ static NSString *kVideoCover = @"https://upload-images.jianshu.io/upload_images/
     [self.controlView showTitle:@"iPhone X" coverURLString:kVideoCover fullScreenMode:FullScreenModeAutomatic];
 }
 
-- (void)picBtnClick {
-    /// 配置画中画
-    TFY_AVPlayerManager *manager = (TFY_AVPlayerManager *)self.player.currentPlayerManager;
-    AVPictureInPictureController *vc = [[AVPictureInPictureController alloc] initWithPlayerLayer:manager.avPlayerLayer];
-    ///要有延迟 否则可能开启不成功
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2.0*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-        if (vc.pictureInPictureActive) {
-            [vc stopPictureInPicture];
+- (void)picBtnClick:(UIButton *)sender {
+    if ([AVPictureInPictureController isPictureInPictureSupported]) {
+        if (self.pipController.isPictureInPictureActive) {
+            [self.pipController stopPictureInPicture];
+            sender.selected = NO;
         } else {
-            [vc startPictureInPicture];
+            TFY_AVPlayerManager *manager = (TFY_AVPlayerManager *)self.player.currentPlayerManager;
+            self.pipController = [[AVPictureInPictureController alloc] initWithPlayerLayer:manager.avPlayerLayer];
+            if (@available(iOS 14.2, *)) {
+                self.pipController.canStartPictureInPictureAutomaticallyFromInline = true;
+            }
+            self.pipController.delegate = self;
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [self.pipController startPictureInPicture];
+            });
+            sender.selected = YES;
         }
-    });
+    }
 }
 
+#pragma mark ------- 画中画代理，和画中画状态有关的逻辑 在代理中处理
+// 即将开启画中画
+- (void)pictureInPictureControllerWillStartPictureInPicture:(AVPictureInPictureController *)pictureInPictureController{
+    NSLog(@"即将开启画中画");
+}
+// 已经开启画中画
+- (void)pictureInPictureControllerDidStartPictureInPicture:(AVPictureInPictureController *)pictureInPictureController{
+    NSLog(@"已经开启画中画");
+}
+// 开启画中画失败
+- (void)pictureInPictureController:(AVPictureInPictureController *)pictureInPictureController failedToStartPictureInPictureWithError:(NSError *)error{
+    NSLog(@"开启画中画失败");
+}
+// 即将关闭画中画
+- (void)pictureInPictureControllerWillStopPictureInPicture:(AVPictureInPictureController *)pictureInPictureController{
+    NSLog(@"即将关闭画中画");
+}
+// 已经关闭画中画
+- (void)pictureInPictureControllerDidStopPictureInPicture:(AVPictureInPictureController *)pictureInPictureController{
+    NSLog(@"已经关闭画中画");
+}
+// 关闭画中画且恢复播放界面
+- (void)pictureInPictureController:(AVPictureInPictureController *)pictureInPictureController restoreUserInterfaceForPictureInPictureStopWithCompletionHandler:(void (^)(BOOL restored))completionHandler{
+    NSLog(@"关闭画中画且恢复播放界面");
+}
 
 - (void)changeVideo:(UIButton *)sender {
     NSString *URLString = @"https://www.apple.com.cn/105/media/cn/airpods-pro/2022/d2deeb8e-83eb-48ea-9721-f567cf0fffa8/films/under-the-spell/airpods-pro-under-the-spell-tpl-cn-2022_16x9.m3u8";
@@ -234,7 +266,7 @@ static NSString *kVideoCover = @"https://upload-images.jianshu.io/upload_images/
     if (!_pipBtn) {
         _pipBtn = [UIButton buttonWithType:UIButtonTypeSystem];
         [_pipBtn setTitle:@"开启画中画" forState:UIControlStateNormal];
-        [_pipBtn addTarget:self action:@selector(picBtnClick) forControlEvents:UIControlEventTouchUpInside];
+        [_pipBtn addTarget:self action:@selector(picBtnClick:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _pipBtn;
 }
