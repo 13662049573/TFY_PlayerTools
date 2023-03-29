@@ -294,7 +294,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// 锁定屏幕方向。
 @property (nonatomic, getter=isLockedScreen) BOOL lockedScreen;
 
-/// The block invoked When player will rotate.
+/// 当玩家旋转时调用的方块。
 @property (nonatomic, copy, nullable) void(^orientationWillChange)(TFY_PlayerController *player, BOOL isFullScreen);
 
 /// 当玩家旋转时，方块被调用。
