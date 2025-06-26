@@ -542,23 +542,13 @@
 
 #pragma mark - Private Method
 
-- (void)sliderValueChangingValue:(CGFloat)value isForward:(BOOL)forward {
-    if (self.horizontalPanShowControlView) {
-        /// 显示控制层
-        [self showControlViewWithAnimated:NO];
-        [self cancelAutoFadeOutControlView];
-    }
-    
-    self.fastProgressView.value = value;
+- (void)sliderValueChanged:(CGFloat)value isForward:(BOOL)forward {
     self.fastView.hidden = NO;
-    self.fastView.alpha = 1;
-    if (forward) {
-        self.fastImageView.image = Player_Image(@"Player_fast_forward");
-    } else {
-        self.fastImageView.image = Player_Image(@"Player_fast_backward");
-    }
-    NSString *draggedTime = [TFY_ITools convertTimeSecond:self.player.totalTime*value];
-    NSString *totalTime = [TFY_ITools convertTimeSecond:self.player.totalTime];
+    self.fastProgressView.value = value;
+    
+    // 使用缓存的时间转换方法
+    NSString *draggedTime = [self.player cachedTimeString:self.player.totalTime*value];
+    NSString *totalTime = [self.player cachedTimeString:self.player.totalTime];
     self.fastTimeLabel.text = [NSString stringWithFormat:@"%@ / %@",draggedTime,totalTime];
     /// 更新滑杆
     [self.portraitControlView sliderValueChanged:value currentTimeString:draggedTime];
@@ -567,7 +557,10 @@
     self.bottomPgrogress.value = value;
 
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideFastView) object:nil];
-    [self performSelector:@selector(hideFastView) withObject:nil afterDelay:0.1];
+    // 使用更安全的延迟执行方法
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self hideFastView];
+    });
     
     if (self.fastViewAnimated) {
         [UIView animateWithDuration:0.4 animations:^{

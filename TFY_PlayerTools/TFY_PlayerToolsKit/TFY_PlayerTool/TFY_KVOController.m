@@ -1,111 +1,103 @@
 //
 //  TFY_KVOController.m
-//  TFY_PlayerView
+//  TFY_PlayerTools
 //
-//  Created by 田风有 on 2019/6/30.
-//  Copyright © 2019 田风有. All rights reserved.
+//  Created by 田风有 on 2023/3/16.
+//  Copyright © 2023 田风有. All rights reserved.
 //
 
 #import "TFY_KVOController.h"
 
+// 调试日志控制宏
+#ifdef DEBUG
+    #define TFYKVOLog(fmt, ...) NSLog((@"[TFY_KVO] " fmt), ##__VA_ARGS__)
+#else
+    #define TFYKVOLog(fmt, ...)
+#endif
+
 @interface TFY_KVOEntry : NSObject
-@property (nonatomic, weak)   NSObject *observer;
-@property (nonatomic, strong) NSString *keyPath;
+@property (nonatomic, weak) id observer;
+@property (nonatomic, copy) NSString *keyPath;
+@property (nonatomic, copy) void(^block)(id obj, NSDictionary *change);
 @end
 
 @implementation TFY_KVOEntry
 @end
 
 @interface TFY_KVOController ()
-@property (nonatomic, weak) NSObject *target;
-@property (nonatomic, strong) NSMutableArray *observerArray;
+@property (nonatomic, strong) NSMutableArray<TFY_KVOEntry *> *entries;
 @end
 
 @implementation TFY_KVOController
 
-- (instancetype)initWithTarget:(NSObject *)target {
+- (instancetype)init {
     self = [super init];
     if (self) {
-        _target = target;
-        _observerArray = [[NSMutableArray alloc] init];
+        _entries = [NSMutableArray array];
     }
     return self;
 }
 
-- (void)safelyAddObserver:(NSObject *)observer
-               forKeyPath:(NSString *)keyPath
-                  options:(NSKeyValueObservingOptions)options
-                  context:(void *_Nullable)context {
-    if (_target == nil) return;
-    
-    NSInteger indexEntry = [self indexEntryOfObserver:observer forKeyPath:keyPath];
-    if (indexEntry != NSNotFound) {
-        // duplicated register
-        NSLog(@"duplicated observer");
-    } else {
-        @try {
-            [_target addObserver:observer
-                     forKeyPath:keyPath
-                        options:options
-                        context:context];
-            
-            TFY_KVOEntry *entry = [[TFY_KVOEntry alloc] init];
-            entry.observer = observer;
-            entry.keyPath  = keyPath;
-            [_observerArray addObject:entry];
-        } @catch (NSException *e) {
-            NSLog(@"TFYKVO: failed to add observer for %@\n", keyPath);
+- (void)addObserver:(id)observer forKeyPath:(NSString *)keyPath options:(NSKeyValueObservingOptions)options block:(void(^)(id obj, NSDictionary *change))block {
+    // 检查是否已经存在相同的观察者
+    for (TFY_KVOEntry *entry in self.entries) {
+        if (entry.observer == observer && [entry.keyPath isEqualToString:keyPath]) {
+            TFYKVOLog(@"duplicated observer");
+            return;
         }
+    }
+    
+    TFY_KVOEntry *entry = [[TFY_KVOEntry alloc] init];
+    entry.observer = observer;
+    entry.keyPath = keyPath;
+    entry.block = block;
+    
+    @try {
+        [observer addObserver:self forKeyPath:keyPath options:options context:(__bridge void *)(entry)];
+        [self.entries addObject:entry];
+    } @catch (NSException *e) {
+        TFYKVOLog(@"TFYKVO: failed to add observer for %@\n", keyPath);
     }
 }
 
-- (void)safelyRemoveObserver:(NSObject *)observer
-                  forKeyPath:(NSString *)keyPath {
-    if (_target == nil) return;
-    
-    NSInteger indexEntry = [self indexEntryOfObserver:observer forKeyPath:keyPath];
-    if (indexEntry == NSNotFound) {
-        // duplicated register
-        NSLog(@"duplicated observer");
-    } else {
-        [_observerArray removeObjectAtIndex:indexEntry];
-        @try {
-            [_target removeObserver:observer
-                            forKeyPath:keyPath];
-        } @catch (NSException *e) {
-            NSLog(@"TFYKVO: failed to remove observer for %@\n", keyPath);
+- (void)removeObserver:(id)observer forKeyPath:(NSString *)keyPath {
+    // 检查是否已经存在相同的观察者
+    for (TFY_KVOEntry *entry in self.entries) {
+        if (entry.observer == observer && [entry.keyPath isEqualToString:keyPath]) {
+            TFYKVOLog(@"duplicated observer");
+            return;
         }
+    }
+    
+    @try {
+        [observer removeObserver:self forKeyPath:keyPath];
+    } @catch (NSException *e) {
+        TFYKVOLog(@"TFYKVO: failed to remove observer for %@\n", keyPath);
     }
 }
 
-- (void)safelyRemoveAllObservers {
-    if (_target == nil) return;
-    [_observerArray enumerateObjectsUsingBlock:^(TFY_KVOEntry *entry, NSUInteger idx, BOOL *stop) {
-        if (entry == nil) return;
-        NSObject *observer = entry.observer;
-        if (observer == nil) return;
-        @try {
-            [_target removeObserver:observer
-                        forKeyPath:entry.keyPath];
-        } @catch (NSException *e) {
-            NSLog(@"TFYKVO: failed to remove observer for %@\n", entry.keyPath);
+- (void)removeAllObservers {
+    for (TFY_KVOEntry *entry in self.entries) {
+        if (entry.observer) {
+            @try {
+                [entry.observer removeObserver:self forKeyPath:entry.keyPath];
+            } @catch (NSException *e) {
+                TFYKVOLog(@"TFYKVO: failed to remove observer for %@\n", entry.keyPath);
+            }
         }
-    }];
-    
-    [_observerArray removeAllObjects];
+    }
+    [self.entries removeAllObjects];
 }
 
-- (NSInteger)indexEntryOfObserver:(NSObject *)observer
-                   forKeyPath:(NSString *)keyPath {
-    __block NSInteger foundIndex = NSNotFound;
-    [_observerArray enumerateObjectsUsingBlock:^(TFY_KVOEntry *entry, NSUInteger idx, BOOL *stop) {
-        if (entry.observer == observer &&
-            [entry.keyPath isEqualToString:keyPath]) {
-            foundIndex = idx;
-            *stop = YES;
-        }
-    }];
-    return foundIndex;
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    TFY_KVOEntry *entry = (__bridge TFY_KVOEntry *)(context);
+    if (entry.block) {
+        entry.block(object, change);
+    }
+}
+
+- (void)dealloc {
+    [self removeAllObservers];
 }
 
 @end

@@ -375,16 +375,19 @@
 }
 
 - (void)setImage:(UIImage *)image isFromCache:(BOOL)isFromCache {
+    // 避免重复设置相同的图片
+    if (self.image == image) {
+        return;
+    }
+    
     self.image = image;
     if (!isFromCache && image) {
         // 只有在图片真正改变时才添加动画
-        if (self.image != image) {
-            CATransition *animation = [CATransition animation];
-            [animation setDuration:0.3f]; // 减少动画时间
-            [animation setType:kCATransitionFade];
-            animation.removedOnCompletion = YES;
-            [self.layer addAnimation:animation forKey:@"transition"];
-        }
+        CATransition *animation = [CATransition animation];
+        [animation setDuration:0.2f]; // 进一步减少动画时间
+        [animation setType:kCATransitionFade];
+        animation.removedOnCompletion = YES;
+        [self.layer addAnimation:animation forKey:@"transition"];
     }
 }
 

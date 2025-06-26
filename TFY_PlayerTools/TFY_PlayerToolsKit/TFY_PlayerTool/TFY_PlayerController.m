@@ -19,6 +19,22 @@
 #import "TFY_PlayerConstants.h"
 #import "TFY_PlayerPerformanceOptimizer.h"
 
+// 调试日志控制宏
+#ifdef DEBUG
+    #define TFYPlayerLog(fmt, ...) NSLog((@"[TFY_Player] " fmt), ##__VA_ARGS__)
+    #define TFYPlayerLogInfo(fmt, ...) NSLog((@"[TFY_Player] INFO: " fmt), ##__VA_ARGS__)
+    #define TFYPlayerLogError(fmt, ...) NSLog((@"[TFY_Player] ERROR: " fmt), ##__VA_ARGS__)
+#else
+    #define TFYPlayerLog(fmt, ...)
+    #define TFYPlayerLogInfo(fmt, ...)
+    #define TFYPlayerLogError(fmt, ...)
+#endif
+
+// 缓存键定义
+static NSString * const kPlayerStateCacheKey = @"player_state";
+static NSString * const kPlayerConfigCacheKey = @"player_config";
+static NSString * const kPlayerTimeCacheKey = @"player_time";
+
 static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 
 @interface TFY_PlayerController () <AVPictureInPictureControllerDelegate>
@@ -40,6 +56,11 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 /// 画中画连续播放重试次数
 @property (nonatomic, assign) NSInteger pipRetryCount;
 
+// 性能优化相关属性
+@property (nonatomic, strong) NSCache *playerCache;
+@property (nonatomic, assign) BOOL isPlayerReady;
+@property (nonatomic, strong) dispatch_queue_t backgroundQueue;
+
 @end
 
 @implementation TFY_PlayerController
@@ -54,6 +75,13 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
         dispatch_once(&onceToken, ^{
             _tfyPlayRecords = @{}.mutableCopy;
         });
+        
+        // 初始化性能优化相关属性
+        self.playerCache = [[NSCache alloc] init];
+        self.playerCache.countLimit = 50;
+        self.playerCache.totalCostLimit = 10 * 1024 * 1024; // 10MB
+        self.isPlayerReady = NO;
+        self.backgroundQueue = dispatch_queue_create("com.tfy.player.background", DISPATCH_QUEUE_SERIAL);
         
         // 启用性能优化和监控
         TFY_PlayerPerformanceOptimizer *optimizer = [TFY_PlayerPerformanceOptimizer sharedOptimizer];
@@ -89,6 +117,15 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
     [self.currentPlayerManager stop];
     // 停止性能监控
     [[TFY_PlayerPerformanceOptimizer sharedOptimizer] stopPerformanceMonitoring];
+    
+    // 清理缓存
+    [self.playerCache removeAllObjects];
+    self.playerCache = nil;
+    
+    // 清理播放记录
+    if (_tfyPlayRecords) {
+        [_tfyPlayRecords removeAllObjects];
+    }
 }
 
 + (instancetype)playerWithPlayerManager:(id<TFY_PlayerMediaPlayback>)playerManager containerView:(nonnull UIView *)containerView {
@@ -136,6 +173,9 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
     @player_weakify(self)
     self.currentPlayerManager.playerPrepareToPlay = ^(id<TFY_PlayerMediaPlayback>  _Nonnull asset, NSURL * _Nonnull assetURL) {
         @player_strongify(self)
+        // 应用缓存的配置
+        [self applyCachedPlayerConfig];
+        
         if (self.resumePlayRecord && [_tfyPlayRecords valueForKey:assetURL.absoluteString]) {
             NSTimeInterval seekTime = [_tfyPlayRecords valueForKey:assetURL.absoluteString].doubleValue;
             self.currentPlayerManager.seekTime = seekTime;
@@ -154,6 +194,10 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
     
     self.currentPlayerManager.playerReadyToPlay = ^(id<TFY_PlayerMediaPlayback>  _Nonnull asset, NSURL * _Nonnull assetURL) {
         @player_strongify(self)
+        self.isPlayerReady = YES;
+        // 缓存播放器状态
+        [self cachePlayerState];
+        
         if (self.playerReadyToPlay) self.playerReadyToPlay(asset,assetURL);
         if (!self.customAudioSession) {
             // Apps using this category don't mute when the phone's mute button is turned on, but play sound when the phone is silent
@@ -171,6 +215,14 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
         }
         if (self.currentPlayerManager.assetURL.absoluteString) {
             [_tfyPlayRecords setValue:@(currentTime) forKey:self.currentPlayerManager.assetURL.absoluteString];
+        }
+        
+        // 定期缓存播放器状态（每5秒）
+        static NSTimeInterval lastCacheTime = 0;
+        NSTimeInterval now = CACurrentMediaTime();
+        if (now - lastCacheTime > 5.0) {
+            [self cachePlayerState];
+            lastCacheTime = now;
         }
     };
     
@@ -577,42 +629,36 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 
 // 画中画模式下的资源切换方法
 - (void)switchToNewAssetInPipMode:(NSURL *)assetURL {
-    NSLog(@"TFY_PlayerController: switchToNewAssetInPipMode - 开始切换资源，尝试保持画中画");
+    TFYPlayerLogInfo(@"switchToNewAssetInPipMode - 开始切换资源，尝试保持画中画");
     
     // 获取当前的AVPlayer实例
-    if ([self.currentPlayerManager respondsToSelector:@selector(player)]) {
-        AVPlayer *player = [self.currentPlayerManager performSelector:@selector(player)];
+    AVPlayer *player = [self getCurrentPlayer];
+    
+    if (player) {
+        // 创建新的AVPlayerItem而不是重新创建整个播放器
+        AVURLAsset *asset = [AVURLAsset URLAssetWithURL:assetURL options:nil];
+        AVPlayerItem *newPlayerItem = [AVPlayerItem playerItemWithAsset:asset];
         
-        if (player) {
-            // 创建新的AVPlayerItem而不是重新创建整个播放器
-            AVURLAsset *asset = [AVURLAsset URLAssetWithURL:assetURL options:nil];
-            AVPlayerItem *newPlayerItem = [AVPlayerItem playerItemWithAsset:asset];
-            
-            NSLog(@"TFY_PlayerController: switchToNewAssetInPipMode - 替换PlayerItem");
-            
-            // 暂停当前播放
-            [player pause];
-            
-            // 替换PlayerItem
-            [player replaceCurrentItemWithPlayerItem:newPlayerItem];
-            
-            // 等待新item准备就绪后开始播放
-            [self observeNewPlayerItemForPip:newPlayerItem];
-        } else {
-            NSLog(@"TFY_PlayerController: switchToNewAssetInPipMode - 无法获取AVPlayer，使用普通方式");
-            // 如果无法获取AVPlayer，回退到普通方式
-            [self fallbackToNormalAssetSwitch:assetURL];
-        }
+        TFYPlayerLogInfo(@"switchToNewAssetInPipMode - 替换PlayerItem");
+        
+        // 暂停当前播放
+        [player pause];
+        
+        // 替换PlayerItem
+        [player replaceCurrentItemWithPlayerItem:newPlayerItem];
+        
+        // 等待新item准备就绪后开始播放
+        [self observeNewPlayerItemForPip:newPlayerItem];
     } else {
-        NSLog(@"TFY_PlayerController: switchToNewAssetInPipMode - 播放器管理器不支持player方法，使用普通方式");
-        // 如果播放器管理器不支持player方法，回退到普通方式
+        TFYPlayerLogInfo(@"switchToNewAssetInPipMode - 无法获取AVPlayer，使用普通方式");
+        // 如果无法获取AVPlayer，回退到普通方式
         [self fallbackToNormalAssetSwitch:assetURL];
     }
 }
 
 // 回退到普通的资源切换方式
 - (void)fallbackToNormalAssetSwitch:(NSURL *)assetURL {
-    NSLog(@"TFY_PlayerController: fallbackToNormalAssetSwitch - 使用普通方式切换资源");
+    TFYPlayerLogInfo(@"fallbackToNormalAssetSwitch - 使用普通方式切换资源");
     
     // 记录画中画状态
     BOOL wasPipActive = [self isPictureInPictureActive];
@@ -633,22 +679,14 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 
 // 专门为画中画模式设计的资源切换方法  
 - (void)switchAssetURLForPipMode:(NSURL *)assetURL {
-    NSLog(@"TFY_PlayerController: switchAssetURLForPipMode - 开始画中画模式资源切换");
+    TFYPlayerLogInfo(@"switchAssetURLForPipMode - 开始画中画模式资源切换");
     
     // 获取当前的AVPlayer和AVPlayerLayer
-    AVPlayer *currentPlayer = nil;
-    AVPlayerLayer *currentPlayerLayer = nil;
-    
-    if ([self.currentPlayerManager respondsToSelector:@selector(player)]) {
-        currentPlayer = [self.currentPlayerManager performSelector:@selector(player)];
-    }
-    
-    if ([self.currentPlayerManager respondsToSelector:@selector(avPlayerLayer)]) {
-        currentPlayerLayer = [self.currentPlayerManager performSelector:@selector(avPlayerLayer)];
-    }
+    AVPlayer *currentPlayer = [self getCurrentPlayer];
+    AVPlayerLayer *currentPlayerLayer = [self getCurrentPlayerLayer];
     
     if (currentPlayer && currentPlayerLayer) {
-        NSLog(@"TFY_PlayerController: switchAssetURLForPipMode - 手动替换PlayerItem");
+        TFYPlayerLogInfo(@"switchAssetURLForPipMode - 手动替换PlayerItem");
         
         // 暂停当前播放
         [currentPlayer pause];
@@ -667,10 +705,50 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
         [self observeNewPlayerItemForPip:newPlayerItem];
         
     } else {
-        NSLog(@"TFY_PlayerController: switchAssetURLForPipMode - 无法获取Player或PlayerLayer，使用普通方式");
+        TFYPlayerLogInfo(@"switchAssetURLForPipMode - 无法获取Player或PlayerLayer，使用普通方式");
         // 如果无法获取必要的对象，回退到正常方式
         self.currentPlayerManager.assetURL = assetURL;
     }
+}
+
+// 安全获取当前AVPlayer的方法
+- (AVPlayer *)getCurrentPlayer {
+    // 先从缓存获取
+    NSString *cacheKey = [NSString stringWithFormat:@"player_%@", self.currentPlayerManager.assetURL.absoluteString];
+    AVPlayer *cachedPlayer = [self.playerCache objectForKey:cacheKey];
+    if (cachedPlayer) {
+        return cachedPlayer;
+    }
+    
+    if ([self.currentPlayerManager respondsToSelector:@selector(player)]) {
+        AVPlayer *player = [self.currentPlayerManager performSelector:@selector(player)];
+        if (player) {
+            // 缓存player实例
+            [self.playerCache setObject:player forKey:cacheKey cost:1];
+        }
+        return player;
+    }
+    return nil;
+}
+
+// 安全获取当前AVPlayerLayer的方法
+- (AVPlayerLayer *)getCurrentPlayerLayer {
+    // 先从缓存获取
+    NSString *cacheKey = [NSString stringWithFormat:@"playerLayer_%@", self.currentPlayerManager.assetURL.absoluteString];
+    AVPlayerLayer *cachedLayer = [self.playerCache objectForKey:cacheKey];
+    if (cachedLayer) {
+        return cachedLayer;
+    }
+    
+    if ([self.currentPlayerManager respondsToSelector:@selector(avPlayerLayer)]) {
+        AVPlayerLayer *layer = [self.currentPlayerManager performSelector:@selector(avPlayerLayer)];
+        if (layer) {
+            // 缓存layer实例
+            [self.playerCache setObject:layer forKey:cacheKey cost:1];
+        }
+        return layer;
+    }
+    return nil;
 }
 
 // 手动更新播放器管理器的内部引用
@@ -2170,16 +2248,87 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
     TFY_PlayerPerformanceOptimizer *optimizer = [TFY_PlayerPerformanceOptimizer sharedOptimizer];
     [optimizer clearMemoryCache];
     
-    // 如果当前没有播放，可以释放一些资源
-    if (!self.currentPlayerManager.isPlaying) {
-        // 清理控制视图的一些临时资源
-        // 移除对不存在方法的调用
-        // if ([self.controlView respondsToSelector:@selector(clearTemporaryResources)]) {
-        //     [self.controlView performSelector:@selector(clearTemporaryResources)];
-        // }
-    }
+    // 清理播放器缓存
+    [self.playerCache removeAllObjects];
     
     TFYPlayerLogInfo(@"内存清理已完成");
+}
+
+@end
+
+#pragma mark - Player Cache Management
+
+@implementation TFY_PlayerController (PlayerCache)
+
+// 缓存播放器状态
+- (void)cachePlayerState {
+    if (!self.currentPlayerManager.assetURL) return;
+    
+    NSMutableDictionary *state = [NSMutableDictionary dictionary];
+    state[@"isPlaying"] = @(self.currentPlayerManager.isPlaying);
+    state[@"currentTime"] = @(self.currentPlayerManager.currentTime);
+    state[@"totalTime"] = @(self.currentPlayerManager.totalTime);
+    state[@"bufferTime"] = @(self.currentPlayerManager.bufferTime);
+    state[@"loadState"] = @(self.currentPlayerManager.loadState);
+    state[@"playState"] = @(self.currentPlayerManager.playState);
+    state[@"presentationSize"] = [NSValue valueWithCGSize:self.currentPlayerManager.presentationSize];
+    
+    NSString *cacheKey = [NSString stringWithFormat:@"%@_%@", kPlayerStateCacheKey, self.currentPlayerManager.assetURL.absoluteString];
+    [self.playerCache setObject:state forKey:cacheKey cost:5];
+}
+
+// 获取缓存的播放器状态
+- (NSDictionary *)getCachedPlayerState {
+    if (!self.currentPlayerManager.assetURL) return nil;
+    
+    NSString *cacheKey = [NSString stringWithFormat:@"%@_%@", kPlayerStateCacheKey, self.currentPlayerManager.assetURL.absoluteString];
+    return [self.playerCache objectForKey:cacheKey];
+}
+
+// 缓存播放器配置
+- (void)cachePlayerConfig {
+    NSMutableDictionary *config = [NSMutableDictionary dictionary];
+    config[@"volume"] = @(self.volume);
+    config[@"brightness"] = @(self.brightness);
+    config[@"muted"] = @(self.isMuted);
+    config[@"shouldAutoPlayNext"] = @(self.shouldAutoPlayNext);
+    config[@"shouldLoopPlay"] = @(self.shouldLoopPlay);
+    config[@"pauseWhenAppResignActive"] = @(self.pauseWhenAppResignActive);
+    
+    [self.playerCache setObject:config forKey:kPlayerConfigCacheKey cost:3];
+}
+
+// 获取缓存的播放器配置
+- (NSDictionary *)getCachedPlayerConfig {
+    return [self.playerCache objectForKey:kPlayerConfigCacheKey];
+}
+
+// 应用缓存的配置
+- (void)applyCachedPlayerConfig {
+    NSDictionary *config = [self getCachedPlayerConfig];
+    if (config) {
+        if (config[@"volume"]) self.volume = [config[@"volume"] floatValue];
+        if (config[@"brightness"]) self.brightness = [config[@"brightness"] floatValue];
+        if (config[@"muted"]) self.muted = [config[@"muted"] boolValue];
+        if (config[@"shouldAutoPlayNext"]) self.shouldAutoPlayNext = [config[@"shouldAutoPlayNext"] boolValue];
+        if (config[@"shouldLoopPlay"]) self.shouldLoopPlay = [config[@"shouldLoopPlay"] boolValue];
+        if (config[@"pauseWhenAppResignActive"]) self.pauseWhenAppResignActive = [config[@"pauseWhenAppResignActive"] boolValue];
+    }
+}
+
+// 缓存时间转换结果
+- (NSString *)cachedTimeString:(NSTimeInterval)time {
+    NSString *cacheKey = [NSString stringWithFormat:@"%@_%.0f", kPlayerTimeCacheKey, time];
+    NSString *cachedString = [self.playerCache objectForKey:cacheKey];
+    if (cachedString) {
+        return cachedString;
+    }
+    
+    NSString *timeString = [TFY_ITools convertTimeSecond:time];
+    if (timeString) {
+        [self.playerCache setObject:timeString forKey:cacheKey cost:1];
+    }
+    return timeString;
 }
 
 @end

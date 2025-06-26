@@ -61,10 +61,19 @@
     self.globalCache.totalCostLimit = self.memoryCacheLimit;
     self.globalCache.countLimit = 200;
     
+    // 设置缓存清理策略
+    self.globalCache.evictsObjectsWithDiscardedContent = YES;
+    
     // 监听内存警告
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(handleMemoryWarning)
                                                  name:UIApplicationDidReceiveMemoryWarningNotification
+                                               object:nil];
+    
+    // 监听应用进入后台
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(handleAppDidEnterBackground)
+                                                 name:UIApplicationDidEnterBackgroundNotification
                                                object:nil];
 }
 
@@ -182,6 +191,11 @@
 }
 
 #pragma mark - 内存警告处理
+
+- (void)handleAppDidEnterBackground {
+    // 应用进入后台时清理部分缓存
+    [self.globalCache removeAllObjects];
+}
 
 - (void)handleMemoryWarning {
     // 清理一半的缓存
