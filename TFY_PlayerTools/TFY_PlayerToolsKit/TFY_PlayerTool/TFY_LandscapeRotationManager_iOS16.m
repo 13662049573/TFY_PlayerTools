@@ -21,10 +21,24 @@
 - (void)setNeedsUpdateOfSupportedInterfaceOrientations {
     if (@available(iOS 16.0, *)) {
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 160000
-        [UIApplication.sharedApplication.keyWindow.rootViewController setNeedsUpdateOfSupportedInterfaceOrientations];
+        UIWindow *keyWindow = nil;
+        for (UIWindowScene *scene in [UIApplication sharedApplication].connectedScenes) {
+            if (scene.activationState == UISceneActivationStateForegroundActive) {
+                keyWindow = scene.windows.firstObject;
+                break;
+            }
+        }
+        [keyWindow.rootViewController setNeedsUpdateOfSupportedInterfaceOrientations];
         [self.window.rootViewController setNeedsUpdateOfSupportedInterfaceOrientations];
 #else
-        [(id)UIApplication.sharedApplication.keyWindow.rootViewController setNeedsUpdateOfSupportedInterfaceOrientations];
+        UIWindow *keyWindow = nil;
+        for (UIWindowScene *scene in [UIApplication sharedApplication].connectedScenes) {
+            if (scene.activationState == UISceneActivationStateForegroundActive) {
+                keyWindow = scene.windows.firstObject;
+                break;
+            }
+        }
+        [(id)keyWindow.rootViewController setNeedsUpdateOfSupportedInterfaceOrientations];
         [(id)self.window.rootViewController setNeedsUpdateOfSupportedInterfaceOrientations];
 #endif
     }

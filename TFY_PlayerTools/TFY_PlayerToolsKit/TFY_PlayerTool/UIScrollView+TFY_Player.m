@@ -11,6 +11,7 @@
 #import "TFY_ReachabilityManager.h"
 #import "TFY_KVOController.h"
 #import "TFY_PlayerToolsHeader.h"
+#import "TFY_PlayerPerformanceOptimizer.h"
 
 #define Player_WS(weakSelf)  __weak __typeof(&*self)weakSelf = self;
 
@@ -498,61 +499,40 @@ Scroll to indexPath with position.
  Find the playing cell while the scrollDirection is horizontal.
  */
 - (void)_findCorrectCellWhenScrollViewDirectionHorizontal:(void (^ __nullable)(NSIndexPath *indexPath))handler {
-    if (!self.tfy_shouldAutoPlay) return;
-    if (self.tfy_containerType == PlayerContainerTypeView) return;
-    if (!self.tfy_stopWhileNotVisible) {
-        /// If you have a cell that is playing, stop the traversal.
-        if (self.tfy_playingIndexPath) {
-            NSIndexPath *finalIndexPath = self.tfy_playingIndexPath;
-            if (self.tfy_scrollViewDidScrollCallback) self.tfy_scrollViewDidScrollCallback(finalIndexPath);
-            if (handler) handler(finalIndexPath);
-            self.tfy_shouldPlayIndexPath = finalIndexPath;
-            return;
-        }
-    }
-    
     NSArray *visiableCells = nil;
     NSIndexPath *indexPath = nil;
-    BOOL isLast = self.contentOffset.x + self.frame.size.width >= self.contentSize.width;
     if ([self _isTableView]) {
         UITableView *tableView = (UITableView *)self;
         visiableCells = [tableView visibleCells];
-        // First visible cell indexPath
+        /// Start with the first visible cell
         indexPath = tableView.indexPathsForVisibleRows.firstObject;
-        if ((self.contentOffset.x <= 0 || isLast) && (!self.tfy_playingIndexPath || [indexPath compare:self.tfy_playingIndexPath] == NSOrderedSame)) {
-            UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-            UIView *playerView = [cell viewWithTag:self.tfy_containerViewTag];
-            if (playerView && !playerView.hidden && playerView.alpha > 0.01) {
-                if (self.tfy_scrollViewDidScrollCallback) self.tfy_scrollViewDidScrollCallback(indexPath);
-                if (handler) handler(indexPath);
-                self.tfy_shouldPlayIndexPath = indexPath;
-                return;
-            }
-        }
     } else if ([self _isCollectionView]) {
         UICollectionView *collectionView = (UICollectionView *)self;
         visiableCells = [collectionView visibleCells];
         NSArray *sortedIndexPaths = [collectionView.indexPathsForVisibleItems sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
             return [obj1 compare:obj2];
         }];
-        
-        visiableCells = [visiableCells sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
-            NSIndexPath *path1 = (NSIndexPath *)[collectionView indexPathForCell:obj1];
-            NSIndexPath *path2 = (NSIndexPath *)[collectionView indexPathForCell:obj2];
-            return [path1 compare:path2];
-        }];
-        
-        // First visible cell indexPath
-        indexPath = isLast ? sortedIndexPaths.lastObject : sortedIndexPaths.firstObject;
-        if ((self.contentOffset.x <= 0 || isLast) && (!self.tfy_playingIndexPath || [indexPath compare:self.tfy_playingIndexPath] == NSOrderedSame)) {
-            UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
-            UIView *playerView = [cell viewWithTag:self.tfy_containerViewTag];
-            if (playerView && !playerView.hidden && playerView.alpha > 0.01) {
-                if (self.tfy_scrollViewDidScrollCallback) self.tfy_scrollViewDidScrollCallback(indexPath);
-                if (handler) handler(indexPath);
-                self.tfy_shouldPlayIndexPath = indexPath;
-                return;
-            }
+        indexPath = sortedIndexPaths.firstObject;
+    }
+    if (!visiableCells.count) return;
+    
+    // 缓存已显示的播放视图
+    static NSMutableSet *visiblePlayerViews = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        visiblePlayerViews = [NSMutableSet set];
+    });
+    [visiblePlayerViews removeAllObjects];
+    
+    for (UIView *cell in visiableCells) {
+        NSIndexPath *indexPath = [self tfy_getIndexPathForCell:cell];
+        UIView *playerView = [cell viewWithTag:self.tfy_containerViewTag];
+        if (playerView && !playerView.hidden && playerView.alpha > 0.01) {
+            [visiblePlayerViews addObject:playerView];
+            if (self.tfy_scrollViewDidScrollCallback) self.tfy_scrollViewDidScrollCallback(indexPath);
+            if (handler) handler(indexPath);
+            self.tfy_shouldPlayIndexPath = indexPath;
+            return;
         }
     }
     
@@ -563,37 +543,60 @@ Scroll to indexPath with position.
         cells = [visiableCells reverseObjectEnumerator].allObjects;
     }
     
-    /// Mid line.
-    CGFloat scrollViewMidX = CGRectGetWidth(self.frame)/2;
+    /// Mid line - 缓存中心点计算
+    static CGFloat lastScrollViewWidth = 0;
+    static CGFloat cachedMidX = 0;
+    CGFloat currentWidth = CGRectGetWidth(self.frame);
+    if (lastScrollViewWidth != currentWidth) {
+        lastScrollViewWidth = currentWidth;
+        cachedMidX = currentWidth / 2;
+    }
+    
     /// The final playing indexPath.
     __block NSIndexPath *finalIndexPath = nil;
     /// The final distance from the center line.
-    __block CGFloat finalSpace = 0;
+    __block CGFloat finalSpace = CGFLOAT_MAX;
+    
+    // 预计算常用值
+    CGFloat selfMinX = CGRectGetMinX(self.frame);
+    CGFloat selfMaxX = CGRectGetMaxX(self.frame);
+    CGFloat playerApperaPercent = self.tfy_playerApperaPercent;
+    
     @player_weakify(self)
     [cells enumerateObjectsUsingBlock:^(UIView *cell, NSUInteger idx, BOOL * _Nonnull stop) {
         @player_strongify(self)
         UIView *playerView = [cell viewWithTag:self.tfy_containerViewTag];
         if (!playerView || playerView.hidden || playerView.alpha <= 0.01) return;
+        
+        // 使用缓存避免重复的坐标转换
         CGRect rect1 = [playerView convertRect:playerView.frame toView:self];
         CGRect rect = [self convertRect:rect1 toView:self.superview];
-        /// playerView left to scrollView top space.
-        CGFloat leftSpacing = CGRectGetMinX(rect) - CGRectGetMinX(self.frame) - CGRectGetMinX(playerView.frame);
-        /// playerView right to scrollView top space.
-        CGFloat rightSpacing = CGRectGetMaxX(self.frame) - CGRectGetMaxX(rect) + CGRectGetMinX(playerView.frame);
-        CGFloat centerSpacing = ABS(scrollViewMidX - CGRectGetMidX(rect));
+        
+        /// 优化计算 - 减少重复计算
+        CGFloat rectWidth = CGRectGetWidth(rect);
+        CGFloat rectMinX = CGRectGetMinX(rect);
+        CGFloat rectMaxX = CGRectGetMaxX(rect);
+        CGFloat playerFrameMinX = CGRectGetMinX(playerView.frame);
+        
+        CGFloat leftSpacing = rectMinX - selfMinX - playerFrameMinX;
+        CGFloat rightSpacing = selfMaxX - rectMaxX + playerFrameMinX;
+        CGFloat centerSpacing = fabs(cachedMidX - CGRectGetMidX(rect));
+        
         NSIndexPath *indexPath = [self tfy_getIndexPathForCell:cell];
         
-        /// Play when the video playback section is visible.
-        if ((leftSpacing >= -(1 - self.tfy_playerApperaPercent) * CGRectGetWidth(rect)) && (rightSpacing >= -(1 - self.tfy_playerApperaPercent) * CGRectGetWidth(rect))) {
+        /// 优化可见性检查
+        CGFloat visibilityThreshold = (1 - playerApperaPercent) * rectWidth;
+        if (leftSpacing >= -visibilityThreshold && rightSpacing >= -visibilityThreshold) {
             if (!finalIndexPath || centerSpacing < finalSpace) {
                 finalIndexPath = indexPath;
                 finalSpace = centerSpacing;
             }
         }
     }];
+    
     /// if find the playing indexPath.
     if (finalIndexPath) {
-        if (self.tfy_scrollViewDidScrollCallback) self.tfy_scrollViewDidScrollCallback(indexPath);
+        if (self.tfy_scrollViewDidScrollCallback) self.tfy_scrollViewDidScrollCallback(finalIndexPath);
         if (handler) handler(finalIndexPath);
         self.tfy_shouldPlayIndexPath = finalIndexPath;
     }
@@ -657,6 +660,15 @@ Scroll to indexPath with position.
 
 - (void)tfy_filterShouldPlayCellWhileScrolled:(void (^ __nullable)(NSIndexPath *indexPath))handler {
     if (!self.tfy_shouldAutoPlay) return;
+    
+    // 检查滚动性能优化设置
+    TFY_PlayerPerformanceOptimizer *optimizer = [TFY_PlayerPerformanceOptimizer sharedOptimizer];
+    if (!optimizer.scrollPerformanceOptimizationEnabled) {
+        // 如果关闭了滚动优化，使用简化版本
+        if (handler) handler(self.tfy_playingIndexPath);
+        return;
+    }
+    
     @player_weakify(self)
     [self tfy_filterShouldPlayCellWhileScrolling:^(NSIndexPath *indexPath) {
         @player_strongify(self)

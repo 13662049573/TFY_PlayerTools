@@ -15,5 +15,8 @@
 #import "TFY_LandscapeRotationManager.h"
 #import "TFY_PortraitViewController.h"
 #import "TFY_LandscapeViewController.h"
+#import "TFY_PlayerConstants.h"
+#import "TFY_PlayerControlView.h"
+#import "TFY_SpeedLoadingView.h"
 
 #endif /* TFY_PlayerTool_h */

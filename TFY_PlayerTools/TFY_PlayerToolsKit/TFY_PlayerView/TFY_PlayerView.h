@@ -13,5 +13,6 @@
 #import "UIView+PlayerFrame.h"
 #import "UIImageView+PlayerImageView.h"
 #import "TFY_LoadingView.h"
+#import "TFY_SliderView.h"
 
 #endif /* TFY_PlayerView_h */

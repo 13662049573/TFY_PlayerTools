@@ -14,9 +14,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong) TFY_PlayerController *player;
 
-@property (nonatomic, copy) void(^detailVCPopCallback)();
+@property (nonatomic, copy) void(^detailVCPopCallback)(void);
 
-@property (nonatomic, copy) void(^detailVCPlayCallback)();
+@property (nonatomic, copy) void(^detailVCPlayCallback)(void);
 
 @end
 

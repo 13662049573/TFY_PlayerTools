@@ -166,6 +166,9 @@
 }
 
 - (void)startTimer {
+    if (self.timer) {
+        [self destoryTimer];
+    }
     self.timer = [NSTimer timerWithTimeInterval:self.refreshTime target:[TFY_PlayerTimerTarget proxyWithTarget:self] selector:@selector(updateUI) userInfo:nil repeats:YES];
     [[NSRunLoop currentRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
     [self.timer fire];
@@ -181,14 +184,28 @@
 #pragma mark - update UI
 
 - (void)updateUI {
+    // 只有在视图可见时才更新UI
+    if (self.window == nil || self.hidden || self.alpha <= 0.01) {
+        return;
+    }
+    
     [self updateDate];
     [self updateBattery];
+    
+    // 批量更新布局，减少布局计算
     [self setNeedsLayout];
-    [self layoutIfNeeded];
 }
 
 - (void)updateDate {
-    NSMutableString *dateString = [[NSMutableString alloc] initWithString:[self.dateFormatter stringFromDate:[NSDate date]]];
+    NSString *currentDateString = [self.dateFormatter stringFromDate:[NSDate date]];
+    // 缓存之前的时间字符串，避免重复处理
+    static NSString *lastDateString = nil;
+    if ([currentDateString isEqualToString:lastDateString]) {
+        return;
+    }
+    lastDateString = [currentDateString copy];
+    
+    NSMutableString *dateString = [[NSMutableString alloc] initWithString:currentDateString];
     NSRange amRange = [dateString rangeOfString:[self.dateFormatter AMSymbol]];
     NSRange pmRange = [dateString rangeOfString:[self.dateFormatter PMSymbol]];
     if (amRange.location != NSNotFound) {

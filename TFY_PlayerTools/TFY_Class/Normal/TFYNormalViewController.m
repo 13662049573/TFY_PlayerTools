@@ -13,7 +13,7 @@
 
 static NSString *kVideoCover = @"https://upload-images.jianshu.io/upload_images/635942-14593722fe3f0695.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240";
 
-@interface TFYNormalViewController ()<AVPictureInPictureControllerDelegate>
+@interface TFYNormalViewController ()
 @property (nonatomic, strong) TFY_PlayerController *player;
 @property (nonatomic, strong) UIImageView *containerView;
 @property (nonatomic, strong) TFY_PlayerControlView *controlView;
@@ -22,7 +22,6 @@ static NSString *kVideoCover = @"https://upload-images.jianshu.io/upload_images/
 @property (nonatomic, strong) UIButton *nextBtn;
 @property (nonatomic, strong) UIButton *pipBtn;
 @property (nonatomic, strong) NSArray <NSURL *>*assetURLs;
-@property (nonatomic, strong) AVPictureInPictureController *pipController;
 @end
 
 @implementation TFYNormalViewController
@@ -44,6 +43,7 @@ static NSString *kVideoCover = @"https://upload-images.jianshu.io/upload_images/
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     self.player.viewControllerDisappear = NO;
+    [self updatePipButtonTitle];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -93,7 +93,10 @@ static NSString *kVideoCover = @"https://upload-images.jianshu.io/upload_images/
     self.player.controlView = self.controlView;
     /// 设置退到后台继续播放
     self.player.pauseWhenAppResignActive = NO;
-//    self.player.resumePlayRecord = YES;
+    self.player.shouldAutoPlayNext = YES;
+    self.player.shouldLoopPlay = YES;
+    /// 启用画中画功能（只有明确启用后才会创建画中画控制器）
+    self.player.enablePictureInPicture = YES;
     
     @player_weakify(self)
     self.player.orientationDidChanged = ^(TFY_PlayerController * _Nonnull player, BOOL isFullScreen) {
@@ -105,15 +108,92 @@ static NSString *kVideoCover = @"https://upload-images.jianshu.io/upload_images/
         }
         */
     };
-    /// 播放完成
+    
+    /// 播放完成 - 支持画中画连续播放
     self.player.playerDidToEnd = ^(id  _Nonnull asset) {
         @player_strongify(self)
-        if (!self.player.isLastAssetURL) {
+        NSLog(@"视频播放完成，当前播放索引: %ld", (long)self.player.currentPlayIndex);
+        
+        // 检查是否在画中画模式下
+        BOOL isPipActive = [self.player isPictureInPictureActive];
+        
+        if (isPipActive) {
+            // 在画中画模式下，让 TFY_PlayerController 内部的画中画连续播放逻辑来处理
+            // 这里不执行连续播放，避免与内部逻辑冲突
+            NSLog(@"画中画模式下播放完成，由TFY_PlayerController内部处理连续播放");
+            return;
+        }
+        
+        // 非画中画模式下的正常连续播放逻辑
+        if (self.player.shouldAutoPlayNext && !self.player.isLastAssetURL) {
+            // 自动播放下一个视频
             [self.player playTheNext];
             NSString *title = [NSString stringWithFormat:@"视频标题%zd",self.player.currentPlayIndex];
             [self.controlView showTitle:title coverURLString:kVideoCover fullScreenMode:FullScreenModeLandscape];
+            NSLog(@"自动播放下一个视频，新索引: %ld", (long)self.player.currentPlayIndex);
+        } else if (self.player.shouldLoopPlay) {
+            // 循环播放，回到第一个视频
+            [self.player playTheIndex:0];
+            [self.controlView showTitle:@"iPhone X" coverURLString:kVideoCover fullScreenMode:FullScreenModeAutomatic];
+            NSLog(@"循环播放，回到第一个视频");
         } else {
+            // 停止播放
             [self.player stop];
+            NSLog(@"停止播放");
+        }
+    };
+    
+    // 画中画相关回调
+    self.player.pipWillStart = ^(TFY_PlayerController *player) {
+        @player_strongify(self)
+        NSLog(@"画中画即将开始");
+        self.pipBtn.selected = YES;
+        [self updatePipButtonTitle];
+    };
+    
+    self.player.pipDidStart = ^(TFY_PlayerController *player) {
+        @player_strongify(self)
+        NSLog(@"画中画已经开始，当前视频索引: %ld", (long)self.player.currentPlayIndex);
+        // 画中画模式下确保播放器继续工作
+        if (!self.player.isPlaying) {
+            [self.player.currentPlayerManager play];
+        }
+        [self updatePipButtonTitle];
+    };
+    
+    self.player.pipWillStop = ^(TFY_PlayerController *player) {
+        @player_strongify(self)
+        NSLog(@"画中画即将停止");
+    };
+    
+    self.player.pipDidStop = ^(TFY_PlayerController *player) {
+        @player_strongify(self)
+        NSLog(@"画中画已经停止");
+        self.pipBtn.selected = NO;
+        [self updatePipButtonTitle];
+    };
+    
+    self.player.pipFailedToStart = ^(TFY_PlayerController *player, NSError *error) {
+        @player_strongify(self)
+        NSLog(@"画中画启动失败: %@", error.localizedDescription);
+        self.pipBtn.selected = NO;
+        [self updatePipButtonTitle];
+    };
+    
+    self.player.pipRestoreUserInterface = ^(TFY_PlayerController *player, void(^completion)(BOOL restored)) {
+        @player_strongify(self)
+        NSLog(@"画中画需要恢复用户界面");
+        // 如果正在处理画中画连续播放，不恢复用户界面
+        if (player.isHandlingPipContinuousPlay) {
+            NSLog(@"正在处理画中画连续播放，不恢复用户界面");
+            if (completion) {
+                completion(NO);
+            }
+        } else {
+            // 确保界面正确恢复
+            if (completion) {
+                completion(YES);
+            }
         }
     };
     
@@ -123,56 +203,26 @@ static NSString *kVideoCover = @"https://upload-images.jianshu.io/upload_images/
 }
 
 - (void)picBtnClick:(UIButton *)sender {
-    if ([AVPictureInPictureController isPictureInPictureSupported]) {
-        if (self.pipController.isPictureInPictureActive) {
-            [self.pipController stopPictureInPicture];
+    if ([self.player isPictureInPictureSupported]) {
+        if ([self.player isPictureInPictureActive]) {
+            [self.player stopPictureInPicture];
             sender.selected = NO;
         } else {
-            @try {
-                    NSError *error = nil;
-                    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
-                    [[AVAudioSession sharedInstance] setActive:YES error:&error];
-                } @catch (NSException *exception) {
-                    NSLog(@"AVAudioSession错误");
-                }
-            TFY_AVPlayerManager *manager = (TFY_AVPlayerManager *)self.player.currentPlayerManager;
-            self.pipController = [[AVPictureInPictureController alloc] initWithPlayerLayer:manager.avPlayerLayer];
-            if (@available(iOS 14.2, *)) {
-                self.pipController.canStartPictureInPictureAutomaticallyFromInline = true;
-            }
-            self.pipController.delegate = self;
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [self.pipController startPictureInPicture];
-            });
+            [self.player startPictureInPicture];
             sender.selected = YES;
         }
+        [self updatePipButtonTitle];
+    } else {
+        NSLog(@"当前设备不支持画中画功能");
     }
 }
 
-#pragma mark ------- 画中画代理，和画中画状态有关的逻辑 在代理中处理
-// 即将开启画中画
-- (void)pictureInPictureControllerWillStartPictureInPicture:(AVPictureInPictureController *)pictureInPictureController{
-    NSLog(@"即将开启画中画");
-}
-// 已经开启画中画
-- (void)pictureInPictureControllerDidStartPictureInPicture:(AVPictureInPictureController *)pictureInPictureController{
-    NSLog(@"已经开启画中画");
-}
-// 开启画中画失败
-- (void)pictureInPictureController:(AVPictureInPictureController *)pictureInPictureController failedToStartPictureInPictureWithError:(NSError *)error{
-    NSLog(@"开启画中画失败");
-}
-// 即将关闭画中画
-- (void)pictureInPictureControllerWillStopPictureInPicture:(AVPictureInPictureController *)pictureInPictureController{
-    NSLog(@"即将关闭画中画");
-}
-// 已经关闭画中画
-- (void)pictureInPictureControllerDidStopPictureInPicture:(AVPictureInPictureController *)pictureInPictureController{
-    NSLog(@"已经关闭画中画");
-}
-// 关闭画中画且恢复播放界面
-- (void)pictureInPictureController:(AVPictureInPictureController *)pictureInPictureController restoreUserInterfaceForPictureInPictureStopWithCompletionHandler:(void (^)(BOOL restored))completionHandler{
-    NSLog(@"关闭画中画且恢复播放界面");
+- (void)updatePipButtonTitle {
+    if ([self.player isPictureInPictureActive]) {
+        [self.pipBtn setTitle:@"关闭画中画" forState:UIControlStateNormal];
+    } else {
+        [self.pipBtn setTitle:@"开启画中画" forState:UIControlStateNormal];
+    }
 }
 
 - (void)changeVideo:(UIButton *)sender {

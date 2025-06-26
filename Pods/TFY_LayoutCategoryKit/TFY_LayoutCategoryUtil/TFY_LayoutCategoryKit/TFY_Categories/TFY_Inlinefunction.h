@@ -70,7 +70,7 @@ CG_INLINE void TFY_RemoveOneNotification(id _Nonnull observer,NSNotificationName
 }
 
 //仅仅是状态栏的高度
-CG_INLINE CGFloat kStatusBarHeight() {
+CG_INLINE CGFloat kStatusBarHeight(void) {
     return (TFY_SafeArea([UIApplication tfy_window]).top);
 }
 

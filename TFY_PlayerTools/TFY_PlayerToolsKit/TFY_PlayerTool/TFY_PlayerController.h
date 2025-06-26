@@ -7,6 +7,7 @@
 //
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
+#import <AVKit/AVKit.h>
 
 #import "TFY_PlayerMediaPlayback.h"
 #import "TFY_OrientationObserver.h"
@@ -60,7 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  playerWithPlayerManager: containerView:
  创建一个TFY_PlayerController来播放一个单独的视听项目。
- playerManager必须符合“TFY_PlayerMediaPlayback”协议。
+ playerManager必须符合"TFY_PlayerMediaPlayback"协议。
  containerView查看视频帧必须设置containerView。
  tfyPlayerController的实例。
  */
@@ -69,7 +70,7 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  initWithPlayerManager: containerView:
  创建一个TFY_PlayerController来播放一个单独的视听项目。
- playerManager必须符合“tfyPlayerMediaPlayback”协议。
+ playerManager必须符合"tfyPlayerMediaPlayback"协议。
  containerView查看视频帧必须设置containerView。
  tfyPlayerController的实例。
  */
@@ -79,7 +80,7 @@ NS_ASSUME_NONNULL_BEGIN
  playerWithScrollView: playerManager: containerViewTag:
  创建一个TFY_PlayerController来播放一个单独的视听项目。在' UITableView '或' UICollectionView '中使用。
  scrollView是tableView或collectionView。
- playerManager必须符合“TFY_PlayerMediaPlayback”协议。
+ playerManager必须符合"TFY_PlayerMediaPlayback"协议。
  要在scrollView查看视频，必须设置containerViewTag。
  tfyPlayerController的实例。
  */
@@ -89,7 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
   initWithScrollView: playerManager: containerViewTag:
  创建一个TFY_PlayerController来播放一个单独的视听项目。在' UITableView '或' UICollectionView '中使用。
  scrollView是tableView或collectionView。
- playerManager必须符合“TFY_PlayerMediaPlayback”协议。
+ playerManager必须符合"TFY_PlayerMediaPlayback"协议。
  要在scrollView查看视频，必须设置containerViewTag。
  tfyPlayerController的实例。
  */
@@ -97,14 +98,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 /*!
  playerWithScrollView: playerManager: containerView:
- 创建一个TFY_PlayerController来播放一个单独的视听项目。在' UIScrollView '中使用。playerManager必须符合“TFY_PlayerMediaPlayback”协议。在scrollView中查看视频。
+ 创建一个TFY_PlayerController来播放一个单独的视听项目。在' UIScrollView '中使用。playerManager必须符合"TFY_PlayerMediaPlayback"协议。在scrollView中查看视频。
  tfyPlayerController的实例。
  */
 + (instancetype)playerWithScrollView:(UIScrollView *)scrollView playerManager:(id<TFY_PlayerMediaPlayback>)playerManager containerView:(UIView *)containerView;
 
 /*!
  initWithScrollView: playerManager: containerView:
- 创建一个TFY_PlayerController来播放一个单独的视听项目。在' UIScrollView '中使用。playerManager必须符合“TFY_PlayerMediaPlayback”协议。在scrollView中查看视频。
+ 创建一个TFY_PlayerController来播放一个单独的视听项目。在' UIScrollView '中使用。playerManager必须符合"TFY_PlayerMediaPlayback"协议。在scrollView中查看视频。
  tfyPlayerController的实例。
  */
 - (instancetype)initWithScrollView:(UIScrollView *)scrollView playerManager:(id<TFY_PlayerMediaPlayback>)playerManager containerView:(UIView *)containerView;
@@ -173,6 +174,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// is the first asset URL in `assetURLs`.
 @property (nonatomic, readonly) BOOL isFirstAssetURL;
+
+/// 是否启用循环播放，默认为NO
+@property (nonatomic, assign) BOOL shouldLoopPlay;
+
+/// 是否启用自动连续播放，默认为YES
+@property (nonatomic, assign) BOOL shouldAutoPlayNext;
 
 ///如果是，播放器将被调用pause方法当收到' UIApplicationWillResignActiveNotification '通知。
 /// default为YES。
@@ -268,6 +275,9 @@ NS_ASSUME_NONNULL_BEGIN
  停止当前在单元格上播放的视频。
  */
 - (void)stopCurrentPlayingCell;
+
+/// 当前是否正在播放
+@property (nonatomic, readonly) BOOL isPlaying;
 
 @end
 
@@ -523,6 +533,69 @@ NS_ASSUME_NONNULL_BEGIN
                 animated:(BOOL)animated
        completionHandler:(void (^ __nullable)(void))completionHandler;
 
+
+@end
+
+@interface TFY_PlayerController (PlayerPictureInPicture)
+
+/// 是否支持画中画功能
+@property (nonatomic, readonly) BOOL isPictureInPictureSupported;
+
+/// 当前是否处于画中画模式
+@property (nonatomic, readonly) BOOL isPictureInPictureActive;
+
+/// 是否正在处理画中画连续播放
+@property (nonatomic, readonly) BOOL isHandlingPipContinuousPlay;
+
+/// 画中画控制器
+@property (nonatomic, strong, readonly) AVPictureInPictureController *pipController;
+
+/// 是否启用画中画功能，默认为YES
+@property (nonatomic, assign) BOOL enablePictureInPicture;
+
+/// 当画中画即将开始时调用的块
+@property (nonatomic, copy, nullable) void(^pipWillStart)(TFY_PlayerController *player);
+
+/// 当画中画已经开始时调用的块
+@property (nonatomic, copy, nullable) void(^pipDidStart)(TFY_PlayerController *player);
+
+/// 当画中画即将停止时调用的块
+@property (nonatomic, copy, nullable) void(^pipWillStop)(TFY_PlayerController *player);
+
+/// 当画中画已经停止时调用的块
+@property (nonatomic, copy, nullable) void(^pipDidStop)(TFY_PlayerController *player);
+
+/// 当画中画启动失败时调用的块
+@property (nonatomic, copy, nullable) void(^pipFailedToStart)(TFY_PlayerController *player, NSError *error);
+
+/// 当画中画需要恢复用户界面时调用的块
+@property (nonatomic, copy, nullable) void(^pipRestoreUserInterface)(TFY_PlayerController *player, void(^completion)(BOOL restored));
+
+/**
+ 启动画中画功能
+ @return 是否成功启动
+ */
+- (BOOL)startPictureInPicture;
+
+/**
+ 停止画中画功能
+ */
+- (void)stopPictureInPicture;
+
+@end
+
+#pragma mark - PlayerPerformance
+
+@interface TFY_PlayerController (PlayerPerformance)
+
+/// 获取当前性能统计信息
+- (NSDictionary *)getPerformanceStats;
+
+/// 清理播放器缓存
+- (void)clearPlayerCache;
+
+/// 手动触发内存清理
+- (void)triggerMemoryCleanup;
 
 @end
 

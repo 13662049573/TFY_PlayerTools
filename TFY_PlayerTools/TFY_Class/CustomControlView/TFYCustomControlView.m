@@ -11,6 +11,7 @@
 #import "TFY_ITools.h"
 #import "TFY_SliderView.h"
 #import "UIImageView+PlayerImageView.h"
+#import "TFY_SpeedLoadingView.h"
 
 @interface TFYCustomControlView ()<TFY_SliderViewDelegate>
 

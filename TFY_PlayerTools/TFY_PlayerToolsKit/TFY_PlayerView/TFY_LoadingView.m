@@ -7,6 +7,7 @@
 //
 
 #import "TFY_LoadingView.h"
+#import "TFY_PlayerPerformanceOptimizer.h"
 
 @interface TFY_LoadingView ()
 @property (nonatomic, strong, readonly) CAShapeLayer *shapeLayer;
@@ -63,13 +64,26 @@
 - (void)startAnimating {
     if (self.animating) return;
     self.animating = YES;
-    if (self.animType == LoadingTypeFadeOut) [self fadeOutShow];
-    CABasicAnimation *rotationAnim = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
-    rotationAnim.toValue = [NSNumber numberWithFloat:2 * M_PI];
-    rotationAnim.duration = self.duration;
-    rotationAnim.repeatCount = CGFLOAT_MAX;
-    rotationAnim.removedOnCompletion = NO;
-    [self.shapeLayer addAnimation:rotationAnim forKey:@"rotation"];
+    
+    // 检查性能优化器设置
+    TFY_PlayerPerformanceOptimizer *optimizer = [TFY_PlayerPerformanceOptimizer sharedOptimizer];
+    BOOL shouldOptimizeAnimation = !optimizer.animationOptimizationEnabled;
+    
+    // 使用CADisplayLink确保动画同步
+    if (self.animType == LoadingTypeFadeOut) {
+        [self fadeOutShow];
+    } else {
+        CABasicAnimation *rotationAnim = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+        rotationAnim.toValue = [NSNumber numberWithFloat:2 * M_PI];
+        rotationAnim.duration = shouldOptimizeAnimation ? self.duration * 1.5 : self.duration; // 低性能设备减慢动画
+        rotationAnim.repeatCount = CGFLOAT_MAX;
+        rotationAnim.removedOnCompletion = NO;
+        // 优化动画性能
+        rotationAnim.fillMode = kCAFillModeForwards;
+        rotationAnim.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
+        [self.shapeLayer addAnimation:rotationAnim forKey:@"rotation"];
+    }
+    
     if (self.hidesWhenStopped) {
         self.hidden = NO;
     }
@@ -78,44 +92,52 @@
 - (void)stopAnimating {
     if (!self.animating) return;
     self.animating = NO;
+    
+    // 使用更平滑的停止方式
+    [CATransaction begin];
+    [CATransaction setDisableActions:YES];
     [self.shapeLayer removeAllAnimations];
+    [CATransaction commit];
+    
     if (self.hidesWhenStopped) {
         self.hidden = YES;
     }
 }
 
 - (void)fadeOutShow {
-    CABasicAnimation *headAnimation = [CABasicAnimation animation];
-    headAnimation.keyPath = @"strokeStart";
+    // 优化动画组合
+    CABasicAnimation *headAnimation = [CABasicAnimation animationWithKeyPath:@"strokeStart"];
     headAnimation.duration = self.duration / 1.5f;
     headAnimation.fromValue = @(0.f);
     headAnimation.toValue = @(0.25f);
+    headAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
     
-    CABasicAnimation *tailAnimation = [CABasicAnimation animation];
-    tailAnimation.keyPath = @"strokeEnd";
+    CABasicAnimation *tailAnimation = [CABasicAnimation animationWithKeyPath:@"strokeEnd"];
     tailAnimation.duration = self.duration / 1.5f;
     tailAnimation.fromValue = @(0.f);
     tailAnimation.toValue = @(1.f);
+    tailAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
     
-    CABasicAnimation *endHeadAnimation = [CABasicAnimation animation];
-    endHeadAnimation.keyPath = @"strokeStart";
+    CABasicAnimation *endHeadAnimation = [CABasicAnimation animationWithKeyPath:@"strokeStart"];
     endHeadAnimation.beginTime = self.duration / 1.5f;
     endHeadAnimation.duration = self.duration / 3.0f;
     endHeadAnimation.fromValue = @(0.25f);
     endHeadAnimation.toValue = @(1.f);
+    endHeadAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
     
-    CABasicAnimation *endTailAnimation = [CABasicAnimation animation];
-    endTailAnimation.keyPath = @"strokeEnd";
+    CABasicAnimation *endTailAnimation = [CABasicAnimation animationWithKeyPath:@"strokeEnd"];
     endTailAnimation.beginTime = self.duration / 1.5f;
     endTailAnimation.duration = self.duration / 3.0f;
     endTailAnimation.fromValue = @(1.f);
     endTailAnimation.toValue = @(1.f);
+    endTailAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
     
     CAAnimationGroup *animations = [CAAnimationGroup animation];
     [animations setDuration:self.duration];
     [animations setAnimations:@[headAnimation, tailAnimation, endHeadAnimation, endTailAnimation]];
     animations.repeatCount = INFINITY;
     animations.removedOnCompletion = NO;
+    animations.fillMode = kCAFillModeForwards;
     [self.shapeLayer addAnimation:animations forKey:@"strokeAnim"];
     
     if (self.hidesWhenStopped) {

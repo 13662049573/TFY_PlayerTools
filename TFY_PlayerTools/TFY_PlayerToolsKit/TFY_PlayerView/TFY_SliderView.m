@@ -255,19 +255,24 @@ static const CGFloat kAnimate = 0.3;
     self.loadingBarView.hidden = NO;
     
     [self.loadingBarView.layer removeAllAnimations];
+    
+    // 优化动画性能，减少重复计算
     CAAnimationGroup *animationGroup = [[CAAnimationGroup alloc] init];
     animationGroup.duration = 0.4;
     animationGroup.beginTime = CACurrentMediaTime() + 0.4;
-    animationGroup.repeatCount = MAXFLOAT;
+    animationGroup.repeatCount = INFINITY; // 使用INFINITY替代MAXFLOAT
     animationGroup.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
+    animationGroup.removedOnCompletion = NO;
+    animationGroup.fillMode = kCAFillModeForwards;
     
-    CABasicAnimation *scaleAnimation = [CABasicAnimation animation];
-    scaleAnimation.keyPath = @"transform.scale.x";
+    // 缓存宽度计算
+    CGFloat targetWidth = self.player_width * 10;
+    
+    CABasicAnimation *scaleAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale.x"];
     scaleAnimation.fromValue = @(1000.0f);
-    scaleAnimation.toValue = @(self.player_width * 10);
+    scaleAnimation.toValue = @(targetWidth);
     
-    CABasicAnimation *alphaAnimation = [CABasicAnimation animation];
-    alphaAnimation.keyPath = @"opacity";
+    CABasicAnimation *alphaAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
     alphaAnimation.fromValue = @(1.0f);
     alphaAnimation.toValue = @(0.0f);
     
@@ -279,12 +284,19 @@ static const CGFloat kAnimate = 0.3;
  *  Stops animation of the spinnner.
  */
 - (void)stopAnimating {
+    if (!self.isLoading) return;
+    
     self.isLoading = NO;
     self.bufferProgressView.hidden = NO;
     self.sliderProgressView.hidden = NO;
     self.sliderBtn.hidden = self.isHideSliderBlock;
     self.loadingBarView.hidden = YES;
+    
+    // 使用事务确保动画移除的性能
+    [CATransaction begin];
+    [CATransaction setDisableActions:YES];
     [self.loadingBarView.layer removeAllAnimations];
+    [CATransaction commit];
 }
 
 #pragma mark - User Action

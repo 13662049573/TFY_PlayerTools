@@ -102,7 +102,7 @@ static TFY_AppDotNetAPIClient *sharedManager = nil;
     return isEnableInterfaceDebug;
 }
 
-static inline NSString *cachePath() {
+static inline NSString *cachePath(void) {
     return [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/TFY_NetworkingCaches"];
 }
 

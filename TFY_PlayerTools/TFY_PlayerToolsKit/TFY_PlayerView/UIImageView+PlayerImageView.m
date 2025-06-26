@@ -9,6 +9,7 @@
 #import "UIImageView+PlayerImageView.h"
 #import <objc/runtime.h>
 #import <CommonCrypto/CommonDigest.h>
+#import "TFY_PlayerPerformanceOptimizer.h"
 
 @implementation PlayerImageDownloader
 
@@ -322,34 +323,41 @@
     [self.imageDownloader startDownloadImageWithUrl:theRequest.URL.absoluteString progress:nil finished:^(NSData *data, NSError *error) {
         // success
         if (data != nil && error == nil) {
-            dispatch_async(dispatch_get_global_queue(0, 0), ^{
+            // 使用高质量队列进行图片处理
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
                 UIImage *image = [UIImage imageWithData:data];
                 UIImage *finalImage = image;
                 
                 if (image) {
                     if (weakSelf.shouldAutoClipImageToViewSize) {
-                        // cutting
-                        if (fabs(weakSelf.frame.size.width - image.size.width) != 0
-                            && fabs(weakSelf.frame.size.height - image.size.height) != 0) {
-                            finalImage = [self clipImage:image toSize:weakSelf.frame.size isScaleToMax:YES];
+                        // 检查是否真的需要裁剪，避免不必要的计算
+                        CGSize viewSize = weakSelf.frame.size;
+                        if (!CGSizeEqualToSize(viewSize, CGSizeZero) && 
+                            (fabs(viewSize.width - image.size.width) > 1.0 || 
+                             fabs(viewSize.height - image.size.height) > 1.0)) {
+                            finalImage = [self clipImage:image toSize:viewSize isScaleToMax:YES];
                         }
                     }
                     
-                    [[UIApplication sharedApplication] player_cacheImage:finalImage forRequest:theRequest];
+                    // 异步缓存图片
+                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
+                        [[UIApplication sharedApplication] player_cacheImage:finalImage forRequest:theRequest];
+                    });
                 } else {
                     [[UIApplication sharedApplication] player_cacheFailRequest:theRequest];
                 }
                 
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    if (finalImage) {
-                        [weakSelf setImage:finalImage isFromCache:NO];
+                    __strong __typeof(weakSelf) strongSelf = weakSelf;
+                    if (strongSelf && finalImage) {
+                        [strongSelf setImage:finalImage isFromCache:NO];
                         
-                        if (weakSelf.completion) {
-                            weakSelf.completion(weakSelf.image);
+                        if (strongSelf.completion) {
+                            strongSelf.completion(strongSelf.image);
                         }
-                    } else {// error data
-                        if (weakSelf.completion) {
-                            weakSelf.completion(weakSelf.image);
+                    } else if (strongSelf) {// error data
+                        if (strongSelf.completion) {
+                            strongSelf.completion(strongSelf.image);
                         }
                     }
                 });
@@ -366,21 +374,43 @@
 
 - (void)setImage:(UIImage *)image isFromCache:(BOOL)isFromCache {
     self.image = image;
-    if (!isFromCache) {
-        CATransition *animation = [CATransition animation];
-        [animation setDuration:0.6f];
-        [animation setType:kCATransitionFade];
-        animation.removedOnCompletion = YES;
-        [self.layer addAnimation:animation forKey:@"transition"];
+    if (!isFromCache && image) {
+        // 只有在图片真正改变时才添加动画
+        if (self.image != image) {
+            CATransition *animation = [CATransition animation];
+            [animation setDuration:0.3f]; // 减少动画时间
+            [animation setType:kCATransitionFade];
+            animation.removedOnCompletion = YES;
+            [self.layer addAnimation:animation forKey:@"transition"];
+        }
     }
 }
 
 - (void)cancelRequest {
     [self.imageDownloader.task cancel];
+    self.imageDownloader = nil; // 立即释放
 }
 
+// 优化图片裁剪方法，添加缓存机制
 - (UIImage *)clipImage:(UIImage *)image toSize:(CGSize)size isScaleToMax:(BOOL)isScaleToMax {
-    CGFloat scale =  [UIScreen mainScreen].scale;
+    // 如果尺寸相同，直接返回原图
+    if (CGSizeEqualToSize(image.size, size)) {
+        return image;
+    }
+    
+    // 使用性能优化器的全局缓存
+    TFY_PlayerPerformanceOptimizer *optimizer = [TFY_PlayerPerformanceOptimizer sharedOptimizer];
+    
+    NSString *cacheKey = [NSString stringWithFormat:@"clip_%.0fx%.0f_%.0fx%.0f_%d", 
+                         image.size.width, image.size.height, 
+                         size.width, size.height, isScaleToMax];
+    
+    UIImage *cachedImage = [optimizer.globalCache objectForKey:cacheKey];
+    if (cachedImage) {
+        return cachedImage;
+    }
+    
+    CGFloat scale = [UIScreen mainScreen].scale;
     
     UIGraphicsBeginImageContextWithOptions(size, NO, scale);
     
@@ -396,6 +426,12 @@
     [image drawInRect:CGRectMake(0, 0, aspectFitSize.width, aspectFitSize.height)];
     UIImage *finalImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
+    
+    // 使用性能优化器缓存处理后的图片
+    if (finalImage && optimizer.imageCacheOptimizationEnabled) {
+        NSUInteger cost = (NSUInteger)(finalImage.size.width * finalImage.size.height * 4);
+        [optimizer.globalCache setObject:finalImage forKey:cacheKey cost:cost];
+    }
     
     return finalImage;
 }

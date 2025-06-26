@@ -15,7 +15,13 @@ API_AVAILABLE(ios(13.0)) @implementation UIViewController (PlayerRotation)
 
 /// Hook
 - (void)tfy_setContentOverlayInsets:(UIEdgeInsets)insets andLeftMargin:(CGFloat)leftMargin rightMargin:(CGFloat)rightMargin {
-    UIWindow *keyWindow = UIApplication.sharedApplication.keyWindow;
+    UIWindow *keyWindow = nil;
+    for (UIWindowScene *scene in [UIApplication sharedApplication].connectedScenes) {
+        if (scene.activationState == UISceneActivationStateForegroundActive) {
+            keyWindow = scene.windows.firstObject;
+            break;
+        }
+    }
     UIWindow *otherWindow = self.view.window;
     if ([keyWindow isKindOfClass:TFY_LandscapeWindow.class] && otherWindow != nil) {
         TFY_LandscapeRotationManager *manager = ((TFY_LandscapeWindow *)keyWindow).rotationManager;

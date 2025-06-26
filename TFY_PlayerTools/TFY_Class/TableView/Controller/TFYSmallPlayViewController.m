@@ -259,7 +259,7 @@ static NSString *kIdentifier = @"kIdentifier";
 
 - (UIActivityIndicatorView *)activity {
     if (!_activity) {
-        _activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        _activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
         _activity.hidesWhenStopped = YES;
     }
     return _activity;

@@ -13,6 +13,7 @@
 #import "TFYOtherCell.h"
 #import "TFY_ITools.h"
 #import "TFY_PlayerTool.h"
+#import "TFY_PlayerControlView.h"
 static NSString *kIdentifier = @"kIdentifier";
 
 @interface TFYTableHeaderViewController ()<UITableViewDelegate,UITableViewDataSource>
@@ -33,7 +34,18 @@ static NSString *kIdentifier = @"kIdentifier";
     [self.view addSubview:self.tableView];
     
     [self requestData];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
     
+    // 在视图出现后设置tableHeaderView，避免布局警告
+    if (!self.tableView.tableHeaderView) {
+        [self setupPlayerAndHeader];
+    }
+}
+
+- (void)setupPlayerAndHeader {
     self.tableView.tableHeaderView = self.headerView;
     self.headerView.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.width*9/16);
     

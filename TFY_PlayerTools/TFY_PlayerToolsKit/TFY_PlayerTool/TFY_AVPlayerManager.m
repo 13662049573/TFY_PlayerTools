@@ -326,15 +326,41 @@ static NSString *const kPresentationSize         = @"presentationSize";
                               options:NSKeyValueObservingOptionNew
                               context:nil];
     
+    // 移除之前的时间观察器
+    if (_timeObserver) {
+        [self.player removeTimeObserver:_timeObserver];
+        _timeObserver = nil;
+    }
+    
     CMTime interval = CMTimeMakeWithSeconds(self.timeRefreshInterval > 0 ? self.timeRefreshInterval : 0.1, NSEC_PER_SEC);
     @player_weakify(self)
     _timeObserver = [self.player addPeriodicTimeObserverForInterval:interval queue:dispatch_get_main_queue() usingBlock:^(CMTime time) {
         @player_strongify(self)
         if (!self) return;
+        
+        // 减少不必要的回调，只在播放状态和有效时间范围内回调
         NSArray *loadedRanges = self.playerItem.seekableTimeRanges;
-        if (self.isPlaying && self.loadState == PlayerLoadStateStalled) self.player.rate = self.rate;
+        if (self.isPlaying && self.loadState == PlayerLoadStateStalled) {
+            self.player.rate = self.rate;
+        }
+        
         if (loadedRanges.count > 0) {
-            if (self.playerPlayTimeChanged) self.playerPlayTimeChanged(self, self.currentTime, self.totalTime);
+            NSTimeInterval currentTime = self.currentTime;
+            NSTimeInterval totalTime = self.totalTime;
+            
+            // 缓存上次的时间，避免频繁无效回调
+            static NSTimeInterval lastCurrentTime = 0;
+            static NSTimeInterval lastTotalTime = 0;
+            
+            // 只有时间变化超过0.1秒或总时长变化时才回调
+            if (fabs(currentTime - lastCurrentTime) >= 0.1 || fabs(totalTime - lastTotalTime) >= 0.1) {
+                lastCurrentTime = currentTime;
+                lastTotalTime = totalTime;
+                
+                if (self.playerPlayTimeChanged) {
+                    self.playerPlayTimeChanged(self, currentTime, totalTime);
+                }
+            }
         }
     }];
     
