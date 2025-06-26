@@ -365,7 +365,7 @@
         if (velocity.x > 0) style = YES;
         if (velocity.x < 0) style = NO;
         if (velocity.x == 0) return;
-        [self sliderValueChangingValue:self.sumTime/totalMovieDuration isForward:style];
+        [self sliderValueChanged:self.sumTime/totalMovieDuration isForward:style];
     } else if (direction == PanDirectionV) {
         if (location == PanLocationLeft) { /// 调节亮度
             self.player.brightness -= (velocity.y) / 10000;
@@ -426,16 +426,15 @@
         [self.portraitControlView playBtnSelectedState:YES];
         [self.landScapeControlView playBtnSelectedState:YES];
         self.failBtn.hidden = YES;
-        /// 开始播放时候判断是否显示loading
         if (videoPlayer.currentPlayerManager.loadState == PlayerLoadStateStalled && !self.prepareShowLoading) {
             [self.activity startAnimating];
         } else if ((videoPlayer.currentPlayerManager.loadState == PlayerLoadStateStalled || videoPlayer.currentPlayerManager.loadState == PlayerLoadStatePrepare) && self.prepareShowLoading) {
             [self.activity startAnimating];
         }
+        [self.activity stopAnimating]; // 兜底，播放中强制隐藏loading
     } else if (state == PlayerPlayStatePaused) {
         [self.portraitControlView playBtnSelectedState:NO];
         [self.landScapeControlView playBtnSelectedState:NO];
-        /// 暂停的时候隐藏loading
         [self.activity stopAnimating];
         self.failBtn.hidden = YES;
     } else if (state == PlayerPlayStatePlayFailed) {
@@ -458,18 +457,22 @@
             self.effectView.hidden = YES;
             self.player.currentPlayerManager.view.backgroundColor = [UIColor blackColor];
         }
+        [self.activity stopAnimating]; // 可播放时强制隐藏loading
     }
     if (state == PlayerLoadStateStalled && videoPlayer.currentPlayerManager.isPlaying && !self.prepareShowLoading) {
         [self.activity startAnimating];
     } else if ((state == PlayerLoadStateStalled || state == PlayerLoadStatePrepare) && videoPlayer.currentPlayerManager.isPlaying && self.prepareShowLoading) {
         [self.activity startAnimating];
-    } else {
+    } else if (state != PlayerLoadStatePlaythroughOK && state != PlayerLoadStatePlayable) {
         [self.activity stopAnimating];
     }
 }
 
 /// 播放进度改变回调
 - (void)videoPlayer:(TFY_PlayerController *)videoPlayer currentTime:(NSTimeInterval)currentTime totalTime:(NSTimeInterval)totalTime {
+    if (currentTime > 0 && self.activity && !self.activity.hidden) {
+        [self.activity stopAnimating]; // 兜底：只要有播放进度就隐藏loading
+    }
     [self.portraitControlView videoPlayer:videoPlayer currentTime:currentTime totalTime:totalTime];
     [self.landScapeControlView videoPlayer:videoPlayer currentTime:currentTime totalTime:totalTime];
     if (!self.bottomPgrogress.isdragging) {

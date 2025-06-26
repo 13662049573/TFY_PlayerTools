@@ -203,13 +203,23 @@ static NSString *kVideoCover = @"https://upload-images.jianshu.io/upload_images/
 }
 
 - (void)picBtnClick:(UIButton *)sender {
+    NSLog(@"TFYNormalViewController: 画中画按钮被点击");
+    NSLog(@"- 设备支持画中画: %@", [self.player isPictureInPictureSupported] ? @"YES" : @"NO");
+    NSLog(@"- 当前画中画状态: %@", [self.player isPictureInPictureActive] ? @"活跃" : @"未活跃");
+    
     if ([self.player isPictureInPictureSupported]) {
         if ([self.player isPictureInPictureActive]) {
+            NSLog(@"停止画中画");
             [self.player stopPictureInPicture];
             sender.selected = NO;
         } else {
-            [self.player startPictureInPicture];
-            sender.selected = YES;
+            NSLog(@"启动画中画");
+            // 执行诊断
+            [self.player.pipManager performDiagnostics];
+            
+            BOOL success = [self.player startPictureInPicture];
+            NSLog(@"画中画启动结果: %@", success ? @"成功" : @"失败");
+            sender.selected = success;
         }
         [self updatePipButtonTitle];
     } else {

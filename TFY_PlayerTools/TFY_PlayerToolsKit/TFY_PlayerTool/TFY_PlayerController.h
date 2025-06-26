@@ -17,6 +17,8 @@
 #import "TFY_FloatView.h"
 #import "UIScrollView+TFY_Player.h"
 
+@class TFY_PlayerPictureInPictureManager;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface TFY_PlayerController : NSObject
@@ -550,6 +552,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// 画中画控制器
 @property (nonatomic, strong, readonly) AVPictureInPictureController *pipController;
 
+/// 画中画管理器（用于调试和高级控制）
+@property (nonatomic, strong, readonly) TFY_PlayerPictureInPictureManager *pipManager;
+
 /// 是否启用画中画功能，默认为YES
 @property (nonatomic, assign) BOOL enablePictureInPicture;
 
@@ -571,6 +576,21 @@ NS_ASSUME_NONNULL_BEGIN
 /// 当画中画需要恢复用户界面时调用的块
 @property (nonatomic, copy, nullable) void(^pipRestoreUserInterface)(TFY_PlayerController *player, void(^completion)(BOOL restored));
 
+/// 画中画连续播放请求下一个资源URL的回调
+@property (nonatomic, copy, nullable) NSURL * _Nullable (^pipRequestNextAssetURL)(TFY_PlayerController *player);
+
+/// 是否启用画中画连续播放功能，默认为NO
+@property (nonatomic, assign) BOOL enablePipContinuousPlay;
+
+/// 画中画是否因播放结束而停止（内部使用）
+@property (nonatomic, assign) BOOL pipStoppedDueToPlaybackEnd;
+
+/// 画中画重试次数（内部使用）
+@property (nonatomic, assign) NSInteger pipRetryCount;
+
+/// 切换到后台时自动启动画中画，默认NO
+@property (nonatomic, assign) BOOL autoStartPiPWhenEnterBackground;
+
 /**
  启动画中画功能
  @return 是否成功启动
@@ -581,6 +601,11 @@ NS_ASSUME_NONNULL_BEGIN
  停止画中画功能
  */
 - (void)stopPictureInPicture;
+
+/**
+ 获取上次PiP启动时间（用于防抖）
+ */
+- (NSTimeInterval)lastPipStartTime;
 
 @end
 
@@ -596,6 +621,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// 手动触发内存清理
 - (void)triggerMemoryCleanup;
+
+@end
+
+@interface TFY_PlayerController (PlayerCache)
+/// 应用缓存的播放器配置
+- (void)applyCachedPlayerConfig;
+
+/// 缓存播放器状态
+- (void)cachePlayerState;
+
+
+/// 缓存时间字符串转换，提高性能
+- (NSString *)cachedTimeString:(NSTimeInterval)time;
 
 @end
 

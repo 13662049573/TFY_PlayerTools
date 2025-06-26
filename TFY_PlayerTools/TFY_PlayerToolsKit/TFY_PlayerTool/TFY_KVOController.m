@@ -26,9 +26,18 @@
 
 @interface TFY_KVOController ()
 @property (nonatomic, strong) NSMutableArray<TFY_KVOEntry *> *entries;
+@property (nonatomic, weak) NSObject *target;
 @end
 
 @implementation TFY_KVOController
+
+- (instancetype)initWithTarget:(NSObject *)target {
+    self = [self init];
+    if (self) {
+        _target = target;
+    }
+    return self;
+}
 
 - (instancetype)init {
     self = [super init];
@@ -93,6 +102,35 @@
     TFY_KVOEntry *entry = (__bridge TFY_KVOEntry *)(context);
     if (entry.block) {
         entry.block(object, change);
+    }
+}
+
+- (void)safelyAddObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath options:(NSKeyValueObservingOptions)options context:(void *)context {
+    @try {
+        [observer addObserver:self forKeyPath:keyPath options:options context:context];
+    } @catch (NSException *exception) {
+        TFYKVOLog(@"Failed to safely add observer for %@: %@", keyPath, exception);
+    }
+}
+
+- (void)safelyRemoveAllObservers {
+    for (TFY_KVOEntry *entry in self.entries) {
+        if (entry.observer) {
+            @try {
+                [entry.observer removeObserver:self forKeyPath:entry.keyPath];
+            } @catch (NSException *e) {
+                TFYKVOLog(@"Failed to safely remove observer for %@: %@", entry.keyPath, e);
+            }
+        }
+    }
+    [self.entries removeAllObjects];
+}
+
+- (void)safelyRemoveObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath {
+    @try {
+        [observer removeObserver:self forKeyPath:keyPath];
+    } @catch (NSException *e) {
+        TFYKVOLog(@"Failed to safely remove observer for %@: %@", keyPath, e);
     }
 }
 

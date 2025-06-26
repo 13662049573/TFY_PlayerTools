@@ -46,7 +46,9 @@ static NSString *const kPresentationSize         = @"presentationSize";
 
 - (void)setPlayer:(AVPlayer *)player {
     if (player == _player) return;
+    _player = player;
     self.avLayer.player = player;
+    NSLog(@"TFY_PlayerPresentView: 设置player %@ 到 AVPlayerLayer", player ? @"成功" : @"为nil");
 }
 
 - (void)setVideoGravity:(AVLayerVideoGravity)videoGravity {
@@ -255,6 +257,13 @@ static NSString *const kPresentationSize         = @"presentationSize";
     TFY_PlayerPresentView *presentView = [[TFY_PlayerPresentView alloc] init];
     presentView.player = _player;
     self.view.playerView = presentView;
+    
+    // 确保PlayerLayer的player引用正确设置（这对画中画功能很重要）
+    AVPlayerLayer *playerLayer = [presentView avLayer];
+    if (playerLayer.player != _player) {
+        playerLayer.player = _player;
+        NSLog(@"TFY_AVPlayerManager: 修复了PlayerLayer的player引用");
+    }
 
     self.scalingMode = _scalingMode;
     if (@available(iOS 9.0, *)) {

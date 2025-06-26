@@ -53,6 +53,17 @@
     #endif
 #endif
 
+// 调试日志控制宏
+#ifdef DEBUG
+    #define TFYPlayerLog(fmt, ...) NSLog((@"[TFYPlayer] " fmt), ##__VA_ARGS__)
+    #define TFYPlayerLogInfo(fmt, ...) NSLog((@"[TFYPlayer][Info] " fmt), ##__VA_ARGS__)
+    #define TFYPlayerLogError(fmt, ...) NSLog((@"[TFYPlayer][Error] " fmt), ##__VA_ARGS__)
+#else
+    #define TFYPlayerLog(fmt, ...)
+    #define TFYPlayerLogInfo(fmt, ...)
+    #define TFYPlayerLogError(fmt, ...)
+#endif
+
 typedef NS_ENUM(NSUInteger, PlayerPlaybackState) {
     PlayerPlayStateUnknown,
     PlayerPlayStatePlaying,

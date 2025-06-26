@@ -16,19 +16,10 @@
 #import "TFY_PlayerToolsHeader.h"
 #import "TFY_ReachabilityManager.h"
 #import "TFY_AVPlayerManager.h"
-#import "TFY_PlayerConstants.h"
 #import "TFY_PlayerPerformanceOptimizer.h"
+#import "TFY_PlayerPictureInPictureManager.h"
 
-// 调试日志控制宏
-#ifdef DEBUG
-    #define TFYPlayerLog(fmt, ...) NSLog((@"[TFY_Player] " fmt), ##__VA_ARGS__)
-    #define TFYPlayerLogInfo(fmt, ...) NSLog((@"[TFY_Player] INFO: " fmt), ##__VA_ARGS__)
-    #define TFYPlayerLogError(fmt, ...) NSLog((@"[TFY_Player] ERROR: " fmt), ##__VA_ARGS__)
-#else
-    #define TFYPlayerLog(fmt, ...)
-    #define TFYPlayerLogInfo(fmt, ...)
-    #define TFYPlayerLogError(fmt, ...)
-#endif
+
 
 // 缓存键定义
 static NSString * const kPlayerStateCacheKey = @"player_state";
@@ -37,7 +28,7 @@ static NSString * const kPlayerTimeCacheKey = @"player_time";
 
 static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 
-@interface TFY_PlayerController () <AVPictureInPictureControllerDelegate>
+@interface TFY_PlayerController () <TFYPictureInPictureManagerDelegate>
 
 @property (nonatomic, strong) TFY_PlayerNotification *notification;
 @property (nonatomic, strong) UISlider *volumeViewSlider;
@@ -49,17 +40,19 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 @property (nonatomic, assign) BOOL isSmallFloatViewShow;
 /// The indexPath is playing.
 @property (nonatomic, nullable) NSIndexPath *playingIndexPath;
-/// 标记画中画是否因为播放结束而停止
-@property (nonatomic, assign) BOOL pipStoppedDueToPlaybackEnd;
-/// 标记是否正在处理画中画连续播放
-@property (nonatomic, assign) BOOL isHandlingPipContinuousPlay;
-/// 画中画连续播放重试次数
-@property (nonatomic, assign) NSInteger pipRetryCount;
+
+/// 画中画管理器
+@property (nonatomic, strong) TFY_PlayerPictureInPictureManager *pipManager;
 
 // 性能优化相关属性
 @property (nonatomic, strong) NSCache *playerCache;
 @property (nonatomic, assign) BOOL isPlayerReady;
 @property (nonatomic, strong) dispatch_queue_t backgroundQueue;
+
+// 画中画连续播放相关属性
+@property (nonatomic, assign) BOOL pipStoppedDueToPlaybackEnd;
+@property (nonatomic, assign) BOOL isHandlingPipContinuousPlay;
+@property (nonatomic, assign) NSInteger pipRetryCount;
 
 @end
 
@@ -88,6 +81,10 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
         [optimizer applyRecommendedOptimizations];
         [optimizer startPerformanceMonitoring];
         
+        // 初始化画中画管理器
+        self.pipManager = [[TFY_PlayerPictureInPictureManager alloc] initWithPlayerController:self];
+        self.pipManager.delegate = self;
+        
         @player_weakify(self)
         [[TFY_ReachabilityManager sharedManager] startMonitoring];
         [[TFY_ReachabilityManager sharedManager] setReachabilityStatusChangeBlock:^(ReachabilityStatus status) {
@@ -97,6 +94,15 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
             }
         }];
         [self configureVolume];
+        
+        self.autoStartPiPWhenEnterBackground = NO;
+        
+        self.notification.willResignActive = ^(TFY_PlayerNotification *registrar) {
+            @player_strongify(self)
+            if (self.autoStartPiPWhenEnterBackground && !self.isPictureInPictureActive && self.enablePictureInPicture) {
+                [self startPictureInPicture];
+            }
+        };
     }
     return self;
 }
@@ -106,7 +112,7 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
     MPVolumeView *volumeView = [[MPVolumeView alloc] init];
     self.volumeViewSlider = nil;
     for (UIView *view in [volumeView subviews]){
-        if ([view.class.description isEqualToString:TFYPlayerVolumeSliderClassName]){
+        if ([view.class.description isEqualToString:kVolumeSliderClassName]){
             self.volumeViewSlider = (UISlider *)view;
             break;
         }
@@ -115,6 +121,11 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 
 - (void)dealloc {
     [self.currentPlayerManager stop];
+    
+    // 清理画中画管理器
+    [self.pipManager cleanup];
+    self.pipManager = nil;
+    
     // 停止性能监控
     [[TFY_PlayerPerformanceOptimizer sharedOptimizer] stopPerformanceMonitoring];
     
@@ -200,9 +211,27 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
         
         if (self.playerReadyToPlay) self.playerReadyToPlay(asset,assetURL);
         if (!self.customAudioSession) {
-            // Apps using this category don't mute when the phone's mute button is turned on, but play sound when the phone is silent
-            [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback withOptions:AVAudioSessionCategoryOptionAllowBluetooth error:nil];
-            [[AVAudioSession sharedInstance] setActive:YES error:nil];
+            // Configure audio session for Picture in Picture support
+            NSError *audioError = nil;
+            AVAudioSessionCategoryOptions options = AVAudioSessionCategoryOptionAllowBluetooth | 
+                                                   AVAudioSessionCategoryOptionAllowBluetoothA2DP |
+                                                   AVAudioSessionCategoryOptionAllowAirPlay |
+                                                   AVAudioSessionCategoryOptionMixWithOthers;
+            
+            BOOL success = [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback 
+                                                             withOptions:options 
+                                                                   error:&audioError];
+            if (!success) {
+                NSLog(@"TFY_PlayerController: Audio Session配置失败: %@", audioError.localizedDescription);
+            }
+            
+            success = [[AVAudioSession sharedInstance] setActive:YES error:&audioError];
+            if (!success) {
+                NSLog(@"TFY_PlayerController: Audio Session激活失败: %@", audioError.localizedDescription);
+            }
+            
+            NSLog(@"TFY_PlayerController: Audio Session配置完成 - Category: %@, Options: %lu", 
+                  [AVAudioSession sharedInstance].category, (unsigned long)options);
         }
         if (self.viewControllerDisappear) self.pauseByEvent = YES;
     };
@@ -358,7 +387,11 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
             [window endEditing:YES];
             if (!self.pauseWhenAppResignActive) {
                 [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
-                [[AVAudioSession sharedInstance] setActive:YES error:nil];
+                NSError *audioError = nil;
+                BOOL success = [[AVAudioSession sharedInstance] setActive:YES error:&audioError];
+                if (!success) {
+                    NSLog(@"TFY_PlayerController: 后台Audio Session激活失败: %@", audioError.localizedDescription);
+                }
             }
         };
         _notification.didBecomeActive = ^(TFY_PlayerNotification * _Nonnull registrar) {
@@ -568,7 +601,7 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
     NSLog(@"TFY_PlayerController: handlePipContinuousPlayback - 开始处理画中画连续播放");
     
     // 延迟一点时间确保播放器状态稳定
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(TFYPlayerTiming.pipDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(kPipCheckDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         NSLog(@"TFY_PlayerController: 检查连续播放条件 - shouldAutoPlayNext: %@, isLastAssetURL: %@, shouldLoopPlay: %@", 
               self.shouldAutoPlayNext ? @"YES" : @"NO",
               self.isLastAssetURL ? @"YES" : @"NO",
@@ -824,9 +857,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
     [self manuallySetupPlayerEndNotificationForPip];
 }
 
-// 静态context用于KVO  
-// 使用TFYPlayerConstants中定义的KVO上下文
-
 // 手动设置播放结束通知，确保画中画连续播放正常工作
 - (void)manuallySetupPlayerEndNotificationForPip {
     NSLog(@"TFY_PlayerController: manuallySetupPlayerEndNotificationForPip - 开始手动设置播放结束通知");
@@ -898,11 +928,10 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
     
     // 设置超时处理
     __weak typeof(self) weakSelf = self;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(TFYPlayerTiming.observerTimeout * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         __strong typeof(weakSelf) strongSelf = weakSelf;
         if (strongSelf) {
-            NSNumber *isObserving = objc_getAssociatedObject(playerItem, @"isObserving");
-            if (isObserving.boolValue) {
+            NSNumber *isObserving = objc_getAssociatedObject(playerItem, @"isObserving");            if (isObserving.boolValue) {
                 @try {
                     [playerItem removeObserver:strongSelf forKeyPath:@"status" context:TFYPlayerPipItemContext];
                     objc_setAssociatedObject(playerItem, @"isObserving", @NO, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -961,12 +990,9 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 
 // 监听播放器准备状态用于画中画重启
 - (void)observePlayerReadyStateForPip:(NSURL *)assetURL {
-    // 重置重试计数
     self.pipRetryCount = 0;
-    
-    // 监听播放器准备状态
     __weak typeof(self) weakSelf = self;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(TFYPlayerTiming.pipCheckDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(kPipCheckDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         __strong typeof(weakSelf) strongSelf = weakSelf;
         if (strongSelf) {
             [strongSelf checkPlayerReadyAndRestartPip];
@@ -984,9 +1010,9 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
         [self restartPipAfterVideoChange];
     } else {
         self.pipRetryCount++;
-        if (self.pipRetryCount < TFYPlayerRetry.maxPipRetryCount) {
+        if (self.pipRetryCount < 3) {
             NSLog(@"TFY_PlayerController: 画中画模式 - 播放器未就绪，第%ld次重试", (long)self.pipRetryCount);
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(TFYPlayerTiming.pipRetryDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 [self checkPlayerReadyAndRestartPip];
             });
         } else {
@@ -1003,7 +1029,7 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
     objc_setAssociatedObject(self, @selector(pipController), nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     
     // 启动新的画中画
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(TFYPlayerTiming.pipRestartDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         BOOL success = [self startPictureInPicture];
         NSLog(@"TFY_PlayerController: 画中画重启结果: %@", success ? @"成功" : @"失败");
         
@@ -1051,8 +1077,8 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
                     }
                 }
                 
-                        // 标记画中画连续播放处理完成，但保持连续播放能力
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(TFYPlayerTiming.pipCheckDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                // 标记画中画连续播放处理完成，但保持连续播放能力
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(kPipCheckDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     // 不要在这里设置 isHandlingPipContinuousPlay = NO，这会阻止后续的连续播放
                     // 只重置播放结束标志
                     self.pipStoppedDueToPlaybackEnd = NO;
@@ -1094,22 +1120,82 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 
 - (void)resetPipController {
     if (@available(iOS 15.0, *)) {
-        // 如果正在处理画中画连续播放，完全跳过重置
-        if (self.isHandlingPipContinuousPlay) {
-            NSLog(@"TFY_PlayerController: resetPipController - 跳过重置，正在处理画中画连续播放");
-            return;
-        }
-        
-        // 只有在画中画正在运行且不是因为播放结束而停止时才重置
         AVPictureInPictureController *pip = objc_getAssociatedObject(self, @selector(pipController));
-        if (pip && pip.isPictureInPictureActive && !self.pipStoppedDueToPlaybackEnd) {
-            NSLog(@"TFY_PlayerController: resetPipController - 停止正在运行的画中画");
-            [pip stopPictureInPicture];
+        if (pip) {
+            NSLog(@"TFY_PlayerController: 重置pipController");
+            pip.delegate = nil;
+            objc_setAssociatedObject(self, @selector(pipController), nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         }
-        
-        objc_setAssociatedObject(self, @selector(pipController), nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        NSLog(@"TFY_PlayerController: resetPipController - 画中画控制器已重置");
     }
+}
+
+- (BOOL)allowOrentitaionRotation {
+    NSNumber *value = objc_getAssociatedObject(self, @selector(allowOrentitaionRotation));
+    return value ? [value boolValue] : NO;
+}
+
+- (BOOL)exitFullScreenWhenStop {
+    NSNumber *value = objc_getAssociatedObject(self, @selector(exitFullScreenWhenStop));
+    return value ? [value boolValue] : NO;
+}
+
+- (UIStatusBarAnimation)fullScreenStatusBarAnimation {
+    NSNumber *value = objc_getAssociatedObject(self, @selector(fullScreenStatusBarAnimation));
+    return value ? (UIStatusBarAnimation)[value integerValue] : UIStatusBarAnimationSlide;
+}
+
+- (UIStatusBarStyle)fullScreenStatusBarStyle {
+    NSNumber *value = objc_getAssociatedObject(self, @selector(fullScreenStatusBarStyle));
+    return value ? (UIStatusBarStyle)[value integerValue] : UIStatusBarStyleLightContent;
+}
+
+- (BOOL)isFullScreen {
+    NSNumber *value = objc_getAssociatedObject(self, @selector(isFullScreen));
+    return value ? [value boolValue] : NO;
+}
+
+- (BOOL)isLockedScreen {
+    NSNumber *value = objc_getAssociatedObject(self, @selector(isLockedScreen));
+    return value ? [value boolValue] : NO;
+}
+
+- (void)setOrientationWillChange:(void (^)(TFY_PlayerController *player, BOOL isFullScreen))orientationWillChange {
+    objc_setAssociatedObject(self, @selector(orientationWillChange), orientationWillChange, OBJC_ASSOCIATION_COPY);
+}
+
+- (BOOL)shouldAutorotate {
+    NSNumber *value = objc_getAssociatedObject(self, @selector(shouldAutorotate));
+    return value ? [value boolValue] : YES;
+}
+
+- (BOOL)isStatusBarHidden {
+    NSNumber *value = objc_getAssociatedObject(self, @selector(isStatusBarHidden));
+    return value ? [value boolValue] : NO;
+}
+
+- (void (^)(TFY_PlayerController *player, BOOL isFullScreen))orientationDidChanged {
+    return objc_getAssociatedObject(self, @selector(orientationDidChanged));
+}
+
+// autoStartPiPWhenEnterBackground属性实现
+- (void)setAutoStartPiPWhenEnterBackground:(BOOL)autoStartPiPWhenEnterBackground {
+    objc_setAssociatedObject(self, @selector(autoStartPiPWhenEnterBackground), @(autoStartPiPWhenEnterBackground), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+- (BOOL)autoStartPiPWhenEnterBackground {
+    NSNumber *value = objc_getAssociatedObject(self, @selector(autoStartPiPWhenEnterBackground));
+    return value ? [value boolValue] : NO;
+}
+// isPictureInPictureActive属性实现
+- (BOOL)isPictureInPictureActive {
+    return self.pipManager.isPictureInPictureActive;
+}
+// isPictureInPictureSupported属性实现
+- (BOOL)isPictureInPictureSupported {
+    return self.pipManager.isPictureInPictureSupported;
+}
+
+- (TFY_PlayerPictureInPictureManager *)pipManager {
+    return _pipManager;
 }
 
 @end
@@ -1888,15 +1974,15 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 - (CGFloat)playerDisapperaPercent {
     NSNumber *number = objc_getAssociatedObject(self, _cmd);
     if (number) return number.floatValue;
-    self.playerDisapperaPercent = TFYPlayerUI.defaultPlayerDisapperaPercent;
-    return TFYPlayerUI.defaultPlayerDisapperaPercent;
+    self.playerDisapperaPercent = kDefaultPlayerDisapperaPercent;
+    return kDefaultPlayerDisapperaPercent;
 }
 
 - (CGFloat)playerApperaPercent {
     NSNumber *number = objc_getAssociatedObject(self, _cmd);
     if (number) return number.floatValue;
-    self.playerApperaPercent = TFYPlayerUI.defaultPlayerApperaPercent;
-    return TFYPlayerUI.defaultPlayerApperaPercent;
+    self.playerApperaPercent = kDefaultPlayerApperaPercent;
+    return kDefaultPlayerApperaPercent;
 }
 
 - (void (^)(NSIndexPath * _Nonnull, CGFloat))tfy_playerAppearingInScrollView {
@@ -2007,174 +2093,67 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 @end
 
 #pragma mark - PlayerPictureInPicture
-
 @implementation TFY_PlayerController (PlayerPictureInPicture)
 
-- (BOOL)isPictureInPictureSupported {
-    if (@available(iOS 15.0, *)) {
-        return [AVPictureInPictureController isPictureInPictureSupported];
-    }
-    return NO;
-}
-
-- (BOOL)isPictureInPictureActive {
-    if (@available(iOS 15.0, *)) {
-        // 只检查已存在的画中画控制器，避免意外创建
-        AVPictureInPictureController *pip = objc_getAssociatedObject(self, @selector(pipController));
-        return pip ? pip.isPictureInPictureActive : NO;
-    }
-    return NO;
-}
-
-- (BOOL)isHandlingPipContinuousPlay {
-    return [objc_getAssociatedObject(self, @selector(isHandlingPipContinuousPlay)) boolValue];
-}
-
-- (AVPictureInPictureController *)pipController {
-    AVPictureInPictureController *pip = objc_getAssociatedObject(self, _cmd);
-    if (!pip && self.enablePictureInPicture && self.currentPlayerManager && [self.currentPlayerManager respondsToSelector:@selector(avPlayerLayer)]) {
-        if (@available(iOS 15.0, *)) {
-            AVPlayerLayer *layer = [self.currentPlayerManager performSelector:@selector(avPlayerLayer)];
-            if (layer && layer.player) {
-                NSLog(@"TFY_PlayerController: 创建新的画中画控制器");
-                pip = [[AVPictureInPictureController alloc] initWithPlayerLayer:layer];
-                pip.delegate = self;
-                objc_setAssociatedObject(self, _cmd, pip, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-            } else {
-                NSLog(@"TFY_PlayerController: 无法创建画中画控制器 - AVPlayerLayer或AVPlayer为空");
-            }
-        }
-    }
-    return pip;
-}
-
-- (void)setEnablePictureInPicture:(BOOL)enablePictureInPicture {
-    objc_setAssociatedObject(self, @selector(enablePictureInPicture), @(enablePictureInPicture), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (BOOL)enablePictureInPicture {
-    NSNumber *num = objc_getAssociatedObject(self, _cmd);
-    if (num) return num.boolValue;
-    return NO; // 默认不启用画中画功能
-}
+#pragma mark - Picture In Picture Methods
 
 - (BOOL)startPictureInPicture {
-    if (@available(iOS 15.0, *)) {
-        if (self.enablePictureInPicture && self.isPictureInPictureSupported) {
-            // 检查播放器是否准备就绪
-            if (!self.currentPlayerManager.isPreparedToPlay) {
-                NSLog(@"TFY_PlayerController: startPictureInPicture - 播放器未准备就绪，跳过启动画中画");
-                return NO;
-            }
-            
-            // 检查画中画控制器是否存在
-            if (!self.pipController) {
-                NSLog(@"TFY_PlayerController: startPictureInPicture - 画中画控制器不存在，尝试重新创建");
-                // 强制重新创建画中画控制器
-                objc_setAssociatedObject(self, @selector(pipController), nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-            }
-            
-            if (!self.pipController.delegate) {
-                self.pipController.delegate = self;
-            }
-            
-            if (!self.pipController.isPictureInPictureActive) {
-                NSLog(@"TFY_PlayerController: startPictureInPicture - 启动画中画");
-                [self.pipController startPictureInPicture];
-                return YES;
-            } else {
-                NSLog(@"TFY_PlayerController: startPictureInPicture - 画中画已经处于活动状态");
-                return YES;
-            }
-        } else {
-            NSLog(@"TFY_PlayerController: startPictureInPicture - 画中画功能未启用或不支持");
-            return NO;
-        }
-    }
-    return NO;
+    return [self.pipManager startPictureInPicture];
 }
 
 - (void)stopPictureInPicture {
+    [self.pipManager stopPictureInPicture];
+}
+
+- (NSTimeInterval)lastPipStartTime {
+    NSNumber *value = objc_getAssociatedObject(self, @selector(lastPipStartTime));
+    return value ? [value doubleValue] : 0;
+}
+
+- (void)setLastPipStartTime:(NSTimeInterval)lastPipStartTime {
+    objc_setAssociatedObject(self, @selector(lastPipStartTime), @(lastPipStartTime), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (AVPictureInPictureController *)pipController {
     if (@available(iOS 15.0, *)) {
-        if (self.pipController.isPictureInPictureActive) {
-            // 标记这是用户主动停止的，不是连续播放引起的
-            self.isHandlingPipContinuousPlay = NO;
-            self.pipStoppedDueToPlaybackEnd = NO;
-            // 清理手动添加的播放结束通知
-            [[NSNotificationCenter defaultCenter] removeObserver:self 
-                                                            name:AVPlayerItemDidPlayToEndTimeNotification 
-                                                          object:nil];
-            NSLog(@"TFY_PlayerController: 用户主动停止画中画");
-            [self.pipController stopPictureInPicture];
-        }
+        return objc_getAssociatedObject(self, @selector(pipController));
+    }
+    return nil;
+}
+
+- (void)setPipController:(AVPictureInPictureController *)pipController {
+    if (@available(iOS 15.0, *)) {
+        objc_setAssociatedObject(self, @selector(pipController), pipController, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
 }
 
-#pragma mark - AVPictureInPictureControllerDelegate
+#pragma mark - Picture In Picture Properties
 
-- (void)pictureInPictureControllerWillStartPictureInPicture:(AVPictureInPictureController *)pictureInPictureController {
-    if (self.pipWillStart) self.pipWillStart(self);
+- (void)setEnablePictureInPicture:(BOOL)enablePictureInPicture {
+    self.pipManager.enablePictureInPicture = enablePictureInPicture;
 }
 
-- (void)pictureInPictureControllerDidStartPictureInPicture:(AVPictureInPictureController *)pictureInPictureController {
-    if (self.pipDidStart) self.pipDidStart(self);
+- (BOOL)enablePictureInPicture {
+    return self.pipManager.enablePictureInPicture;
 }
 
-- (void)pictureInPictureControllerWillStopPictureInPicture:(AVPictureInPictureController *)pictureInPictureController {
-    if (self.pipWillStop) self.pipWillStop(self);
+- (void)setEnablePipContinuousPlay:(BOOL)enablePipContinuousPlay {
+    objc_setAssociatedObject(self, @selector(enablePipContinuousPlay), @(enablePipContinuousPlay), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    self.pipManager.enableContinuousPlayback = enablePipContinuousPlay;
 }
 
-- (void)pictureInPictureControllerDidStopPictureInPicture:(AVPictureInPictureController *)pictureInPictureController {
-    NSLog(@"TFY_PlayerController: pictureInPictureControllerDidStopPictureInPicture 被调用");
-    
-    // 检查是否因为播放结束而停止画中画，如果是则自动播放下一个
-    NSLog(@"TFY_PlayerController: pipStoppedDueToPlaybackEnd = %@, isHandlingPipContinuousPlay = %@", 
-          self.pipStoppedDueToPlaybackEnd ? @"YES" : @"NO",
-          self.isHandlingPipContinuousPlay ? @"YES" : @"NO");
-    
-    // 如果正在处理画中画连续播放，不重置控制器
-    if (!self.isHandlingPipContinuousPlay) {
-        // 用户主动停止画中画，完全重置状态
-        NSLog(@"TFY_PlayerController: 用户主动停止画中画，重置所有状态");
-        [self resetPipController];
-        // 重置连续播放状态
-        self.isHandlingPipContinuousPlay = NO;
-        self.pipStoppedDueToPlaybackEnd = NO;
-        // 清理手动添加的播放结束通知
-        [[NSNotificationCenter defaultCenter] removeObserver:self 
-                                                        name:AVPlayerItemDidPlayToEndTimeNotification 
-                                                      object:nil];
-        NSLog(@"TFY_PlayerController: 清理画中画播放结束通知");
-    } else {
-        NSLog(@"TFY_PlayerController: 画中画连续播放过程中停止，保持连续播放状态");
+- (BOOL)enablePipContinuousPlay {
+    NSNumber *value = objc_getAssociatedObject(self, @selector(enablePipContinuousPlay));
+    if (value) {
+        return [value boolValue];
     }
-    
-    if (self.pipDidStop) self.pipDidStop(self);
+    return self.pipManager.enableContinuousPlayback;
 }
-
-- (void)pictureInPictureController:(AVPictureInPictureController *)pictureInPictureController failedToStartPictureInPictureWithError:(NSError *)error {
-    NSLog(@"TFY_PlayerController: 画中画启动失败: %@", error.localizedDescription);
-    // 重置画中画连续播放状态
-    self.isHandlingPipContinuousPlay = NO;
-    self.pipStoppedDueToPlaybackEnd = NO;
-    if (self.pipFailedToStart) self.pipFailedToStart(self, error);
-}
-
-- (void)pictureInPictureController:(AVPictureInPictureController *)pictureInPictureController restoreUserInterfaceForPictureInPictureStopWithCompletionHandler:(void (^)(BOOL restored))completionHandler {
-    if (self.pipRestoreUserInterface) {
-        self.pipRestoreUserInterface(self, completionHandler);
-    } else {
-        if (completionHandler) completionHandler(NO);
-    }
-}
-
-
-
-#pragma mark - Block Property Getter/Setter
 
 - (void)setPipWillStart:(void (^)(TFY_PlayerController *))pipWillStart {
     objc_setAssociatedObject(self, @selector(pipWillStart), pipWillStart, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
+
 - (void (^)(TFY_PlayerController *))pipWillStart {
     return objc_getAssociatedObject(self, _cmd);
 }
@@ -2182,6 +2161,7 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 - (void)setPipDidStart:(void (^)(TFY_PlayerController *))pipDidStart {
     objc_setAssociatedObject(self, @selector(pipDidStart), pipDidStart, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
+
 - (void (^)(TFY_PlayerController *))pipDidStart {
     return objc_getAssociatedObject(self, _cmd);
 }
@@ -2189,6 +2169,7 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 - (void)setPipWillStop:(void (^)(TFY_PlayerController *))pipWillStop {
     objc_setAssociatedObject(self, @selector(pipWillStop), pipWillStop, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
+
 - (void (^)(TFY_PlayerController *))pipWillStop {
     return objc_getAssociatedObject(self, _cmd);
 }
@@ -2196,6 +2177,7 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 - (void)setPipDidStop:(void (^)(TFY_PlayerController *))pipDidStop {
     objc_setAssociatedObject(self, @selector(pipDidStop), pipDidStop, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
+
 - (void (^)(TFY_PlayerController *))pipDidStop {
     return objc_getAssociatedObject(self, _cmd);
 }
@@ -2203,6 +2185,7 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 - (void)setPipFailedToStart:(void (^)(TFY_PlayerController *, NSError *))pipFailedToStart {
     objc_setAssociatedObject(self, @selector(pipFailedToStart), pipFailedToStart, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
+
 - (void (^)(TFY_PlayerController *, NSError *))pipFailedToStart {
     return objc_getAssociatedObject(self, _cmd);
 }
@@ -2210,9 +2193,121 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 - (void)setPipRestoreUserInterface:(void (^)(TFY_PlayerController *, void(^)(BOOL)))pipRestoreUserInterface {
     objc_setAssociatedObject(self, @selector(pipRestoreUserInterface), pipRestoreUserInterface, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
+
 - (void (^)(TFY_PlayerController *, void(^)(BOOL)))pipRestoreUserInterface {
     return objc_getAssociatedObject(self, _cmd);
 }
+
+- (void)setPipRequestNextAssetURL:(NSURL * _Nullable (^)(TFY_PlayerController *))pipRequestNextAssetURL {
+    objc_setAssociatedObject(self, @selector(pipRequestNextAssetURL), pipRequestNextAssetURL, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+- (NSURL * _Nullable (^)(TFY_PlayerController *))pipRequestNextAssetURL {
+    return objc_getAssociatedObject(self, _cmd);
+}
+
+- (void)setPipStoppedDueToPlaybackEnd:(BOOL)pipStoppedDueToPlaybackEnd {
+    objc_setAssociatedObject(self, @selector(pipStoppedDueToPlaybackEnd), @(pipStoppedDueToPlaybackEnd), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (BOOL)pipStoppedDueToPlaybackEnd {
+    NSNumber *value = objc_getAssociatedObject(self, @selector(pipStoppedDueToPlaybackEnd));
+    return value ? [value boolValue] : NO;
+}
+
+- (void)setIsHandlingPipContinuousPlay:(BOOL)isHandlingPipContinuousPlay {
+    objc_setAssociatedObject(self, @selector(isHandlingPipContinuousPlay), @(isHandlingPipContinuousPlay), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (BOOL)isHandlingPipContinuousPlay {
+    NSNumber *value = objc_getAssociatedObject(self, @selector(isHandlingPipContinuousPlay));
+    return value ? [value boolValue] : NO;
+}
+
+- (void)setPipRetryCount:(NSInteger)pipRetryCount {
+    objc_setAssociatedObject(self, @selector(pipRetryCount), @(pipRetryCount), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (NSInteger)pipRetryCount {
+    NSNumber *value = objc_getAssociatedObject(self, @selector(pipRetryCount));
+    return value ? [value integerValue] : 0;
+}
+
+#pragma mark - TFYPictureInPictureManagerDelegate
+
+- (void)pictureInPictureManager:(TFY_PlayerPictureInPictureManager *)manager willStartPictureInPicture:(AVPictureInPictureController *)pipController {
+    NSLog(@"TFY_PlayerController: 画中画即将开始");
+    if (self.pipWillStart) {
+        self.pipWillStart(self);
+    }
+}
+
+- (void)pictureInPictureManager:(TFY_PlayerPictureInPictureManager *)manager didStartPictureInPicture:(AVPictureInPictureController *)pipController {
+    NSLog(@"TFY_PlayerController: 画中画已开始");
+    if (self.pipDidStart) {
+        self.pipDidStart(self);
+    }
+}
+
+- (void)pictureInPictureManager:(TFY_PlayerPictureInPictureManager *)manager willStopPictureInPicture:(AVPictureInPictureController *)pipController {
+    NSLog(@"TFY_PlayerController: 画中画即将停止");
+    if (self.pipWillStop) {
+        self.pipWillStop(self);
+    }
+}
+
+- (void)pictureInPictureManager:(TFY_PlayerPictureInPictureManager *)manager didStopPictureInPicture:(AVPictureInPictureController *)pipController {
+    NSLog(@"TFY_PlayerController: 画中画已停止");
+    if (self.pipDidStop) {
+        self.pipDidStop(self);
+    }
+}
+
+- (void)pictureInPictureManager:(TFY_PlayerPictureInPictureManager *)manager failedToStartWithError:(NSError *)error {
+    NSLog(@"TFY_PlayerController: 画中画启动失败: %@", error.localizedDescription);
+    if (self.pipFailedToStart) {
+        self.pipFailedToStart(self, error);
+    }
+}
+
+- (void)pictureInPictureManager:(TFY_PlayerPictureInPictureManager *)manager 
+    restoreUserInterfaceForPictureInPictureStopWithCompletionHandler:(void (^)(BOOL restored))completionHandler {
+    NSLog(@"TFY_PlayerController: 画中画请求恢复用户界面");
+    if (self.pipRestoreUserInterface) {
+        self.pipRestoreUserInterface(self, completionHandler);
+    } else {
+        if (completionHandler) {
+            completionHandler(NO);
+        }
+    }
+}
+
+- (void)pictureInPictureManager:(TFY_PlayerPictureInPictureManager *)manager didChangeState:(TFYPipState)state {
+    NSLog(@"TFY_PlayerController: 画中画状态变更为: %ld", (long)state);
+}
+
+- (NSURL * _Nullable)pictureInPictureManagerRequestNextAssetURL:(TFY_PlayerPictureInPictureManager *)manager {
+    if (self.pipRequestNextAssetURL) {
+        return self.pipRequestNextAssetURL(self);
+    }
+    
+    // 默认逻辑：如果有assetURLs数组，自动播放下一个
+    if (self.assetURLs && self.assetURLs.count > 0) {
+        NSInteger nextIndex = self.currentPlayIndex + 1;
+        if (nextIndex < self.assetURLs.count) {
+            NSLog(@"TFY_PlayerController: 画中画连续播放 - 自动播放下一个视频 (index: %ld)", (long)nextIndex);
+            return self.assetURLs[nextIndex];
+        }
+    }
+    
+    NSLog(@"TFY_PlayerController: 画中画连续播放 - 没有更多视频");
+    return nil;
+}
+
+- (void)pictureInPictureManagerDidCompleteContinuousPlayback:(TFY_PlayerPictureInPictureManager *)manager {
+    NSLog(@"TFY_PlayerController: 画中画连续播放完成");
+}
+
 
 @end
 
@@ -2318,18 +2413,24 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 
 // 缓存时间转换结果
 - (NSString *)cachedTimeString:(NSTimeInterval)time {
-    NSString *cacheKey = [NSString stringWithFormat:@"%@_%.0f", kPlayerTimeCacheKey, time];
-    NSString *cachedString = [self.playerCache objectForKey:cacheKey];
-    if (cachedString) {
-        return cachedString;
-    }
-    
-    NSString *timeString = [TFY_ITools convertTimeSecond:time];
-    if (timeString) {
-        [self.playerCache setObject:timeString forKey:cacheKey cost:1];
-    }
-    return timeString;
+    // 简单缓存实现，实际可根据需求优化
+    static NSCache *timeCache = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        timeCache = [[NSCache alloc] init];
+    });
+    NSString *key = [NSString stringWithFormat:@"%.0f", time];
+    NSString *cached = [timeCache objectForKey:key];
+    if (cached) return cached;
+    NSInteger totalSeconds = (NSInteger)time;
+    NSInteger hours = totalSeconds / 3600;
+    NSInteger minutes = (totalSeconds % 3600) / 60;
+    NSInteger seconds = totalSeconds % 60;
+    NSString *result = hours > 0 ? [NSString stringWithFormat:@"%02ld:%02ld:%02ld", (long)hours, (long)minutes, (long)seconds] : [NSString stringWithFormat:@"%02ld:%02ld", (long)minutes, (long)seconds];
+    [timeCache setObject:result forKey:key];
+    return result;
 }
 
 @end
+
 
