@@ -1,4 +1,3 @@
-
 Pod::Spec.new do |spec|
 
   spec.name         = "TFY_PlayerToolsKit"
@@ -8,7 +7,14 @@ Pod::Spec.new do |spec|
   spec.summary      = "视频播放器主要使用工具封装"
 
   spec.description  = <<-DESC
-                     视频播放器主要使用工具封装
+                     这是一个功能强大的iOS视频播放器工具包，支持多种播放模式、手势控制、横竖屏切换等功能。
+                     主要特性包括：
+                     - 支持多种播放器模式（普通播放、全屏播放、小窗口播放）
+                     - 手势控制（音量、亮度、进度调节）
+                     - 横竖屏自动切换
+                     - 网络状态监控
+                     - 性能优化
+                     - 支持iOS 15.0+
                    DESC
 
   spec.homepage     = "https://github.com/13662049573/TFY_PlayerTools"

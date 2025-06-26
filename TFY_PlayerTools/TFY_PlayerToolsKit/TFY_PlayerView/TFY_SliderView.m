@@ -403,7 +403,6 @@ static const CGFloat kAnimate = 0.3;
 - (TFY_SliderButton *)sliderBtn {
     if (!_sliderBtn) {
         _sliderBtn = [TFY_SliderButton buttonWithType:UIButtonTypeCustom];
-        [_sliderBtn setAdjustsImageWhenHighlighted:NO];
     }
     return _sliderBtn;
 }

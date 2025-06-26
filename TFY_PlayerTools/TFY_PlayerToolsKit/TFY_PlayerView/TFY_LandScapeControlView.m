@@ -41,7 +41,8 @@
 @implementation TFY_LandScapeControlView
 
 - (void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarFrameNotification object:nil];
+    // 移除对已弃用通知的监听
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -62,8 +63,20 @@
         [self makeSubViewsAction];
         [self resetControlView];
         
-        /// statusBarFrame changed
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(layoutControllerViews) name:UIApplicationDidChangeStatusBarFrameNotification object:nil];
+        // 使用新的API监听方向变化
+        if (@available(iOS 13.0, *)) {
+            // iOS 13+ 使用新的通知
+            [[NSNotificationCenter defaultCenter] addObserver:self 
+                                                     selector:@selector(layoutControllerViews) 
+                                                         name:UIApplicationDidBecomeActiveNotification 
+                                                       object:nil];
+        } else {
+            // iOS 13以下使用旧的通知
+            [[NSNotificationCenter defaultCenter] addObserver:self 
+                                                     selector:@selector(layoutControllerViews) 
+                                                         name:UIApplicationDidChangeStatusBarFrameNotification 
+                                                       object:nil];
+        }
     }
     return self;
 }
@@ -91,15 +104,16 @@
     min_h = 20;
     self.statusBarView.frame = CGRectMake(min_x, min_y, min_w, min_h);
 
-    min_x = (Player_iPhoneX && UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) ? 44: 15;
+    UIInterfaceOrientation currentOrientation = [self currentInterfaceOrientation];
+    min_x = (Player_iPhoneX && UIInterfaceOrientationIsLandscape(currentOrientation)) ? 44: 15;
     if (@available(iOS 13.0, *)) {
         if (self.showCustomStatusBar) {
             min_y = self.statusBarView.player_bottom;
         } else {
-            min_y = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) ? 10 : (Player_iPhoneX ? 40 : 20);
+            min_y = UIInterfaceOrientationIsLandscape(currentOrientation) ? 10 : (Player_iPhoneX ? 40 : 20);
         }
     } else {
-        min_y = (Player_iPhoneX && UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) ? 10: (Player_iPhoneX ? 40 : 20);
+        min_y = (Player_iPhoneX && UIInterfaceOrientationIsLandscape(currentOrientation)) ? 10: (Player_iPhoneX ? 40 : 20);
     }
     min_w = 40;
     min_h = 40;
@@ -118,7 +132,7 @@
     min_w = min_view_w;
     self.bottomToolView.frame = CGRectMake(min_x, min_y, min_w, min_h);
     
-    min_x = (Player_iPhoneX && UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) ? 44: 15;
+    min_x = (Player_iPhoneX && UIInterfaceOrientationIsLandscape(currentOrientation)) ? 44: 15;
     min_y = 32;
     min_w = 30;
     min_h = 30;
@@ -132,7 +146,7 @@
     self.currentTimeLabel.player_centerY = self.playOrPauseBtn.player_centerY;
     
     min_w = 62;
-    min_x = self.bottomToolView.player_width - min_w - ((Player_iPhoneX && UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) ? 44: min_margin);
+    min_x = self.bottomToolView.player_width - min_w - ((Player_iPhoneX && UIInterfaceOrientationIsLandscape(currentOrientation)) ? 44: min_margin);
     min_y = 0;
     min_h = 30;
     self.totalTimeLabel.frame = CGRectMake(min_x, min_y, min_w, min_h);
@@ -145,7 +159,7 @@
     self.slider.frame = CGRectMake(min_x, min_y, min_w, min_h);
     self.slider.player_centerY = self.playOrPauseBtn.player_centerY;
     
-    min_x = (Player_iPhoneX && UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) ? 50: 18;
+    min_x = (Player_iPhoneX && UIInterfaceOrientationIsLandscape(currentOrientation)) ? 50: 18;
     min_y = 0;
     min_w = 40;
     min_h = 40;
@@ -476,6 +490,25 @@
         [_lockBtn setImage:Player_Image(@"Player_lock-nor") forState:UIControlStateSelected];
     }
     return _lockBtn;
+}
+
+// 新增方法：获取当前界面方向
+- (UIInterfaceOrientation)currentInterfaceOrientation {
+    if (@available(iOS 13.0, *)) {
+        // iOS 13+ 使用windowScene的interfaceOrientation
+        UIWindowScene *windowScene = nil;
+        for (UIWindowScene *scene in UIApplication.sharedApplication.connectedScenes) {
+            if (scene.activationState == UISceneActivationStateForegroundActive) {
+                windowScene = scene;
+                break;
+            }
+        }
+        if (windowScene) {
+            return windowScene.interfaceOrientation;
+        }
+    }
+    // 降级到已弃用的API（仅用于iOS 13以下）
+    return UIApplication.sharedApplication.statusBarOrientation;
 }
 
 @end

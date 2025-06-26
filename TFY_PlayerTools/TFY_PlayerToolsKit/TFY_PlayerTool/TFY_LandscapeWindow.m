@@ -20,7 +20,14 @@
         self.windowLevel = UIWindowLevelStatusBar - 1;
         if (@available(iOS 13.0, *)) {
             if (self.windowScene == nil) {
-                self.windowScene = UIApplication.sharedApplication.keyWindow.windowScene;
+                UIWindowScene *windowScene = nil;
+                for (UIWindowScene *scene in UIApplication.sharedApplication.connectedScenes) {
+                    if (scene.activationState == UISceneActivationStateForegroundActive) {
+                        windowScene = scene;
+                        break;
+                    }
+                }
+                self.windowScene = windowScene;
             }
             if (@available(iOS 9.0, *)) {
                 [self.rootViewController loadViewIfNeeded];

@@ -1529,60 +1529,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
     return objc_getAssociatedObject(self, _cmd);
 }
 
-- (void (^)(TFY_PlayerController * _Nonnull, BOOL))orientationDidChanged {
-    return objc_getAssociatedObject(self, _cmd);
-}
-
-- (BOOL)isFullScreen {
-    return self.orientationObserver.isFullScreen;
-}
-
-- (BOOL)exitFullScreenWhenStop {
-    NSNumber *number = objc_getAssociatedObject(self, _cmd);
-    if (number) return number.boolValue;
-    self.exitFullScreenWhenStop = YES;
-    return YES;
-}
-
-- (BOOL)isStatusBarHidden {
-    return [objc_getAssociatedObject(self, _cmd) boolValue];
-}
-
-- (BOOL)isLockedScreen {
-    return [objc_getAssociatedObject(self, _cmd) boolValue];
-}
-
-- (BOOL)shouldAutorotate {
-    return NO;
-}
-
-- (BOOL)allowOrentitaionRotation {
-    NSNumber *number = objc_getAssociatedObject(self, _cmd);
-    if (number) return number.boolValue;
-    self.allowOrentitaionRotation = YES;
-    return YES;
-}
-
-- (UIStatusBarStyle)fullScreenStatusBarStyle {
-    NSNumber *number = objc_getAssociatedObject(self, _cmd);
-    if (number) return number.integerValue;
-    self.fullScreenStatusBarStyle = UIStatusBarStyleLightContent;
-    return UIStatusBarStyleLightContent;
-}
-
-- (UIStatusBarAnimation)fullScreenStatusBarAnimation {
-    NSNumber *number = objc_getAssociatedObject(self, _cmd);
-    if (number) return number.integerValue;
-    self.fullScreenStatusBarAnimation = UIStatusBarAnimationSlide;
-    return UIStatusBarAnimationSlide;
-}
-
-#pragma mark - setter
-
-- (void)setOrientationWillChange:(void (^)(TFY_PlayerController * _Nonnull, BOOL))orientationWillChange {
-    objc_setAssociatedObject(self, @selector(orientationWillChange), orientationWillChange, OBJC_ASSOCIATION_COPY_NONATOMIC);
-}
-
 - (void)setOrientationDidChanged:(void (^)(TFY_PlayerController * _Nonnull, BOOL))orientationDidChanged {
     objc_setAssociatedObject(self, @selector(orientationDidChanged), orientationDidChanged, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
@@ -2227,9 +2173,10 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
     // 如果当前没有播放，可以释放一些资源
     if (!self.currentPlayerManager.isPlaying) {
         // 清理控制视图的一些临时资源
-        if ([self.controlView respondsToSelector:@selector(clearTemporaryResources)]) {
-            [self.controlView performSelector:@selector(clearTemporaryResources)];
-        }
+        // 移除对不存在方法的调用
+        // if ([self.controlView respondsToSelector:@selector(clearTemporaryResources)]) {
+        //     [self.controlView performSelector:@selector(clearTemporaryResources)];
+        // }
     }
     
     TFYPlayerLogInfo(@"内存清理已完成");

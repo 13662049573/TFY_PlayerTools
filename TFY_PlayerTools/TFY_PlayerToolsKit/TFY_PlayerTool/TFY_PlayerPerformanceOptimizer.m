@@ -82,11 +82,8 @@
 - (void)clearMemoryCache {
     [self.globalCache removeAllObjects];
     
-    // 强制垃圾回收
-    if ([[UIApplication sharedApplication] respondsToSelector:@selector(_performMemoryWarning)]) {
-        // 私有API，生产环境请移除
-        // [[UIApplication sharedApplication] performSelector:@selector(_performMemoryWarning)];
-    }
+    // 移除对私有API的调用，避免警告
+    // 私有API在生产环境中不应该使用
 }
 
 - (void)clearDiskCache {
