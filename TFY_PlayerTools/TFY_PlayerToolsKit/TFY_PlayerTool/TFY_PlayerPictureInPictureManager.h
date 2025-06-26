@@ -161,9 +161,6 @@ typedef NS_ENUM(NSInteger, TFYPipErrorCode) {
 /// 强制清理资源
 - (void)cleanup;
 
-/// 执行画中画诊断
-- (void)performDiagnostics;
-
 /// 配置Audio Session以支持画中画
 - (void)configureAudioSessionForPiP;
 

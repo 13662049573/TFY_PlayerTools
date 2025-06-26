@@ -204,27 +204,7 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
         
         if (self.playerReadyToPlay) self.playerReadyToPlay(asset,assetURL);
         if (!self.customAudioSession) {
-            // Configure audio session for Picture in Picture support
-            NSError *audioError = nil;
-            AVAudioSessionCategoryOptions options = AVAudioSessionCategoryOptionAllowBluetooth | 
-                                                   AVAudioSessionCategoryOptionAllowBluetoothA2DP |
-                                                   AVAudioSessionCategoryOptionAllowAirPlay |
-                                                   AVAudioSessionCategoryOptionMixWithOthers;
-            
-            BOOL success = [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback 
-                                                             withOptions:options 
-                                                                   error:&audioError];
-            if (!success) {
-                NSLog(@"TFY_PlayerController: Audio Session配置失败: %@", audioError.localizedDescription);
-            }
-            
-            success = [[AVAudioSession sharedInstance] setActive:YES error:&audioError];
-            if (!success) {
-                NSLog(@"TFY_PlayerController: Audio Session激活失败: %@", audioError.localizedDescription);
-            }
-            
-            NSLog(@"TFY_PlayerController: Audio Session配置完成 - Category: %@, Options: %lu", 
-                  [AVAudioSession sharedInstance].category, (unsigned long)options);
+            [self.pipManager configureAudioSessionForPiP];
         }
         if (self.viewControllerDisappear) self.pauseByEvent = YES;
     };
@@ -285,26 +265,19 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
         // 检查是否在画中画模式下播放结束
         BOOL isPipActive = [self isPictureInPictureActive];
         
-        TFYPlayerLogInfo(@"playerDidToEnd - isPipActive: %@", isPipActive ? @"YES" : @"NO");
-        
         if (isPipActive) {
             // 检查是否需要处理画中画连续播放
             if (!self.isHandlingPipContinuousPlay) {
                 // 第一次开始画中画连续播放
                 self.isHandlingPipContinuousPlay = YES;
-                TFYPlayerLogInfo(@"开始画中画连续播放模式");
             }
             
             // 标记画中画是因为播放结束而停止的
             self.pipStoppedDueToPlaybackEnd = YES;
             self.pipRetryCount = 0;
-            NSLog(@"TFY_PlayerController: 设置 pipStoppedDueToPlaybackEnd = YES, 处理画中画连续播放");
-            
             // 在画中画模式下，直接处理连续播放逻辑
             [self handlePipContinuousPlayback];
         }
-        
-        NSLog(@"TFY_PlayerController: 触发外部playerDidToEnd回调");
         if (self.playerDidToEnd) self.playerDidToEnd(asset);
         if ([self.controlView respondsToSelector:@selector(videoPlayerPlayEnd:)]) {
             [self.controlView videoPlayerPlayEnd:self];
@@ -591,23 +564,13 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 #pragma mark - PiP Controller Reset
 
 - (void)handlePipContinuousPlayback {
-    NSLog(@"TFY_PlayerController: handlePipContinuousPlayback - 开始处理画中画连续播放");
-    
     // 延迟一点时间确保播放器状态稳定
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(kPipCheckDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        NSLog(@"TFY_PlayerController: 检查连续播放条件 - shouldAutoPlayNext: %@, isLastAssetURL: %@, shouldLoopPlay: %@", 
-              self.shouldAutoPlayNext ? @"YES" : @"NO",
-              self.isLastAssetURL ? @"YES" : @"NO",
-              self.shouldLoopPlay ? @"YES" : @"NO");
-        
         if (self.shouldAutoPlayNext && !self.isLastAssetURL) {
-            NSLog(@"TFY_PlayerController: 画中画模式 - 自动播放下一个视频");
             [self playTheNextInPip];
         } else if (self.shouldLoopPlay) {
-            NSLog(@"TFY_PlayerController: 画中画模式 - 循环播放第一个视频");
             [self playTheIndexInPip:0];
         } else {
-            NSLog(@"TFY_PlayerController: 画中画模式 - 不满足连续播放条件，停止播放");
             self.isHandlingPipContinuousPlay = NO;
         }
     });
@@ -626,7 +589,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
                 return; // 不循环播放，停止播放
             }
         }
-        NSLog(@"TFY_PlayerController: 画中画模式 - 切换到视频索引: %ld", (long)index);
         [self playTheIndexInPip:index];
     }
 }
@@ -641,10 +603,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
         
         NSURL *assetURL = [self.assetURLs objectAtIndex:index];
         self.currentPlayIndex = index;
-        
-        // 在画中画模式下使用特殊的资源切换方法
-        NSLog(@"TFY_PlayerController: 画中画模式 - 切换视频资源到: %@", assetURL.absoluteString);
-        
         // 设置新的资源URL但不触发播放器重建
         objc_setAssociatedObject(self, @selector(assetURL), assetURL, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         
@@ -655,8 +613,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 
 // 画中画模式下的资源切换方法
 - (void)switchToNewAssetInPipMode:(NSURL *)assetURL {
-    TFYPlayerLogInfo(@"switchToNewAssetInPipMode - 开始切换资源，尝试保持画中画");
-    
     // 获取当前的AVPlayer实例
     AVPlayer *player = [self getCurrentPlayer];
     
@@ -664,9 +620,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
         // 创建新的AVPlayerItem而不是重新创建整个播放器
         AVURLAsset *asset = [AVURLAsset URLAssetWithURL:assetURL options:nil];
         AVPlayerItem *newPlayerItem = [AVPlayerItem playerItemWithAsset:asset];
-        
-        TFYPlayerLogInfo(@"switchToNewAssetInPipMode - 替换PlayerItem");
-        
         // 暂停当前播放
         [player pause];
         
@@ -676,7 +629,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
         // 等待新item准备就绪后开始播放
         [self observeNewPlayerItemForPip:newPlayerItem];
     } else {
-        TFYPlayerLogInfo(@"switchToNewAssetInPipMode - 无法获取AVPlayer，使用普通方式");
         // 如果无法获取AVPlayer，回退到普通方式
         [self fallbackToNormalAssetSwitch:assetURL];
     }
@@ -684,8 +636,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 
 // 回退到普通的资源切换方式
 - (void)fallbackToNormalAssetSwitch:(NSURL *)assetURL {
-    TFYPlayerLogInfo(@"fallbackToNormalAssetSwitch - 使用普通方式切换资源");
-    
     // 记录画中画状态
     BOOL wasPipActive = [self isPictureInPictureActive];
     
@@ -705,15 +655,11 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 
 // 专门为画中画模式设计的资源切换方法  
 - (void)switchAssetURLForPipMode:(NSURL *)assetURL {
-    TFYPlayerLogInfo(@"switchAssetURLForPipMode - 开始画中画模式资源切换");
-    
     // 获取当前的AVPlayer和AVPlayerLayer
     AVPlayer *currentPlayer = [self getCurrentPlayer];
     AVPlayerLayer *currentPlayerLayer = [self getCurrentPlayerLayer];
     
     if (currentPlayer && currentPlayerLayer) {
-        TFYPlayerLogInfo(@"switchAssetURLForPipMode - 手动替换PlayerItem");
-        
         // 暂停当前播放
         [currentPlayer pause];
         
@@ -731,7 +677,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
         [self observeNewPlayerItemForPip:newPlayerItem];
         
     } else {
-        TFYPlayerLogInfo(@"switchAssetURLForPipMode - 无法获取Player或PlayerLayer，使用普通方式");
         // 如果无法获取必要的对象，回退到正常方式
         self.currentPlayerManager.assetURL = assetURL;
     }
@@ -779,15 +724,12 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 
 // 手动更新播放器管理器的内部引用
 - (void)updatePlayerManagerReferencesForPip:(AVURLAsset *)asset playerItem:(AVPlayerItem *)playerItem assetURL:(NSURL *)assetURL {
-    NSLog(@"TFY_PlayerController: updatePlayerManagerReferencesForPip - 更新播放器管理器内部引用");
-    
     // 使用KVC直接设置内部属性，避免触发setter
     @try {
         NSObject *playerManager = (NSObject *)self.currentPlayerManager;
         [playerManager setValue:asset forKey:@"asset"];
         [playerManager setValue:playerItem forKey:@"playerItem"];
         [playerManager setValue:assetURL forKey:@"assetURL"];
-        NSLog(@"TFY_PlayerController: updatePlayerManagerReferencesForPip - 成功更新内部引用");
     } @catch (NSException *exception) {
         NSLog(@"TFY_PlayerController: updatePlayerManagerReferencesForPip - 更新内部引用失败: %@", exception.reason);
     }
@@ -795,7 +737,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 
 // 重新初始化播放器管理器的观察者和通知系统
 - (void)reinitializePlayerManagerObserversForPip {
-    NSLog(@"TFY_PlayerController: reinitializePlayerManagerObserversForPip - 重新初始化观察者和通知");
     
     // 先清理旧的观察者和通知
     @try {
@@ -808,7 +749,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
             #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
             [playerItemKVO performSelector:NSSelectorFromString(@"safelyRemoveAllObservers")];
             #pragma clang diagnostic pop
-            NSLog(@"TFY_PlayerController: reinitializePlayerManagerObserversForPip - 清理旧的KVO观察者");
         }
         
         // 移除旧的时间观察者
@@ -818,7 +758,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
             if (player) {
                 [player removeTimeObserver:timeObserver];
                 [playerManager setValue:nil forKey:@"timeObserver"];
-                NSLog(@"TFY_PlayerController: reinitializePlayerManagerObserversForPip - 移除旧的时间观察者");
             }
         }
         
@@ -827,7 +766,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
         if (itemEndObserver) {
             [[NSNotificationCenter defaultCenter] removeObserver:itemEndObserver];
             [playerManager setValue:nil forKey:@"itemEndObserver"];
-            NSLog(@"TFY_PlayerController: reinitializePlayerManagerObserversForPip - 移除旧的播放结束通知");
         }
         
     } @catch (NSException *exception) {
@@ -841,7 +779,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
         #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
         [self.currentPlayerManager performSelector:itemObservingSelector];
         #pragma clang diagnostic pop
-        NSLog(@"TFY_PlayerController: reinitializePlayerManagerObserversForPip - 成功调用itemObserving重新设置观察者");
     } else {
         NSLog(@"TFY_PlayerController: reinitializePlayerManagerObserversForPip - 播放器管理器不支持itemObserving方法");
     }
@@ -852,7 +789,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 
 // 手动设置播放结束通知，确保画中画连续播放正常工作
 - (void)manuallySetupPlayerEndNotificationForPip {
-    NSLog(@"TFY_PlayerController: manuallySetupPlayerEndNotificationForPip - 开始手动设置播放结束通知");
     
     // 获取当前的PlayerItem
     AVPlayerItem *currentItem = nil;
@@ -864,7 +800,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
     }
     
     if (currentItem) {
-        NSLog(@"TFY_PlayerController: manuallySetupPlayerEndNotificationForPip - 找到当前PlayerItem，设置播放结束通知");
         
         // 移除旧的通知（如果有的话）
         [[NSNotificationCenter defaultCenter] removeObserver:self 
@@ -877,7 +812,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
                                                      name:AVPlayerItemDidPlayToEndTimeNotification 
                                                    object:currentItem];
         
-        NSLog(@"TFY_PlayerController: manuallySetupPlayerEndNotificationForPip - 播放结束通知设置完成");
     } else {
         NSLog(@"TFY_PlayerController: manuallySetupPlayerEndNotificationForPip - 警告：无法获取当前PlayerItem");
     }
@@ -885,25 +819,20 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 
 // 画中画专用的播放结束通知处理
 - (void)pipPlayerItemDidPlayToEnd:(NSNotification *)notification {
-    NSLog(@"TFY_PlayerController: pipPlayerItemDidPlayToEnd - 收到播放结束通知");
     
     // 检查是否在画中画模式下
     BOOL isPipActive = [self isPictureInPictureActive];
-    NSLog(@"TFY_PlayerController: pipPlayerItemDidPlayToEnd - isPipActive: %@", isPipActive ? @"YES" : @"NO");
-    
+
     if (isPipActive) {
         // 检查是否需要处理画中画连续播放
         if (!self.isHandlingPipContinuousPlay) {
             // 第一次开始画中画连续播放
             self.isHandlingPipContinuousPlay = YES;
-            NSLog(@"TFY_PlayerController: pipPlayerItemDidPlayToEnd - 开始画中画连续播放模式");
         }
         
         // 标记画中画是因为播放结束而停止的
         self.pipStoppedDueToPlaybackEnd = YES;
         self.pipRetryCount = 0;
-        NSLog(@"TFY_PlayerController: pipPlayerItemDidPlayToEnd - 设置 pipStoppedDueToPlaybackEnd = YES, 处理画中画连续播放");
-        
         // 在画中画模式下，直接处理连续播放逻辑
         [self handlePipContinuousPlayback];
     }
@@ -911,7 +840,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 
 // 监听新PlayerItem的准备状态
 - (void)observeNewPlayerItemForPip:(AVPlayerItem *)playerItem {
-    NSLog(@"TFY_PlayerController: observeNewPlayerItemForPip - 开始监听新PlayerItem状态");
     
     // 监听PlayerItem状态
     [playerItem addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:TFYPlayerPipItemContext];
@@ -928,13 +856,11 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
                 @try {
                     [playerItem removeObserver:strongSelf forKeyPath:@"status" context:TFYPlayerPipItemContext];
                     objc_setAssociatedObject(playerItem, @"isObserving", @NO, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-                    NSLog(@"TFY_PlayerController: observeNewPlayerItemForPip - 超时移除观察者");
                 } @catch (NSException *exception) {
                     NSLog(@"TFY_PlayerController: 超时移除观察者时出现异常: %@", exception.reason);
                 }
                 
                 if (strongSelf.isHandlingPipContinuousPlay) {
-                    NSLog(@"TFY_PlayerController: observeNewPlayerItemForPip - 超时，强制完成处理");
                     strongSelf.isHandlingPipContinuousPlay = NO;
                     strongSelf.pipStoppedDueToPlaybackEnd = NO;
                 }
@@ -945,15 +871,13 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 
 // 更新播放器管理器的内部状态，确保与新的PlayerItem同步
 - (void)updatePlayerManagerStateForPip:(AVPlayerItem *)playerItem {
-    NSLog(@"TFY_PlayerController: updatePlayerManagerStateForPip - 开始更新播放器管理器状态");
     
     // 重新设置播放器管理器的观察者和通知（在playerItem引用更新后）
     [self reinitializePlayerManagerObserversForPip];
     
     // 重新设置播放器管理器的回调 - 这是关键！
     [self playerManagerCallbcak];
-    NSLog(@"TFY_PlayerController: updatePlayerManagerStateForPip - 重新设置播放器回调");
-    
+
     // 验证回调是否正确设置
     if (self.currentPlayerManager.playerDidToEnd) {
         NSLog(@"TFY_PlayerController: updatePlayerManagerStateForPip - playerDidToEnd回调已设置");
@@ -966,7 +890,7 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
         NSObject *playerManager = (NSObject *)self.currentPlayerManager;
         [playerManager setValue:@YES forKey:@"isPreparedToPlay"];
         [playerManager setValue:@YES forKey:@"isReadyToPlay"];
-        NSLog(@"TFY_PlayerController: updatePlayerManagerStateForPip - 设置播放状态");
+       
     } @catch (NSException *exception) {
         NSLog(@"TFY_PlayerController: updatePlayerManagerStateForPip - 设置播放状态失败: %@", exception.reason);
     }
@@ -975,8 +899,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
     if (self.currentPlayerManager.playerReadyToPlay) {
         self.currentPlayerManager.playerReadyToPlay(self.currentPlayerManager, self.assetURL);
     }
-    
-    NSLog(@"TFY_PlayerController: updatePlayerManagerStateForPip - 播放器管理器状态更新完成");
 }
 
 
@@ -995,28 +917,22 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 
 // 检查播放器准备状态并重启画中画
 - (void)checkPlayerReadyAndRestartPip {
-    NSLog(@"TFY_PlayerController: 检查播放器状态 - isPreparedToPlay: %@, playState: %ld", 
-          self.currentPlayerManager.isPreparedToPlay ? @"YES" : @"NO", (long)self.currentPlayerManager.playState);
     
     if (self.currentPlayerManager.isPreparedToPlay || self.currentPlayerManager.playState == PlayerPlayStatePlaying) {
-        NSLog(@"TFY_PlayerController: 画中画模式 - 播放器已准备就绪，重启画中画");
         [self restartPipAfterVideoChange];
     } else {
         self.pipRetryCount++;
         if (self.pipRetryCount < 3) {
-            NSLog(@"TFY_PlayerController: 画中画模式 - 播放器未就绪，第%ld次重试", (long)self.pipRetryCount);
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 [self checkPlayerReadyAndRestartPip];
             });
         } else {
-            NSLog(@"TFY_PlayerController: 画中画模式 - 重试次数超限，强制重启画中画");
             [self restartPipAfterVideoChange];
         }
     }
 }
 
 - (void)restartPipAfterVideoChange {
-    NSLog(@"TFY_PlayerController: 画中画模式 - 重启画中画");
     
     // 强制重新创建画中画控制器，但不重置现有的
     objc_setAssociatedObject(self, @selector(pipController), nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -1024,8 +940,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
     // 启动新的画中画
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         BOOL success = [self startPictureInPicture];
-        NSLog(@"TFY_PlayerController: 画中画重启结果: %@", success ? @"成功" : @"失败");
-        
         // 标记画中画连续播放处理完成
         self.isHandlingPipContinuousPlay = NO;
         self.pipStoppedDueToPlaybackEnd = NO;
@@ -1041,18 +955,15 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
     if (context == TFYPlayerPipItemContext) {
         if ([keyPath isEqualToString:@"status"]) {
             AVPlayerItem *playerItem = (AVPlayerItem *)object;
-            NSLog(@"TFY_PlayerController: observeValueForKeyPath - PlayerItem状态: %ld", (long)playerItem.status);
             
             if (playerItem.status == AVPlayerItemStatusReadyToPlay) {
-                NSLog(@"TFY_PlayerController: observeValueForKeyPath - 新PlayerItem准备就绪，开始播放");
-                
+
                 // 安全地移除观察者
                 NSNumber *isObserving = objc_getAssociatedObject(playerItem, @"isObserving");
                 if (isObserving.boolValue) {
                     @try {
                         [playerItem removeObserver:self forKeyPath:@"status" context:context];
                         objc_setAssociatedObject(playerItem, @"isObserving", @NO, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-                        NSLog(@"TFY_PlayerController: observeValueForKeyPath - 成功移除观察者");
                     } @catch (NSException *exception) {
                         NSLog(@"TFY_PlayerController: 移除观察者时出现异常: %@", exception.reason);
                     }
@@ -1066,7 +977,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
                     AVPlayer *player = [self.currentPlayerManager performSelector:@selector(player)];
                     if (player) {
                         [player play];
-                        NSLog(@"TFY_PlayerController: observeValueForKeyPath - 开始播放新视频");
                     }
                 }
                 
@@ -1075,11 +985,9 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
                     // 不要在这里设置 isHandlingPipContinuousPlay = NO，这会阻止后续的连续播放
                     // 只重置播放结束标志
                     self.pipStoppedDueToPlaybackEnd = NO;
-                    NSLog(@"TFY_PlayerController: 画中画视频切换完成，准备接收下一个播放结束事件");
                 });
                 
             } else if (playerItem.status == AVPlayerItemStatusFailed) {
-                NSLog(@"TFY_PlayerController: observeValueForKeyPath - PlayerItem加载失败: %@", playerItem.error.localizedDescription);
                 
                 // 安全地移除观察者
                 NSNumber *isObserving = objc_getAssociatedObject(playerItem, @"isObserving");
@@ -1115,7 +1023,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
     if (@available(iOS 15.0, *)) {
         AVPictureInPictureController *pip = objc_getAssociatedObject(self, @selector(pipController));
         if (pip) {
-            NSLog(@"TFY_PlayerController: 重置pipController");
             pip.delegate = nil;
             objc_setAssociatedObject(self, @selector(pipController), nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         }
@@ -2229,35 +2136,30 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 #pragma mark - TFYPictureInPictureManagerDelegate
 
 - (void)pictureInPictureManager:(TFY_PlayerPictureInPictureManager *)manager willStartPictureInPicture:(AVPictureInPictureController *)pipController {
-    NSLog(@"TFY_PlayerController: 画中画即将开始");
     if (self.pipWillStart) {
         self.pipWillStart(self);
     }
 }
 
 - (void)pictureInPictureManager:(TFY_PlayerPictureInPictureManager *)manager didStartPictureInPicture:(AVPictureInPictureController *)pipController {
-    NSLog(@"TFY_PlayerController: 画中画已开始");
     if (self.pipDidStart) {
         self.pipDidStart(self);
     }
 }
 
 - (void)pictureInPictureManager:(TFY_PlayerPictureInPictureManager *)manager willStopPictureInPicture:(AVPictureInPictureController *)pipController {
-    NSLog(@"TFY_PlayerController: 画中画即将停止");
     if (self.pipWillStop) {
         self.pipWillStop(self);
     }
 }
 
 - (void)pictureInPictureManager:(TFY_PlayerPictureInPictureManager *)manager didStopPictureInPicture:(AVPictureInPictureController *)pipController {
-    NSLog(@"TFY_PlayerController: 画中画已停止");
     if (self.pipDidStop) {
         self.pipDidStop(self);
     }
 }
 
 - (void)pictureInPictureManager:(TFY_PlayerPictureInPictureManager *)manager failedToStartWithError:(NSError *)error {
-    NSLog(@"TFY_PlayerController: 画中画启动失败: %@", error.localizedDescription);
     if (self.pipFailedToStart) {
         self.pipFailedToStart(self, error);
     }
@@ -2265,7 +2167,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
 
 - (void)pictureInPictureManager:(TFY_PlayerPictureInPictureManager *)manager 
     restoreUserInterfaceForPictureInPictureStopWithCompletionHandler:(void (^)(BOOL restored))completionHandler {
-    NSLog(@"TFY_PlayerController: 画中画请求恢复用户界面");
     if (self.pipRestoreUserInterface) {
         self.pipRestoreUserInterface(self, completionHandler);
     } else {
@@ -2288,12 +2189,9 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
     if (self.assetURLs && self.assetURLs.count > 0) {
         NSInteger nextIndex = self.currentPlayIndex + 1;
         if (nextIndex < self.assetURLs.count) {
-            NSLog(@"TFY_PlayerController: 画中画连续播放 - 自动播放下一个视频 (index: %ld)", (long)nextIndex);
             return self.assetURLs[nextIndex];
         }
     }
-    
-    NSLog(@"TFY_PlayerController: 画中画连续播放 - 没有更多视频");
     return nil;
 }
 
@@ -2327,8 +2225,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
     // 清理性能优化器缓存
     TFY_PlayerPerformanceOptimizer *optimizer = [TFY_PlayerPerformanceOptimizer sharedOptimizer];
     [optimizer clearAllCaches];
-    
-    TFYPlayerLogInfo(@"播放器缓存已清理");
 }
 
 - (void)triggerMemoryCleanup {
@@ -2338,8 +2234,6 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
     
     // 清理播放器缓存
     [self.playerCache removeAllObjects];
-    
-    TFYPlayerLogInfo(@"内存清理已完成");
 }
 
 @end

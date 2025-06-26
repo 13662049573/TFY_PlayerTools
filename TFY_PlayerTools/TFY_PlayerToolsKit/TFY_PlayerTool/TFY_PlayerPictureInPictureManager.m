@@ -107,17 +107,13 @@ static NSString *const kLastErrorKey = @"lastError";
 
 - (BOOL)startPictureInPicture {
     if (@available(iOS 15.0, *)) {
-        NSLog(@"TFY_PipManager: 开始启动画中画流程");
-        
         // 检查是否正在处理
         if (self.isProcessing) {
-            NSLog(@"TFY_PipManager: 正在处理中，避免重复调用");
             return NO;
         }
         
         // 检查重试次数
         if (self.currentRetryCount >= self.maxRetryCount) {
-            NSLog(@"TFY_PipManager: 重试次数超限(%ld)，停止尝试", (long)self.currentRetryCount);
             [self createErrorWithCode:TFYPipErrorCodeRetryLimitExceeded description:@"重试次数超过限制"];
             [self setState:TFYPipStateFailed];
             return NO;
@@ -126,7 +122,6 @@ static NSString *const kLastErrorKey = @"lastError";
         // 防抖检查
         NSTimeInterval currentTime = [[NSDate date] timeIntervalSince1970];
         if (currentTime - self.lastStartTime < self.debounceInterval) {
-            NSLog(@"TFY_PipManager: 启动过于频繁，忽略调用");
             return NO;
         }
         
@@ -146,7 +141,6 @@ static NSString *const kLastErrorKey = @"lastError";
             // 检查是否需要重试
             if ([self shouldRetryForError:error]) {
                 self.currentRetryCount++;
-                NSLog(@"TFY_PipManager: 第%ld次重试 (错误: %@)", (long)self.currentRetryCount, error.localizedDescription);
                 
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.retryInterval * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     [self startPictureInPicture];
@@ -191,7 +185,6 @@ static NSString *const kLastErrorKey = @"lastError";
     [self cleanup];
     self.pipController = nil;
     [self setState:TFYPipStateInactive];
-    NSLog(@"TFY_PipManager: 画中画控制器已重置");
 }
 
 - (BOOL)checkPictureInPictureSupport {
@@ -233,84 +226,65 @@ static NSString *const kLastErrorKey = @"lastError";
     self.currentRetryCount = 0;
     self.isContinuousPlaybackMode = NO;
     [self setState:TFYPipStateInactive];
-    
-    NSLog(@"TFY_PipManager: 资源清理完成");
 }
 
 #pragma mark - Private Methods
 
 - (BOOL)performStartupChecks:(NSError **)error {
-    NSLog(@"[PIP] 启动前检查: enablePictureInPicture=%@, 支持PIP=%@", self.enablePictureInPicture ? @"YES" : @"NO", [self checkPictureInPictureSupport] ? @"YES" : @"NO");
     if (!self.enablePictureInPicture) {
-        NSLog(@"[PIP] 画中画功能未启用");
         *error = [self createErrorWithCode:TFYPipErrorCodeNotEnabled description:@"画中画功能未启用"];
         return NO;
     }
     if (![self checkPictureInPictureSupport]) {
-        NSLog(@"[PIP] 设备不支持画中画");
         *error = [self createErrorWithCode:TFYPipErrorCodeUnsupported description:@"设备不支持画中画"];
         return NO;
     }
     if (!self.playerController || !self.playerController.currentPlayerManager) {
-        NSLog(@"[PIP] 播放器控制器为空");
         *error = [self createErrorWithCode:TFYPipErrorCodePlayerNotReady description:@"播放器控制器为空"];
         return NO;
     }
     if (!self.playerController.currentPlayerManager.isPreparedToPlay) {
-        NSLog(@"[PIP] 播放器未准备好");
         *error = [self createErrorWithCode:TFYPipErrorCodePlayerNotReady description:@"播放器未准备好"];
         return NO;
     }
     AVPlayer *player = [self getAVPlayer];
     AVPlayerLayer *playerLayer = [self getAVPlayerLayer];
-    NSLog(@"[PIP] AVPlayer=%@, AVPlayerLayer=%@", player, playerLayer);
     if (!player) {
-        NSLog(@"[PIP] AVPlayer为空");
         *error = [self createErrorWithCode:TFYPipErrorCodePlayerNotReady description:@"AVPlayer为空"];
         return NO;
     }
     if (!player.currentItem) {
-        NSLog(@"[PIP] AVPlayerItem为空");
         *error = [self createErrorWithCode:TFYPipErrorCodePlayerNotReady description:@"AVPlayerItem为空"];
         return NO;
     }
     if (player.currentItem.status != AVPlayerItemStatusReadyToPlay) {
-        NSLog(@"[PIP] AVPlayerItem未准备好, status=%ld", (long)player.currentItem.status);
         *error = [self createErrorWithCode:TFYPipErrorCodePlayerNotReady description:@"AVPlayerItem未准备好"];
         return NO;
     }
     if (!playerLayer) {
-        NSLog(@"[PIP] AVPlayerLayer为空");
         *error = [self createErrorWithCode:TFYPipErrorCodeLayerNotFound description:@"AVPlayerLayer为空"];
         return NO;
     }
     NSArray *videoTracks = [player.currentItem.asset tracksWithMediaType:AVMediaTypeVideo];
-    NSLog(@"[PIP] 视频轨道数: %lu", (unsigned long)videoTracks.count);
     if (videoTracks.count == 0) {
-        NSLog(@"[PIP] 没有视频轨道");
         *error = [self createErrorWithCode:TFYPipErrorCodeContentUnsupported description:@"没有视频轨道"];
         return NO;
     }
-    NSLog(@"[PIP] PlayerLayer.bounds=%@, superlayer=%@", NSStringFromCGRect(playerLayer.bounds), playerLayer.superlayer);
+    
     if (CGRectIsEmpty(playerLayer.bounds) || CGRectEqualToRect(playerLayer.bounds, CGRectZero)) {
-        NSLog(@"[PIP] AVPlayerLayer bounds无效");
         *error = [self createErrorWithCode:TFYPipErrorCodeLayerNotFound description:@"AVPlayerLayer bounds无效"];
         return NO;
     }
     if (!playerLayer.superlayer) {
-        NSLog(@"[PIP] AVPlayerLayer未添加到视图层级");
         *error = [self createErrorWithCode:TFYPipErrorCodeLayerNotFound description:@"AVPlayerLayer未添加到视图层级"];
         return NO;
     }
     UIView *hostView = [self findHostViewForLayer:playerLayer];
-    NSLog(@"[PIP] hostView=%@, window=%@", hostView, hostView ? hostView.window : nil);
     if (!hostView || !hostView.window) {
-        NSLog(@"[PIP] AVPlayerLayer未关联到window");
         *error = [self createErrorWithCode:TFYPipErrorCodeWindowNotAttached description:@"AVPlayerLayer未关联到window"];
         return NO;
     }
     if (playerLayer.player != player) {
-        NSLog(@"[PIP] 修复PlayerLayer的player引用");
         playerLayer.player = player;
     }
     if (![self ensurePipController:error]) {
@@ -318,39 +292,28 @@ static NSString *const kLastErrorKey = @"lastError";
         return NO;
     }
     if (self.pipController.isPictureInPictureActive) {
-        NSLog(@"[PIP] 画中画已在活动状态");
         *error = [self createErrorWithCode:TFYPipErrorCodeAlreadyActive description:@"画中画已在活动状态"];
         return NO;
     }
-    NSLog(@"[PIP] isPictureInPicturePossible=%@", self.pipController.isPictureInPicturePossible ? @"YES" : @"NO");
+    
     if (!self.pipController.isPictureInPicturePossible) {
-        NSLog(@"[PIP] 当前无法启动画中画，尝试等待和重试");
-        
+
         // 如果这是第一次检查，等待一段时间再重试
         if (self.currentRetryCount == 0) {
             self.currentRetryCount++;
-            NSLog(@"[PIP] 等待1秒后重试画中画启动");
             
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                NSLog(@"[PIP] 重新检查isPictureInPicturePossible: %@", self.pipController.isPictureInPicturePossible ? @"YES" : @"NO");
                 if (self.pipController.isPictureInPicturePossible) {
-                    NSLog(@"[PIP] 等待后画中画变为可用，重新启动");
                     [self.pipController startPictureInPicture];
-                } else {
-                    NSLog(@"[PIP] 等待后画中画仍不可用");
-                    [self performDiagnostics];
                 }
             });
             
             return YES; // 返回YES，因为我们会在延迟后重试
         } else {
-            NSLog(@"[PIP] 重试后仍无法启动画中画");
-            [self performDiagnostics];
             *error = [self createErrorWithCode:TFYPipErrorCodeSystemRestriction description:@"系统限制，无法启动画中画"];
             return NO;
         }
     }
-    NSLog(@"[PIP] 启动前检查全部通过");
     return YES;
 }
 
@@ -368,7 +331,6 @@ static NSString *const kLastErrorKey = @"lastError";
         @try {
             self.pipController = [[AVPictureInPictureController alloc] initWithPlayerLayer:playerLayer];
             self.pipController.delegate = self;
-            NSLog(@"TFY_PipManager: 成功创建画中画控制器");
             
             // 添加isPictureInPicturePossible的KVO监听
             [self.pipController addObserver:self 
@@ -440,8 +402,6 @@ static NSString *const kLastErrorKey = @"lastError";
 - (void)setState:(TFYPipState)state {
     if (_currentState != state) {
         _currentState = state;
-        NSLog(@"TFY_PipManager: 状态变更为 %ld", (long)state);
-        
         if ([self.delegate respondsToSelector:@selector(pictureInPictureManager:didChangeState:)]) {
             [self.delegate pictureInPictureManager:self didChangeState:state];
         }
@@ -465,15 +425,12 @@ static NSString *const kLastErrorKey = @"lastError";
 
 - (void)handlePlaybackEnd:(NSNotification *)notification {
     if (self.isPictureInPictureActive && self.enableContinuousPlayback) {
-        NSLog(@"TFY_PipManager: 画中画模式下播放结束，尝试连续播放");
-        
         if ([self.delegate respondsToSelector:@selector(pictureInPictureManagerRequestNextAssetURL:)]) {
             NSURL *nextURL = [self.delegate pictureInPictureManagerRequestNextAssetURL:self];
             
             if (nextURL) {
                 [self startContinuousPlaybackWithURL:nextURL];
             } else {
-                NSLog(@"TFY_PipManager: 没有下一个资源，结束连续播放");
                 [self completeContinuousPlayback];
             }
         }
@@ -482,7 +439,6 @@ static NSString *const kLastErrorKey = @"lastError";
 
 - (void)startContinuousPlaybackWithURL:(NSURL *)url {
     self.isContinuousPlaybackMode = YES;
-    NSLog(@"TFY_PipManager: 开始连续播放，切换到: %@", url.absoluteString);
     
     AVPlayer *player = [self getAVPlayer];
     if (player) {
@@ -520,30 +476,19 @@ static NSString *const kLastErrorKey = @"lastError";
             AVPlayer *player = [self getAVPlayer];
             if (player) {
                 [player play];
-                NSLog(@"TFY_PipManager: 连续播放新视频开始");
             }
         } else if (item.status == AVPlayerItemStatusFailed) {
             [item removeObserver:self forKeyPath:@"status"];
-            NSLog(@"TFY_PipManager: 连续播放新视频失败: %@", item.error.localizedDescription);
             [self completeContinuousPlayback];
         }
     } else if ([keyPath isEqualToString:@"pictureInPicturePossible"] && object == self.pipController) {
         BOOL isPossible = [change[NSKeyValueChangeNewKey] boolValue];
-        NSLog(@"TFY_PipManager: isPictureInPicturePossible 变更为: %@", isPossible ? @"YES" : @"NO");
-        
         if (isPossible) {
-            NSLog(@"TFY_PipManager: 画中画现在可用！");
             // 通知代理画中画状态可用
             if ([self.delegate respondsToSelector:@selector(pictureInPictureManager:didChangeState:)]) {
                 [self.delegate pictureInPictureManager:self didChangeState:TFYPipStateInactive];
             }
         } else {
-            NSLog(@"TFY_PipManager: 画中画当前不可用，可能的原因:");
-            NSLog(@"1. 正在使用FaceTime或其他应用");
-            NSLog(@"2. 设备不支持画中画");
-            NSLog(@"3. Audio Session配置不正确");
-            NSLog(@"4. AVPlayerLayer配置问题");
-            
             // 尝试重新配置Audio Session
             [self configureAudioSessionForPiP];
         }
@@ -556,8 +501,6 @@ static NSString *const kLastErrorKey = @"lastError";
     if ([self.delegate respondsToSelector:@selector(pictureInPictureManagerDidCompleteContinuousPlayback:)]) {
         [self.delegate pictureInPictureManagerDidCompleteContinuousPlayback:self];
     }
-    
-    NSLog(@"TFY_PipManager: 连续播放完成");
 }
 
 - (void)cleanupContinuousPlayback {
@@ -565,8 +508,6 @@ static NSString *const kLastErrorKey = @"lastError";
 }
 
 - (void)configureAudioSessionForPiP {
-    NSLog(@"TFY_PipManager: 配置Audio Session以支持画中画");
-    
     NSError *error = nil;
     AVAudioSession *audioSession = [AVAudioSession sharedInstance];
     
@@ -590,67 +531,6 @@ static NSString *const kLastErrorKey = @"lastError";
         NSLog(@"TFY_PipManager: Audio Session激活失败: %@", error.localizedDescription);
         return;
     }
-    
-    NSLog(@"TFY_PipManager: Audio Session配置成功");
-    NSLog(@"- Category: %@", audioSession.category);
-    NSLog(@"- Mode: %@", audioSession.mode);
-    NSLog(@"- Options: %lu", (unsigned long)audioSession.categoryOptions);
-    NSLog(@"- Available inputs: %lu", (unsigned long)audioSession.availableInputs.count);
-}
-
-- (void)performDiagnostics {
-    NSLog(@"=== TFY_PipManager 画中画诊断 ===");
-    
-    // 1. 基础支持检查
-    NSLog(@"1. 基础支持:");
-    NSLog(@"   - iOS版本: %@", [[UIDevice currentDevice] systemVersion]);
-    NSLog(@"   - 设备型号: %@", [[UIDevice currentDevice] model]);
-    NSLog(@"   - 画中画支持: %@", [AVPictureInPictureController isPictureInPictureSupported] ? @"YES" : @"NO");
-    
-    // 2. Audio Session检查
-    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-    NSLog(@"2. Audio Session:");
-    NSLog(@"   - Category: %@", audioSession.category);
-    NSLog(@"   - Mode: %@", audioSession.mode);
-    NSLog(@"   - Options: %lu", (unsigned long)audioSession.categoryOptions);
-    NSLog(@"   - Active: %@", audioSession.isOtherAudioPlaying ? @"YES" : @"NO");
-    
-    // 3. 播放器状态检查
-    AVPlayer *player = [self getAVPlayer];
-    AVPlayerLayer *playerLayer = [self getAVPlayerLayer];
-    NSLog(@"3. 播放器状态:");
-    NSLog(@"   - AVPlayer: %@", player ? @"存在" : @"不存在");
-    NSLog(@"   - AVPlayerLayer: %@", playerLayer ? @"存在" : @"不存在");
-    if (player && player.currentItem) {
-        NSLog(@"   - PlayerItem状态: %ld", (long)player.currentItem.status);
-        NSLog(@"   - PlayerItem错误: %@", player.currentItem.error ? player.currentItem.error.localizedDescription : @"无");
-        NSLog(@"   - 播放速率: %.2f", player.rate);
-    }
-    
-    // 4. 视图层级检查
-    if (playerLayer) {
-        NSLog(@"4. 视图层级:");
-        NSLog(@"   - PlayerLayer bounds: %@", NSStringFromCGRect(playerLayer.bounds));
-        NSLog(@"   - PlayerLayer superlayer: %@", playerLayer.superlayer ? @"存在" : @"不存在");
-        UIView *hostView = [self findHostViewForLayer:playerLayer];
-        NSLog(@"   - Host view: %@", hostView ? NSStringFromClass([hostView class]) : @"未找到");
-        NSLog(@"   - Host view window: %@", hostView.window ? @"存在" : @"不存在");
-    }
-    
-    // 5. PiP控制器检查
-    if (self.pipController) {
-        NSLog(@"5. PiP控制器:");
-        NSLog(@"   - isPictureInPicturePossible: %@", self.pipController.isPictureInPicturePossible ? @"YES" : @"NO");
-        NSLog(@"   - isPictureInPictureActive: %@", self.pipController.isPictureInPictureActive ? @"YES" : @"NO");
-        NSLog(@"   - PlayerLayer引用: %@", self.pipController.playerLayer ? @"存在" : @"不存在");
-    }
-    
-    // 6. 系统状态检查
-    NSLog(@"6. 系统状态:");
-    NSLog(@"   - 应用状态: %ld", (long)[UIApplication sharedApplication].applicationState);
-    NSLog(@"   - 多任务支持: %@", [[UIDevice currentDevice] isMultitaskingSupported] ? @"YES" : @"NO");
-    
-    NSLog(@"=== 诊断完成 ===");
 }
 
 #pragma mark - Delegate Notifications
@@ -684,15 +564,14 @@ static NSString *const kLastErrorKey = @"lastError";
 #pragma mark - AVPictureInPictureControllerDelegate
 
 - (void)pictureInPictureControllerWillStartPictureInPicture:(AVPictureInPictureController *)pictureInPictureController {
-    NSLog(@"TFY_PipManager: 画中画即将开始");
-    
+
     if ([self.delegate respondsToSelector:@selector(pictureInPictureManager:willStartPictureInPicture:)]) {
         [self.delegate pictureInPictureManager:self willStartPictureInPicture:pictureInPictureController];
     }
 }
 
 - (void)pictureInPictureControllerDidStartPictureInPicture:(AVPictureInPictureController *)pictureInPictureController {
-    NSLog(@"TFY_PipManager: 画中画已开始");
+    
     [self setState:TFYPipStateActive];
     
     if ([self.delegate respondsToSelector:@selector(pictureInPictureManager:didStartPictureInPicture:)]) {
@@ -701,15 +580,14 @@ static NSString *const kLastErrorKey = @"lastError";
 }
 
 - (void)pictureInPictureControllerWillStopPictureInPicture:(AVPictureInPictureController *)pictureInPictureController {
-    NSLog(@"TFY_PipManager: 画中画即将停止");
-    
+   
     if ([self.delegate respondsToSelector:@selector(pictureInPictureManager:willStopPictureInPicture:)]) {
         [self.delegate pictureInPictureManager:self willStopPictureInPicture:pictureInPictureController];
     }
 }
 
 - (void)pictureInPictureControllerDidStopPictureInPicture:(AVPictureInPictureController *)pictureInPictureController {
-    NSLog(@"TFY_PipManager: 画中画已停止");
+   
     [self setState:TFYPipStateInactive];
     
     // 如果不是连续播放模式，清理资源
@@ -724,7 +602,6 @@ static NSString *const kLastErrorKey = @"lastError";
 
 - (void)pictureInPictureController:(AVPictureInPictureController *)pictureInPictureController 
            failedToStartPictureInPictureWithError:(NSError *)error {
-    NSLog(@"TFY_PipManager: 画中画启动失败: %@", error.localizedDescription);
     
     [self setState:TFYPipStateFailed];
     self.lastError = error;
@@ -735,7 +612,6 @@ static NSString *const kLastErrorKey = @"lastError";
 
 - (void)pictureInPictureController:(AVPictureInPictureController *)pictureInPictureController 
 restoreUserInterfaceForPictureInPictureStopWithCompletionHandler:(void (^)(BOOL))completionHandler {
-    NSLog(@"TFY_PipManager: 请求恢复用户界面");
     
     if ([self.delegate respondsToSelector:@selector(pictureInPictureManager:restoreUserInterfaceForPictureInPictureStopWithCompletionHandler:)]) {
         [self.delegate pictureInPictureManager:self 
