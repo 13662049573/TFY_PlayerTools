@@ -95,14 +95,7 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
         }];
         [self configureVolume];
         
-        self.autoStartPiPWhenEnterBackground = NO;
-        
-        self.notification.willResignActive = ^(TFY_PlayerNotification *registrar) {
-            @player_strongify(self)
-            if (self.autoStartPiPWhenEnterBackground && !self.isPictureInPictureActive && self.enablePictureInPicture) {
-                [self startPictureInPicture];
-            }
-        };
+        self.autoStartPiPWhenEnterBackground = YES;
     }
     return self;
 }
@@ -371,7 +364,7 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
         _notification.willResignActive = ^(TFY_PlayerNotification * _Nonnull registrar) {
             @player_strongify(self)
             if (self.isViewControllerDisappear) return;
-            if (self.pauseWhenAppResignActive && self.currentPlayerManager.isPlaying) {
+            if (self.pauseWhenAppResignActive && self.currentPlayerManager.isPlaying && !self.autoStartPiPWhenEnterBackground) {
                 self.pauseByEvent = YES;
             }
             self.orientationObserver.lockedScreen = YES;
@@ -387,17 +380,17 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
             [window endEditing:YES];
             if (!self.pauseWhenAppResignActive) {
                 [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
-                NSError *audioError = nil;
-                BOOL success = [[AVAudioSession sharedInstance] setActive:YES error:&audioError];
-                if (!success) {
-                    NSLog(@"TFY_PlayerController: 后台Audio Session激活失败: %@", audioError.localizedDescription);
-                }
+                [self.pipManager configureAudioSessionForPiP];
+            }
+            
+            if (self.autoStartPiPWhenEnterBackground && !self.isPictureInPictureActive && self.enablePictureInPicture) {
+                [self startPictureInPicture];
             }
         };
         _notification.didBecomeActive = ^(TFY_PlayerNotification * _Nonnull registrar) {
             @player_strongify(self)
             if (self.isViewControllerDisappear) return;
-            if (self.isPauseByEvent) self.pauseByEvent = NO;
+            if (self.isPauseByEvent && !self.autoStartPiPWhenEnterBackground) self.pauseByEvent = NO;
             self.orientationObserver.lockedScreen = NO;
         };
         _notification.oldDeviceUnavailable = ^(TFY_PlayerNotification * _Nonnull registrar) {
