@@ -213,10 +213,6 @@ static NSString *kVideoCover = @"https://upload-images.jianshu.io/upload_images/
             [self.player stopPictureInPicture];
             sender.selected = NO;
         } else {
-            NSLog(@"启动画中画");
-            // 执行诊断
-            [self.player.pipManager performDiagnostics];
-            
             BOOL success = [self.player startPictureInPicture];
             NSLog(@"画中画启动结果: %@", success ? @"成功" : @"失败");
             sender.selected = success;
