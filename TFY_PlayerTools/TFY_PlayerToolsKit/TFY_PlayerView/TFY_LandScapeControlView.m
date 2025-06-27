@@ -70,12 +70,6 @@
                                                      selector:@selector(layoutControllerViews) 
                                                          name:UIApplicationDidBecomeActiveNotification 
                                                        object:nil];
-        } else {
-            // iOS 13以下使用旧的通知
-            [[NSNotificationCenter defaultCenter] addObserver:self 
-                                                     selector:@selector(layoutControllerViews) 
-                                                         name:UIApplicationDidChangeStatusBarFrameNotification 
-                                                       object:nil];
         }
     }
     return self;
