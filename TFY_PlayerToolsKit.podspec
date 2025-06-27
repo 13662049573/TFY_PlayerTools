@@ -31,16 +31,18 @@ Pod::Spec.new do |spec|
 
   spec.subspec 'TFY_PlayerTool' do |s|
     s.source_files  = "TFY_PlayerTools/TFY_PlayerToolsKit/TFY_PlayerTool/**/*.{h,m}"
+    s.public_header_files = "TFY_PlayerTools/TFY_PlayerToolsKit/TFY_PlayerTool/**/*.h"
   end
 
   spec.subspec 'TFY_PlayerView' do |s|
     s.dependency "TFY_PlayerToolsKit/TFY_PlayerTool"
     s.source_files  = "TFY_PlayerTools/TFY_PlayerToolsKit/TFY_PlayerView/**/*.{h,m}"
+    s.public_header_files = "TFY_PlayerTools/TFY_PlayerToolsKit/TFY_PlayerView/**/*.h"
   end
 
   spec.resources    = "TFY_PlayerTools/TFY_PlayerToolsKit/videoImages.bundle"
 
-  spec.ios.frameworks = 'Foundation', 'UIKit'
+  spec.ios.frameworks = 'Foundation', 'UIKit', 'AVFoundation', 'AVKit', 'MediaPlayer'
 
   spec.xcconfig      = { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include" }
   

@@ -17,5 +17,6 @@
 #import "TFY_LandscapeViewController.h"
 #import "TFY_PlayerPictureInPictureManager.h"
 #import "TFY_PlayerToolsHeader.h"
+#import "TFY_PlayerControlView.h"
 
 #endif /* TFY_PlayerTool_h */

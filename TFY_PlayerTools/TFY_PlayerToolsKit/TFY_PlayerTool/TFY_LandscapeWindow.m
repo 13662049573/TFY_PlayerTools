@@ -67,5 +67,4 @@
     self.rootViewController.view.frame = bounds;
 }
 
-
 @end

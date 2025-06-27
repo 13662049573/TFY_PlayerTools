@@ -588,7 +588,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// 画中画重试次数（内部使用）
 @property (nonatomic, assign) NSInteger pipRetryCount;
 
-/// 切换到后台时自动启动画中画，默认NO
+/// 切换到后台时自动启动画中画，默认YES
 @property (nonatomic, assign) BOOL autoStartPiPWhenEnterBackground;
 
 /**

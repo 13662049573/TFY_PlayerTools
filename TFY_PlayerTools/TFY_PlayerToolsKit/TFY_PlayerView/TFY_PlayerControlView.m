@@ -645,7 +645,12 @@
             _effectView = [[UIVisualEffectView alloc] initWithEffect:effect];
         } else {
             UIToolbar *effectView = [[UIToolbar alloc] init];
-            effectView.barStyle = UIBarStyleBlackTranslucent;
+            if (@available(iOS 13.0, *)) {
+                effectView.barStyle = UIBarStyleBlack;
+                effectView.translucent = YES;
+            } else {
+                effectView.barStyle = UIBarStyleBlackTranslucent;
+            }
             _effectView = effectView;
         }
     }

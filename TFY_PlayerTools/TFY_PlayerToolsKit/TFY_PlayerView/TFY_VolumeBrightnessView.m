@@ -74,7 +74,20 @@
 
 /// 移除系统音量view
 - (void)removeSystemVolumeView {
-    [[UIApplication sharedApplication].keyWindow addSubview:self.volumeView];
+    UIWindow *keyWindow = nil;
+    if (@available(iOS 13.0, *)) {
+        UIWindowScene *windowScene = nil;
+        for (UIWindowScene *scene in UIApplication.sharedApplication.connectedScenes) {
+            if (scene.activationState == UISceneActivationStateForegroundActive) {
+                windowScene = scene;
+                break;
+            }
+        }
+        keyWindow = windowScene.windows.firstObject;
+    } else {
+        keyWindow = [UIApplication sharedApplication].keyWindow;
+    }
+    [keyWindow addSubview:self.volumeView];
 }
 
 - (void)updateProgress:(CGFloat)progress withVolumeBrightnessType:(VolumeBrightnessType)volumeBrightnessType {
