@@ -2,7 +2,7 @@ Pod::Spec.new do |spec|
 
   spec.name         = "TFY_PlayerToolsKit"
 
-  spec.version      = "2.2.4"
+  spec.version      = "2.2.5"
 
   spec.summary      = "视频播放器主要使用工具封装"
 
@@ -31,13 +31,11 @@ Pod::Spec.new do |spec|
 
   spec.subspec 'TFY_PlayerTool' do |s|
     s.source_files  = "TFY_PlayerTools/TFY_PlayerToolsKit/TFY_PlayerTool/**/*.{h,m}"
-    s.public_header_files = "TFY_PlayerTools/TFY_PlayerToolsKit/TFY_PlayerTool/**/*.h"
   end
 
   spec.subspec 'TFY_PlayerView' do |s|
     s.dependency "TFY_PlayerToolsKit/TFY_PlayerTool"
     s.source_files  = "TFY_PlayerTools/TFY_PlayerToolsKit/TFY_PlayerView/**/*.{h,m}"
-    s.public_header_files = "TFY_PlayerTools/TFY_PlayerToolsKit/TFY_PlayerView/**/*.h"
   end
 
   spec.resources    = "TFY_PlayerTools/TFY_PlayerToolsKit/videoImages.bundle"
