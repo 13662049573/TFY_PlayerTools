@@ -91,7 +91,7 @@ NSDictionary *stats = [[TFY_PlayerPerformanceOptimizer sharedInstance] getPerfor
 
 #### CocoaPods (推荐)
 ```ruby
-pod 'TFY_PlayerTools', '~> 2.13.4'
+pod 'TFY_PlayerToolsKit', '~> 2.2.5'
 ```
 
 #### 手动集成
