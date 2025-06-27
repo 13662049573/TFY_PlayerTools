@@ -640,19 +640,8 @@
 
 - (UIView *)effectView {
     if (!_effectView) {
-        if (@available(iOS 8.0, *)) {
-            UIBlurEffect *effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
-            _effectView = [[UIVisualEffectView alloc] initWithEffect:effect];
-        } else {
-            UIToolbar *effectView = [[UIToolbar alloc] init];
-            if (@available(iOS 13.0, *)) {
-                effectView.barStyle = UIBarStyleBlack;
-                effectView.translucent = YES;
-            } else {
-                effectView.barStyle = UIBarStyleBlackTranslucent;
-            }
-            _effectView = effectView;
-        }
+        UIBlurEffect *effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+        _effectView = [[UIVisualEffectView alloc] initWithEffect:effect];
     }
     return _effectView;
 }
