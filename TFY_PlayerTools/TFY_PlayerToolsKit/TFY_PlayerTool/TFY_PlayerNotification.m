@@ -73,6 +73,12 @@
                                              selector:@selector(audioSessionInterruptionNotification:)
                                                  name:AVAudioSessionInterruptionNotification
                                                object:nil];
+    
+    // 监听锁屏事件 protectedDataWillBecomeUnavailableNotification
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(protectedDataWillNotification:)
+                                                 name:UIApplicationProtectedDataWillBecomeUnavailable
+                                               object:nil];
 }
 
 /**
@@ -85,6 +91,7 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self name:AVAudioSessionRouteChangeNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillResignActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationProtectedDataWillBecomeUnavailable object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"AVSystemController_SystemVolumeDidChangeNotification" object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:AVAudioSessionInterruptionNotification object:nil];
 }
@@ -228,6 +235,13 @@
     // 通过回调通知播放器音频中断事件
     if (self.audioInterruptionCallback) {
         self.audioInterruptionCallback(interruptionType);
+    }
+}
+
+- (void)protectedDataWillNotification:(NSNotification *)notification {
+    // 通知播放器应用即将进入后台
+    if (self.protectedDataWill) {
+        self.protectedDataWill(self);
     }
 }
 

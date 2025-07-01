@@ -117,7 +117,10 @@ NS_ASSUME_NONNULL_BEGIN
  * - 更新播放设置
  */
 @property (nonatomic, copy, nullable) void(^categoryChange)(TFY_PlayerNotification *registrar);
-
+/**
+ * 锁屏触发通知
+ */
+@property (nonatomic, copy, nullable) void(^protectedDataWill)(TFY_PlayerNotification *registrar);
 #pragma mark - 音量控制回调
 
 /**
