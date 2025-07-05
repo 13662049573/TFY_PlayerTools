@@ -374,9 +374,7 @@ static NSMutableDictionary <NSString* ,NSNumber *> *_tfyPlayRecords;
         };
         _notification.protectedDataWill = ^(TFY_PlayerNotification * _Nonnull registrar) {
             @player_strongify(self)
-            if (self.currentPlayerManager.isPlaying) {
-                [self.currentPlayerManager pause];
-            }
+            [self.currentPlayerManager pause];
         };
     }
     return _notification;
